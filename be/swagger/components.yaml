@@ -1,0 +1,167 @@
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: ObjectId
+        name:
+          type: string
+        email:
+          type: string
+        date_of_birth:
+          type: string
+          format: date-time
+        password:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        email_verify_token:
+          type: string
+        forgot_password_token:
+          type: string
+        verify:
+          $ref: "#/components/schemas/UserVerifyStatus"
+        address:
+          type: array
+          items:
+            type: string
+        username:
+          type: string
+        avatar:
+          type: string
+
+    UserProfile:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: ObjectId
+        name:
+          type: string
+        email:
+          type: string
+        date_of_birth:
+          type: string
+          format: date-time
+        verify:
+          $ref: "#/components/schemas/UserVerifyStatus"
+        address:
+          type: array
+          items:
+            type: string
+        username:
+          type: string
+        avatar:
+          type: string
+    LoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+          example: test@gmail.com
+        password:
+          type: string
+          example: Password123.
+      required:
+        - email
+        - password
+    RegisterBody:
+      type: object
+      properties:
+        email:
+          type: string
+          example: test@gmail.com
+        password:
+          type: string
+          example: Password123.
+        confirm_password:
+          type: string
+          example: Password123.
+        name:
+          type: string
+          example: Test User
+        username:
+          type: string
+          example: test123123
+    LogoutBody:
+      type: object
+      properties:
+        refresh_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjYyMTE5MzczNjgxMjg2MjY0ZDhjNmJkIiwidG9rZW5fdHlwZSI6MCwiaWF0IjoxNzE1NjE4MzY2LCJleHAiOjE3MTU2MTkyNjZ9.HaYhDhj-aIzWMeEEf5p0piyYOE7WmVKlUxh2vq0sF9o
+    EmailVerifyBody:
+      type: object
+      properties:
+        email_verify_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjYyMTE5MzczNjgxMjg2MjY0ZDhjNmJkIiwidG9rZW5fdHlwZSI6MCwiaWF0IjoxNzE1NjE4MzY2LCJleHAiOjE3MTU2MTkyNjZ9.HaYhDhj-aIzWMeEEf5p0piyYOE7WmVKlUxh2vq0sF9o
+    ForgotPasswordBody:
+      type: object
+      properties:
+        email:
+          type: string
+          example: test@gmail.com
+    ResetPasswordBody:
+      type: object
+      properties:
+        reset_password_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjYyMTE5MzczNjgxMjg2MjY0ZDhjNmJkIiwidG9rZW5fdHlwZSI6MCwiaWF0IjoxNzE1NjE4MzY2LCJleHAiOjE3MTU2MTkyNjZ9.HaYhDhj-aIzWMeEEf5p0piyYOE7WmVKlUxh2vq0sF9o
+        password:
+          type: string
+          example: Password123.
+        confirm_password:
+          type: string
+          example: Password123.
+    ChangePasswordBody:
+      type: object
+      properties:
+        old_password:
+          type: string
+          example: Password123.
+        password:
+          type: string
+          example: Password1234.
+        confirm_password:
+          type: string
+          example: Password1234.
+    UpdateProfileBody:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Test User
+        date_of_birth:
+          type: string
+          format: date
+          example: 1990-01-01
+        username:
+          type: string
+          example: test123123
+    GetUserProfileParams:
+      type: string
+      example: test123123
+
+    SuccessAuthentication:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjYyMTE5MzczNjgxMjg2MjY0ZDhjNmJkIiwidG9rZW5fdHlwZSI6MCwiaWF0IjoxNzE1NjE4MzY2LCJleHAiOjE3MTU2MTkyNjZ9.HaYhDhj-aIzWMeEEf5p0piyYOE7WmVKlUxh2vq0sF9o
+        refresh_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjYyMTE5MzczNjgxMjg2MjY0ZDhjNmJkIiwidG9rZW5fdHlwZSI6MCwiaWF0IjoxNzE1NjE4MzY2LCJleHAiOjE3MTU2MTkyNjZ9.HaYhDhj-aIzWMeEEf5p0piyYOE7WmVKlUxh2vq0sF9o
+  securitySchemes:
+    BearerAuth:
+      type: http
+      in: header
+      name: Authorization
+      description: Bearer token to access these api endpoints
+      scheme: bearer
+      bearerFormat: JWT
