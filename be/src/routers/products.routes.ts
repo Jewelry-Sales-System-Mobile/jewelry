@@ -1,7 +1,9 @@
 import { Router } from "express";
 import {
   ActiveProductController,
+  addImageToProductController,
   CreateProductController,
+  deleteProductImageController,
   GetAllProductsController,
   GetProductByIdController,
   InActiveProductController,
@@ -62,5 +64,31 @@ productsRouter.post(
   "/:product_id/inactive",
   accessTokenValidator,
   wrapRequestHandler(InActiveProductController)
+);
+
+/**
+ * Description: Add image to product
+ * Path: /:product_id/images
+ * Method: POST
+ * Header: { Authorization: Bearer <access_token> }
+ * Body: {address: string}
+ */
+productsRouter.post(
+  "/:product_id/images",
+  accessTokenValidator,
+  wrapRequestHandler(addImageToProductController)
+);
+
+/**
+ * Description: Delete Product Image
+ * Path: /product/:product_id
+ * Method: POST
+ * Header: { Authorization: Bearer <access_token> }
+ * Body: {address: string}
+ */
+productsRouter.put(
+  "/:product_id/images/delete",
+  accessTokenValidator,
+  wrapRequestHandler(deleteProductImageController)
 );
 export default productsRouter;

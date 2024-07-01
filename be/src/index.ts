@@ -10,9 +10,10 @@ import swaggerJsdoc from "swagger-jsdoc";
 import goldPricesRouter from "./routers/gold_prices.routes";
 import userService from "./services/users.services";
 import { config } from "dotenv";
+import { initFolder } from "./utils/file";
 
 config();
-
+initFolder();
 const options: swaggerJsdoc.Options = {
   definition: {
     openapi: "3.0.0",

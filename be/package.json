@@ -21,6 +21,8 @@
     "@types/swagger-ui-express": "^4.1.6",
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
+    "@types/minimist": "^1.2.5",
+    "@types/formidable": "^3.4.5",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
@@ -43,6 +45,16 @@
     "mongodb": "^6.5.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
-    "yaml": "^2.4.2"
+    "yaml": "^2.4.2",
+    "@aws-sdk/client-s3": "^3.374.0",
+    "@aws-sdk/client-ses": "^3.370.0",
+    "@aws-sdk/lib-storage": "^3.374.0",
+    "formidable": "^3.4.0",
+    "helmet": "^7.0.0",
+    "mime": "^3.0.0",
+    "minimist": "^1.2.8",
+    "nanoid": "^4.0.2",
+    "sharp": "^0.32.1",
+    "slash": "^5.1.0"
   }
 }

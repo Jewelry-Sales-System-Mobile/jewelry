@@ -74,3 +74,9 @@ export const COLLECTIONS_MESSAGES = {
   COLLECTION_NOT_FOUND: "Collection not found",
   DELETE_COLLECTION_SUCCESS: "Delete collection success",
 } as const;
+
+export const PRODUCTS_MESSAGES = {
+  PRODUCT_NOT_FOUND: "Product not found",
+  ADD_IMAGE_TO_PRODUCT_SUCCESS: "Add image to product success",
+  DELETE_IMAGE_SUCCESSFULLY: "Delete image successfully",
+};

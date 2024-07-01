@@ -8,3 +8,7 @@ export interface CreateProductReqBody {
 export interface ProductIdReqParams extends ParamsDictionary {
   product_id: string;
 }
+
+export interface DeleteProductImageReqBody {
+  url: string;
+}
