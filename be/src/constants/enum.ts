@@ -11,17 +11,12 @@ export enum TokenType {
   EmailVerifyToken,
 }
 
-export enum CollectionStatus {
-  Active,
-  Inactive,
-}
-
 export enum ProductStatus {
   Active,
   Inactive,
 }
 
 export enum Role {
-  Admin,
-  User,
+  Manager,
+  Staff,
 }

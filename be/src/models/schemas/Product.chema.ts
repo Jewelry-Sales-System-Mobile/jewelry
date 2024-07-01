@@ -7,47 +7,46 @@ type ProductImage = {
 };
 
 interface ProductType {
-  _id: ObjectId;
+  _id?: ObjectId;
   name: string;
-  price: number;
-  description: string;
-  colection_id: ObjectId;
+  barcode?: string;
+  productCode?: string;
+  weight: number;
+  image_url?: string;
+  laborCost?: number; // Tiền công (0.3% của giá vàng)
+  gemCost: number; // Tiền đá ???
+  basePrice?: number; // (latestGoldPrice * weight) + laborCost + gemCost
   created_at?: Date;
   updated_at?: Date;
-  images: ProductImage[];
-  width: number;
-  length: number;
-  color: string[];
   status: ProductStatus;
 }
 
 export default class Product {
-  _id: ObjectId;
+  _id?: ObjectId;
   name: string;
-  price: number;
-  description: string;
-  colection_id: ObjectId;
-  created_at: Date;
-  updated_at: Date;
-  images: ProductImage[];
-  width: number;
-  length: number;
-  color: string[];
+  barcode?: string;
+  productCode?: string;
+  weight: number;
+  image_url?: string;
+  laborCost?: number; // Tiền công
+  gemCost: number; // Tiền đá ???
+  basePrice?: number; // (latestGoldPrice * weight) + laborCost + gemCost
+  created_at?: Date;
+  updated_at?: Date;
   status: ProductStatus;
 
   constructor(product: ProductType) {
-    const date = new Date();
-    this._id = product._id;
-    this.name = product.name || "";
-    this.price = product.price || 0;
-    this.description = product.description || "";
-    this.colection_id = product.colection_id;
-    this.created_at = product.created_at || date;
-    this.updated_at = product.updated_at || date;
-    this.images = product.images || [];
-    this.width = product.width || 0;
-    this.length = product.length || 0;
-    this.color = product.color || [];
+    this._id = product._id || new ObjectId();
+    this.name = product.name;
+    this.barcode = product.barcode || "";
+    this.productCode = product.productCode || "";
+    this.image_url = product.image_url || "";
+    this.weight = product.weight;
+    this.laborCost = product.laborCost || 0;
+    this.gemCost = product.gemCost;
+    this.basePrice = product.basePrice || 0;
+    this.created_at = product.created_at || new Date();
+    this.updated_at = product.updated_at || new Date();
     this.status = product.status || ProductStatus.Active;
   }
 }

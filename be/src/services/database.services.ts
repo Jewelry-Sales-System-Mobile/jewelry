@@ -1,11 +1,12 @@
 import { MongoClient, ServerApiVersion, Db, Collection } from "mongodb";
 import { config } from "dotenv";
 import User from "~/models/schemas/User.schema";
-import RefreshToken from "~/models/schemas/RefreshToken.schema";
 import Product from "~/models/schemas/Product.chema";
+import { envConfig } from "~/constants/config";
+import GoldPrices from "~/models/schemas/GoldPrice.schema";
 config();
 
-const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@nghich.wlx2lor.mongodb.net/?retryWrites=true&w=majority&appName=nghich`;
+const uri = `mongodb+srv://${envConfig.dbUsername}:${envConfig.dbPassword}@jewelry.9tiipyy.mongodb.net/`;
 // const uri = `mongodb+srv://sontt:Son123456@nghich.wlx2lor.mongodb.net/?retryWrites=true&w=majority&appName=nghich`;
 
 class DatabaseService {
@@ -19,7 +20,7 @@ class DatabaseService {
         deprecationErrors: true,
       },
     });
-    this.db = this.client.db(process.env.DB_NAME);
+    this.db = this.client.db(envConfig.dbName);
   }
 
   async connect() {
@@ -38,8 +39,8 @@ class DatabaseService {
     return this.db.collection("users");
   }
 
-  get refreshTokens(): Collection<RefreshToken> {
-    return this.db.collection("refreshTokens");
+  get gold_prices(): Collection<GoldPrices> {
+    return this.db.collection("gold_prices");
   }
 
   get products(): Collection<Product> {

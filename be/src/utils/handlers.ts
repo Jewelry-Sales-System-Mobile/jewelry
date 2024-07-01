@@ -14,3 +14,11 @@ export const wrapRequestHandler = <P>(func: RequestHandler<P>) => {
     }
   };
 };
+
+export const getBangkokTime = () => {
+  // Create a date object for the current time
+  const now = new Date();
+  // Convert to UTC + 7 hours for Bangkok time
+  const bangkokTime = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+  return bangkokTime;
+};
