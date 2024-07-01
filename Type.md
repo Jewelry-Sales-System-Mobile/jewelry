@@ -32,7 +32,7 @@ interface ProductType {
   name: String;
   barcode: String;
   productCode: String;
-  weight: Number;
+  weight: Number; //Đơn vị là gram, 1 chỉ là 3.75 gram, 1 cây là 37.5gram
   laborCost: Number; // Tiền công
   gemCost: Number; // Tiền đá ???
   basePrice: Number; // (latestGoldPrice * weight) + laborCost + gemCost
