@@ -1,7 +1,7 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import CustomTabIcon from "src/components/Navigation";
+import CustomTabIcon from "../../components/Navigation";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import Welcome from "./Welcome";

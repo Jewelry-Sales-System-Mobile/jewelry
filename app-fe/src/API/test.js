@@ -1,6 +1,6 @@
 import { useQuery } from "react-query";
 import { API_ENDPOINTS } from "./api-endpoint";
-import http from "src/Utils/http";
+import http from "../Utils/http";
 
 const getProducts = async () => {
   const { data } = await http.get(API_ENDPOINTS.PRODUCT);

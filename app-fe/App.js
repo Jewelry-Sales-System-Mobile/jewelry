@@ -1,20 +1,23 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NativeWindStyleSheet } from "nativewind";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useEffect, useState } from "react";
+import { Text, View } from "react-native";
+import { QueryClient, QueryClientProvider } from "react-query";
+import Main from "./src/components/Main";
+import { setToken } from "./src/Utils/http";
+const Stack = createNativeStackNavigator();
+NativeWindStyleSheet.setOutput({
+  default: "native",
+});
+const queryClient = new QueryClient();
 
 export default function App() {
+  useEffect(() => {
+    setToken("hello ");
+  }, []);
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <QueryClientProvider client={queryClient}>
+      <Main />
+    </QueryClientProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

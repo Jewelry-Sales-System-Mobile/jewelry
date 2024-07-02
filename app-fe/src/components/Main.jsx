@@ -4,12 +4,12 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
-import StaffNavigation from "src/Screens/Staff/StaffNavigation";
-import UserNavigation from "src/Screens/User/UserNavigation";
-import { useGetProducts } from "src/API/test";
+import StaffNavigation from "../Screens/Staff/StaffNavigation";
+import UserNavigation from "../Screens/User/UserNavigation";
+import { useGetProducts } from "../API/test";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import AdminNavigation from "src/Screens/Admin/AdminNavigation";
-import GuestNavigation from "src/Screens/Guest/GuestNavigation";
+import AdminNavigation from "../Screens/Admin/AdminNavigation";
+import GuestNavigation from "../Screens/Guest/GuestNavigation";
 
 const Stack = createNativeStackNavigator();
 NativeWindStyleSheet.setOutput({
