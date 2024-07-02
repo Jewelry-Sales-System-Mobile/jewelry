@@ -1,18 +1,48 @@
-# jewelry
+# React Native Web Template
 
-Phần mềm quản lý bán hàng trang sức cho công ty kinh doanh trang sức tại 01 cửa hàng có nhiều quầy hàng
+A React Native Web template set up with Expo and configured with NativeWind for styling.
 
-- Quản lý tạo lập đơn hàng bán tại quầy của khách và in hoá đơn bán hàng. Các mặt hàng được nhập bằng quét barcode hoặc nhập trực tiếp mã hàng vào chương trình. Chương trình hỗ trợ in phiếu bảo hành với các mặt hàng trang sức.
-  << Giá bán = giá vốn sản phẩm _ tỉ lệ áp giá, Giá vốn sản phẩm = [giá vàng thời điểm _ trọng lượng sản phẩm] + tiền công + tiền đá >>
-- Quản lý chương trình khuyến mãi của công ty khi bán hàng. Khách còn được hưởng thêm chính sách ưu đãi dành riêng cho khách hàng, đối với trường hợp này phải được xác nhận của quản lý thì nhân viên bán hàng mới ghi nhận chiết khấu cho khách hàng.
-  << Chiếu khấu hoá đơn = chiếu khấu trong kỳ khuyến mãi công ty (nếu có) + chiếu khấu do chính sách ưu đãi cho khách hàng ( nếu có) >>
-- Quản lý mua lại hàng của khách hàng tại quầy và in hóa đơn mua hàng. Đối với mua lại hàng đã bán, công ty sẽ có chính sách ưu đãi giá. Chương trình hỗ trợ tìm lại hoá đơn bán hàng của khách hàng.
-  << Đối với nữ trang + đá thường: quầy hàng chỉ mua lại phần vàng thực tế
-  Đối với đá quý thì cửa hàng mua lại với giá được khai báo trong hệ thống (VD: 70% giá đã bán)
-  Giá vàng mua vào theo bảng giá thời điểm >>
-- Chức năng hiển thị bảng giá vàng trên các thiết bị ti vi tại cửa hàng.
-- Quản lý tích lũy điểm cho khách hàng.
-- Quản lý nhân viên bán cho từng quầy, quản lý doanh thu của quầy và từng nhân viên.
-- Khai báo chính sách đổi trả trang sức.
-- Khai báo các sản phẩm có trong quầy hàng, bảng giá hàng hóa, ...
-- Dashboard thống kê.
+## Libraries Used
+- Expo
+- React Native Web
+- NativeWind
+
+## Instructions
+
+### Setting up a Development Environment
+
+Install all the required dependencies with the following command.
+```
+npm install
+```
+Start a development server with the following command.
+```
+npm start
+```
+Following the on-screen instructions, press "w" to open the app on the web.
+
+To open the app on mobile, ensure your mobile has the Expo Go app installed and is connected to the same local network as the computer, then scan the QR code shown with the Expo Go app (Android) or the Camera App (iOS).
+
+### Creating a Web App Build
+
+Create a web app build with the following command.
+```
+npx expo export:web
+```
+This creates a production-ready static bundle in the web-build directory at the root of the project.
+
+Serve the static bundle locally with the following command.
+```
+npx serve web-build
+```
+Follow the on-screen instructions to test locally how the app works in production.
+
+Read [here](https://docs.expo.dev/distribution/publishing-websites/) for more documentation on creating web apps with Expo.
+
+### Notes on Importing Files
+
+Use absolute imports when importing files, instead of relative paths,
+
+The babel module resolver plugin and TypeScript path mapping has been setup so that absolute imports can be used when importing files. This prevents long relative paths and makes the code more clean and readable. 
+
+This is inspired by the Obytes Starter, a production-ready React Native template. Read [here](https://starter.obytes.com/docs/getting-started/project-structure#importing-files) for more about why and how they setup the absolute imports.
