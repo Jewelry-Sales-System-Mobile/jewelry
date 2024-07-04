@@ -11,6 +11,7 @@ import goldPricesRouter from "./routers/gold_prices.routes";
 import userService from "./services/users.services";
 import { config } from "dotenv";
 import { initFolder } from "./utils/file";
+import counterRouter from "./routers/counter.routes";
 
 config();
 initFolder();
@@ -40,6 +41,7 @@ app.use("/users", usersRouter);
 app.use("/products", productsRouter);
 app.use("/orders", ordersRouter);
 app.use("/gold-prices", goldPricesRouter);
+app.use("/counters", counterRouter);
 
 app.use(defaultErrorHandler);
 

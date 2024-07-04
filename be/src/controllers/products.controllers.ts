@@ -92,7 +92,6 @@ export const deleteProductImageController = async (
 ) => {
   const { product_id } = req.params;
   const { url } = req.body;
-  console.log("req", req);
 
   const product = await productServices.deleteProductImage(product_id, url);
   return res.json({

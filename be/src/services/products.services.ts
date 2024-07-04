@@ -28,11 +28,12 @@ class ProductServices {
   }
 
   generateRandomCode(length: number) {
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const numbers = "0123456789";
     let result = "PD"; // Start with PD
-    const charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    const numbersLength = numbers.length;
+    for (let i = 0; i < 6; i++) {
+      // Generate 6 random numeric characters
+      result += numbers.charAt(Math.floor(Math.random() * numbersLength));
     }
     return result;
   }
@@ -165,7 +166,6 @@ class ProductServices {
         HTTP_STATUS.NOT_FOUND
       );
     }
-    console.log(url);
 
     const filename = url.split("/").pop();
     await deleteFileFromS3(filename as string);

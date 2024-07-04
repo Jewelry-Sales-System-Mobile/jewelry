@@ -4,10 +4,10 @@ import User from "~/models/schemas/User.schema";
 import Product from "~/models/schemas/Product.chema";
 import { envConfig } from "~/constants/config";
 import GoldPrices from "~/models/schemas/GoldPrice.schema";
+import Counter from "~/models/schemas/Counters";
 config();
 
 const uri = `mongodb+srv://${envConfig.dbUsername}:${envConfig.dbPassword}@jewelry.9tiipyy.mongodb.net/`;
-// const uri = `mongodb+srv://sontt:Son123456@nghich.wlx2lor.mongodb.net/?retryWrites=true&w=majority&appName=nghich`;
 
 class DatabaseService {
   private client: MongoClient;
@@ -45,6 +45,10 @@ class DatabaseService {
 
   get products(): Collection<Product> {
     return this.db.collection("products");
+  }
+
+  get counters(): Collection<Counter> {
+    return this.db.collection("counters");
   }
 }
 

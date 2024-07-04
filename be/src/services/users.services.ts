@@ -60,7 +60,6 @@ class UserService {
         updated_at: getBangkokTime(),
       })
     );
-    console.log(getBangkokTime());
 
     const access_token = await this.signAccessToken({
       user_id: user_id.toString(),
