@@ -5,6 +5,7 @@ import CustomTabIcon from "../../components/Navigation";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import Welcome from "./Welcome";
+import SwitchRole from "../../components/SwitchRole";
 
 const Tab = createBottomTabNavigator();
 
@@ -42,6 +43,11 @@ export default function GuestNavigation({ navigation }) {
       <Tab.Screen
         name="Sign Up"
         component={SignUp}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Switch Role"
+        component={SwitchRole}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>
