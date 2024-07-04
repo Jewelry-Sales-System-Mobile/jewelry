@@ -5,6 +5,7 @@ import CustomTabIcon from "../../components/Navigation";
 import ManageTask from "./ManageTask";
 import ManageProduct from "./ManageProduct";
 import AccountSetting from "../AccountSetting";
+import SwitchRole from "../../components/SwitchRole";
 
 const Tab = createBottomTabNavigator();
 
@@ -36,6 +37,11 @@ export default function StaffNavigation({ navigation }) {
       <Tab.Screen
         name="Setting"
         component={AccountSetting}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Switch Role"
+        component={SwitchRole}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>

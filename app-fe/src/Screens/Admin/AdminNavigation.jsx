@@ -6,6 +6,7 @@ import ManageProduct from "./ManageProduct";
 import ManageStaff from "./ManageStaff";
 import ManageOrder from "./ManageOrder";
 import AccountSetting from "../AccountSetting";
+import SwitchRole from "../../components/SwitchRole";
 
 const Tab = createBottomTabNavigator();
 
@@ -50,6 +51,11 @@ export default function AdminNavigation({ navigation }) {
       <Tab.Screen
         name="Setting"
         component={AccountSetting}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Switch Role"
+        component={SwitchRole}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>
