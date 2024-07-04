@@ -6,6 +6,7 @@ import Product from "../Product";
 import Favourite from "./Favourite";
 import ManageCart from "./ManageCart";
 import AccountSetting from "../AccountSetting";
+import SwitchRole from "../../components/SwitchRole";
 
 const Tab = createBottomTabNavigator();
 
@@ -57,6 +58,11 @@ export default function UserNavigation({ navigation }) {
       <Tab.Screen
         name="Setting"
         component={AccountSetting}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Switch Role"
+        component={SwitchRole}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>

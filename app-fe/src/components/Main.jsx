@@ -10,6 +10,7 @@ import { useGetProducts } from "../API/test";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AdminNavigation from "../Screens/Admin/AdminNavigation";
 import GuestNavigation from "../Screens/Guest/GuestNavigation";
+import { useRoleStore } from "../Zustand/Role";
 
 const Stack = createNativeStackNavigator();
 NativeWindStyleSheet.setOutput({
@@ -17,9 +18,10 @@ NativeWindStyleSheet.setOutput({
 });
 
 export default function Main() {
-  const [isSignedIn, setIsSignedIn] = useState(true);
-  const [role, setRole] = useState(0); // 0: admin, 1: staff , 2: user
-  const [token, setToken] = useState(null); // Initialize token state
+  // const [isSignedIn, setIsSignedIn] = useState(true);
+  // const [role, setRole] = useState(0); // 0: admin, 1: staff , 2: user
+  const { role, isSignedIn, token, setRole, setIsSignedIn, setToken } =
+    useRoleStore();
   const { data: products, isLoading, error } = useGetProducts();
   console.log(products, "products");
 
@@ -40,7 +42,7 @@ export default function Main() {
       className=" w-full h-full  bg-white"
       style={{ backgroundColor: "white" }}
     >
-      <View className="flex flex-row ">
+      {/* <View className="flex flex-row ">
         <Text
           onPress={() => setRole(0)}
           className="w-1/4 cursor-pointer text-blue-500"
@@ -68,7 +70,7 @@ export default function Main() {
         <Text onPress={() => setToken("123456")} className="cursor-pointer">
           Set {token} Token
         </Text>
-      </View>
+      </View> */}
       <NavigationContainer>
         <View className="w-full h-full">
           <Stack.Navigator screenOptions={{ headerShown: false }}>
