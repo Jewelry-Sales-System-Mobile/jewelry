@@ -12,6 +12,7 @@ import userService from "./services/users.services";
 import { config } from "dotenv";
 import { initFolder } from "./utils/file";
 import counterRouter from "./routers/counter.routes";
+import customerRouter from "./routers/customers.routes";
 
 config();
 initFolder();
@@ -42,6 +43,8 @@ app.use("/products", productsRouter);
 app.use("/orders", ordersRouter);
 app.use("/gold-prices", goldPricesRouter);
 app.use("/counters", counterRouter);
+app.use("/customers", customerRouter);
+app.use("/orders", ordersRouter);
 
 app.use(defaultErrorHandler);
 

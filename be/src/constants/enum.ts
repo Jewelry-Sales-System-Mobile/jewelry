@@ -20,3 +20,9 @@ export enum Role {
   Manager,
   Staff,
 }
+
+export enum PaymentStatus {
+  Pending,
+  Paid,
+  Cancelled,
+}
