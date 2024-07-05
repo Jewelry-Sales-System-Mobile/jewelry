@@ -3,6 +3,7 @@ import { ParamsDictionary } from "express-serve-static-core";
 import {
   CreateCustomerReqBody,
   CustomerIdReqParams,
+  UpdateCustomerReqBody,
 } from "~/models/requests/Customers.requests";
 import customerServices from "~/services/customers.services";
 
@@ -39,6 +40,19 @@ export const createCustomerController = async (
   const customer = await customerServices.createCustomer(req.body);
   return res.json({
     message: "Create customer successfully",
+    data: customer,
+  });
+};
+
+export const updateCustomerController = async (
+  req: Request<CustomerIdReqParams, any, UpdateCustomerReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { customer_id } = req.params;
+  const customer = await customerServices.updateCustomer(customer_id, req.body);
+  return res.json({
+    message: "Update customer successfully",
     data: customer,
   });
 };

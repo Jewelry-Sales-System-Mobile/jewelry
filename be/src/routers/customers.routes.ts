@@ -3,8 +3,11 @@ import {
   createCustomerController,
   getAllCustomersController,
   getCustomerByIdController,
+  updateCustomerController,
 } from "~/controllers/customers.controllers";
+import { filterMiddleware } from "~/middlewares/common.middlewares";
 import { accessTokenValidator } from "~/middlewares/users.middlewares";
+import { UpdateCustomerReqBody } from "~/models/requests/Customers.requests";
 import { wrapRequestHandler } from "~/utils/handlers";
 
 const customerRouter = Router();
@@ -41,6 +44,19 @@ customerRouter.post(
   "/",
   accessTokenValidator,
   wrapRequestHandler(createCustomerController)
+);
+
+/**
+ * Description: Update customer by ID
+ * Route: PUT /customers/:customer_id
+ * Authentication: Bearer token
+ * Body: UpdateCustomerReqBody
+ */
+customerRouter.put(
+  "/:customer_id",
+  accessTokenValidator,
+  filterMiddleware<UpdateCustomerReqBody>(["dob", "email", "name", "phone"]),
+  wrapRequestHandler(updateCustomerController)
 );
 
 /** */

@@ -6,6 +6,13 @@ export interface CustomerIdReqParams extends ParamsDictionary {
 export interface CreateCustomerReqBody {
   name: string;
   phone: string;
-  dob: Date;
+  dob: string;
   email: string;
+}
+
+export interface UpdateCustomerReqBody {
+  name?: string;
+  phone?: string;
+  dob?: string;
+  email?: string;
 }

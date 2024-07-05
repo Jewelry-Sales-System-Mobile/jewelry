@@ -63,6 +63,8 @@ export const USERS_MESSAGES = {
   GET_MY_ADDRESS_SUCCESS: "Get address success",
   YOU_DONT_HAVE_PERMISSION:
     "You don't have permission to do this action. Just admin can do this",
+  ACTIVE_USER_SUCCESS: "Active user success",
+  INACTIVE_USER_SUCCESS: "Inactive user success",
 } as const;
 
 export const COLLECTIONS_MESSAGES = {

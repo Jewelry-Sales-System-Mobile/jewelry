@@ -8,7 +8,6 @@ import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import goldPricesRouter from "./routers/gold_prices.routes";
-import userService from "./services/users.services";
 import { config } from "dotenv";
 import { initFolder } from "./utils/file";
 import counterRouter from "./routers/counter.routes";
