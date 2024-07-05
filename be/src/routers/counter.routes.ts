@@ -6,6 +6,7 @@ import {
   getAllCountersController,
   getCounterByIdController,
   unAssignEmployeeToCounterController,
+  updateCounterNameController,
 } from "~/controllers/counters.controllers";
 import { accessTokenValidator } from "~/middlewares/users.middlewares";
 import { wrapRequestHandler } from "~/utils/handlers";
@@ -78,6 +79,17 @@ counterRouter.delete(
   "/:counter_id/unassign",
   accessTokenValidator,
   wrapRequestHandler(unAssignEmployeeToCounterController)
+);
+
+/**
+ * Description: Update counter name
+ * Route: PUT /counters/:counter_id
+ * Request body: { counter_name: string }
+ */
+counterRouter.put(
+  "/:counter_id",
+  accessTokenValidator,
+  wrapRequestHandler(updateCounterNameController)
 );
 
 export default counterRouter;
