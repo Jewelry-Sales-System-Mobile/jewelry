@@ -57,3 +57,29 @@ export const createOrderController = async (
     data: order,
   });
 };
+
+export const confirmOrderController = async (
+  req: Request<OrderIdReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { order_id } = req.params;
+  const order = await orderServices.confirmOrder(order_id);
+  return res.json({
+    message: "Confirm order successfully",
+    data: order,
+  });
+};
+
+export const cancelOrderController = async (
+  req: Request<OrderIdReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { order_id } = req.params;
+  const order = await orderServices.cancelOrder(order_id);
+  return res.json({
+    message: "Cancel order successfully",
+    data: order,
+  });
+};

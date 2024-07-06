@@ -1,5 +1,7 @@
 import { Router } from "express";
 import {
+  cancelOrderController,
+  confirmOrderController,
   createOrderController,
   getAllOrdersController,
   getOrderByIdController,
@@ -55,4 +57,25 @@ ordersRouter.post(
   wrapRequestHandler(createOrderController)
 );
 
+/**
+ * Description: Confirm order
+ * Route: PUT /orders/:order_id/confirm
+ * Authentication: Bearer token
+ */
+ordersRouter.put(
+  "/:order_id/confirm",
+  accessTokenValidator,
+  wrapRequestHandler(confirmOrderController)
+);
+
+/**
+ * Description: Cancel order
+ * Route: PUT /orders/:order_id/cancel
+ * Authentication: Bearer token
+ */
+ordersRouter.put(
+  "/:order_id/cancel",
+  accessTokenValidator,
+  wrapRequestHandler(cancelOrderController)
+);
 export default ordersRouter;
