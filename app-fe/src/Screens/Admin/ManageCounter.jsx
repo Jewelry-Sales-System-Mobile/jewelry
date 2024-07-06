@@ -1,10 +1,12 @@
 import { View ,Text} from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SearchBar } from "@rneui/themed";
 import { tailwind } from "nativewind";
 import CounterCard from "../../components/Counter/CounterCard";
 import { useGetCounters } from "../../API/counter";
+import { API_ENDPOINTS } from "../../API/api-endpoint";
+import axios from "axios";
 
 export default function ManageCounter() {
   const { data, isLoading, error } = useGetCounters();
@@ -16,7 +18,10 @@ export default function ManageCounter() {
     setSearch(search);
   };
 
-  if (isLoading) {
+  const [counter, setCounter] = useState([])
+
+
+ if (isLoading) {
     return <View><Text>Loading...</Text></View>;
   }
 
