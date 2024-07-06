@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { PaymentStatus } from "~/constants/enum";
 
-interface OrderDetail {
+export interface OrderDetail {
   productId: ObjectId; // reference to Products collection
   quantity: number;
   unitPrice: number;
@@ -10,7 +10,8 @@ interface OrderDetail {
 interface OrderType {
   _id?: ObjectId;
   customer_id: ObjectId; // reference to Customers collection
-  products: OrderDetail[];
+  order_details: OrderDetail[];
+  order_code?: string;
   subtotal: number;
   discount: number;
   total: number;
@@ -22,7 +23,8 @@ interface OrderType {
 export default class Order {
   _id?: ObjectId;
   customer_id: ObjectId;
-  products: OrderDetail[];
+  order_details: OrderDetail[];
+  order_code?: string;
   subtotal: number;
   discount: number;
   total: number;
@@ -34,7 +36,8 @@ export default class Order {
     const date = new Date();
     this._id = order._id || new ObjectId();
     this.customer_id = order.customer_id;
-    this.products = order.products;
+    this.order_details = order.order_details;
+    this.order_code = order.order_code || "";
     this.subtotal = order.subtotal;
     this.discount = order.discount;
     this.total = order.total;

@@ -6,7 +6,7 @@ import { envConfig } from "~/constants/config";
 import GoldPrices from "~/models/schemas/GoldPrice.schema";
 import Counter from "~/models/schemas/Counters";
 import Customer from "~/models/schemas/Customers";
-import Order from "~/models/schemas/Orders";
+import Order from "~/models/schemas/Orders.schema";
 config();
 
 const uri = `mongodb+srv://${envConfig.dbUsername}:${envConfig.dbPassword}@jewelry.9tiipyy.mongodb.net/`;
