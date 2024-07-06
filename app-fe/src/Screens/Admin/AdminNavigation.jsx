@@ -7,6 +7,8 @@ import ManageStaff from "./ManageStaff";
 import ManageOrder from "./ManageOrder";
 import AccountSetting from "../AccountSetting";
 import SwitchRole from "../../components/SwitchRole";
+import ManageCounter from "./ManageCounter";
+import { Text } from "react-native";
 
 const Tab = createBottomTabNavigator();
 
@@ -16,8 +18,8 @@ export default function AdminNavigation({ navigation }) {
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
-          if (route.name === "Favourite") {
-            iconName = focused ? "heart" : "heart-outline";
+          if (route.name === "Quầy hàng") {
+            iconName = focused ? "file-tray-sharp" : "file-tray-outline";
             return <CustomTabIcon name={iconName} color={color} size={20} />;
           } else if (route.name === "Auth") {
             iconName = focused ? "person" : "person-outline";
@@ -32,6 +34,14 @@ export default function AdminNavigation({ navigation }) {
         tabBarActiveBackgroundColor: "white",
       })}
     >
+      <Tab.Screen
+        name="Quầy hàng"
+        component={ManageCounter}
+        options={{ headerShown: true ,
+          headerTitleAlign: "center",
+          headerTitle: () => <Text className="text-lg font-medium">Quản lý quầy hàng</Text>
+        }}
+      />
       <Tab.Screen
         name="Order"
         component={ManageOrder}
