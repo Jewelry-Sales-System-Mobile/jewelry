@@ -31,7 +31,6 @@ const openapiSpecification = swaggerJsdoc(options);
 const app = express();
 const port = 4000;
 databaseService.connect();
-
 app.use(cors());
 
 app.use(express.json());
