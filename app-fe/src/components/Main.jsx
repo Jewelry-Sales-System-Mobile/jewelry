@@ -11,6 +11,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import AdminNavigation from "../Screens/Admin/AdminNavigation";
 import GuestNavigation from "../Screens/Guest/GuestNavigation";
 import { useRoleStore } from "../Zustand/Role";
+import axios from "axios";
 
 const Stack = createNativeStackNavigator();
 NativeWindStyleSheet.setOutput({
@@ -36,6 +37,24 @@ export default function Main() {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get("http://localhost:4000/products", {
+          headers: {
+            "Content-Type": "application/json",
+            // Replace 'your_token_here' with the variable that holds your token
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjY4M2YxZGI4NmIzNDRjNWMwZWUwMTk4IiwidG9rZW5fdHlwZSI6MCwidmVyaWZ5IjoxLCJyb2xlIjoxLCJpYXQiOjE3MjAyNTQ4NjMsImV4cCI6MTcyMDM0MTI2M30.h1J-92IDZSLzCU93J59QMGTGZRA_bSkiMzOxDZw4pAY`,
+          },
+        });
+        console.log(response.data, "response");
+      } catch (error) {
+        console.error("There was an error fetching the products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
   console.log("token", token); // This will log the token value
   return (
     <View

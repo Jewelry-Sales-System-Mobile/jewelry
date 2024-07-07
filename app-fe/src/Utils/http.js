@@ -17,7 +17,9 @@ http.interceptors.request.use(
   async (config) => {
     const token = await AsyncStorage.getItem("auth_token");
     if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+      config.headers[
+        "Authorization"
+      ] = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjY4M2YxZGI4NmIzNDRjNWMwZWUwMTk4IiwidG9rZW5fdHlwZSI6MCwidmVyaWZ5IjoxLCJyb2xlIjoxLCJpYXQiOjE3MjAyNTI4MjksImV4cCI6MTcyMDMzOTIyOX0.Y3agAgFSPrT4xH2GoMEA-mB-DspsGybWtC06rEls-1M`;
     }
     return config;
   },
