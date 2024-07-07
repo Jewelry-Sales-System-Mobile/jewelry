@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { QueryClient, QueryClientProvider } from "react-query";
 import Main from "src/components/Main";
-import { setToken } from "src/Utils/http";
 const Stack = createNativeStackNavigator();
 NativeWindStyleSheet.setOutput({
   default: "native",
@@ -12,9 +11,6 @@ NativeWindStyleSheet.setOutput({
 const queryClient = new QueryClient();
 
 export default function App() {
-  useEffect(() => {
-    setToken("hello ");
-  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <Main />

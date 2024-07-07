@@ -11,6 +11,9 @@ import AdminNavigation from "../Screens/Admin/AdminNavigation";
 import GuestNavigation from "../Screens/Guest/GuestNavigation";
 import { useRoleStore } from "../Zustand/Role";
 import axios from "axios";
+import SignIn from "../Screens/Guest/SignIn";
+import { getToken } from "../Utils/http";
+import { jwtDecode } from "jwt-decode";
 
 const Stack = createNativeStackNavigator();
 NativeWindStyleSheet.setOutput({
@@ -20,8 +23,7 @@ NativeWindStyleSheet.setOutput({
 export default function Main() {
   // const [isSignedIn, setIsSignedIn] = useState(true);
   // const [role, setRole] = useState(0); // 0: admin, 1: staff , 2: user
-  const { role, isSignedIn, token, setRole, setIsSignedIn, setToken } =
-    useRoleStore();
+  const { role, isSignedIn, setRole, setIsSignedIn, setToken } = useRoleStore();
   // const { data: products, isLoading, error } = useGetProducts();
   // console.log(products, "products");
 
@@ -37,23 +39,25 @@ export default function Main() {
   }, []);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get("http://localhost:4000/products", {
-          headers: {
-            "Content-Type": "application/json",
-            // Replace 'your_token_here' with the variable that holds your token
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjY4M2YxZGI4NmIzNDRjNWMwZWUwMTk4IiwidG9rZW5fdHlwZSI6MCwidmVyaWZ5IjoxLCJyb2xlIjoxLCJpYXQiOjE3MjAyNTQ4NjMsImV4cCI6MTcyMDM0MTI2M30.h1J-92IDZSLzCU93J59QMGTGZRA_bSkiMzOxDZw4pAY`,
-          },
-        });
-        console.log(response.data, "response");
-      } catch (error) {
-        console.error("There was an error fetching the products:", error);
+    const fetchToken = async () => {
+      const token = await getToken();
+      if (token) {
+        decodeToken = jwtDecode(token);
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        console.log("check exp", decodeToken.exp, currentTime);
+        if (currentTime < token.exp) {
+          setRole(decodeToken.role);
+        } else {
+          window.location.href = "/";
+          // Cookies.remove("auth_token");
+          // logout();
+        }
       }
     };
 
-    fetchProducts();
-  }, []);
+    fetchToken();
+  }, [getToken()]);
   console.log("token", token); // This will log the token value
   return (
     <View
@@ -93,35 +97,19 @@ export default function Main() {
         <View className="w-full h-full">
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             {isSignedIn ? (
-              (() => {
-                switch (role) {
-                  case 0:
-                    return (
-                      <Stack.Screen
-                        name="UserNavigate"
-                        component={UserNavigation}
-                      />
-                    );
-                  case 1:
-                    return (
-                      <Stack.Screen
-                        name="StaffNavigate"
-                        component={StaffNavigation}
-                      />
-                    );
-                  case 2:
-                    return (
-                      <Stack.Screen
-                        name="AdminNavigate"
-                        component={AdminNavigation}
-                      />
-                    );
-                  default:
-                    return null;
-                }
-              })()
+              // Screens to show when the user is signed in
+              <>
+                <Stack.Screen name="Guest" component={GuestNavigation} />
+                {/* Add more screens for signed in users here */}
+              </>
             ) : (
-              <Stack.Screen name="Guest" component={GuestNavigation} />
+              // Screens to show when the user is not signed in
+              <>
+                <Stack.Screen name="SignIn" component={SignIn} />
+                {/* <Stack.Screen name="Guest" component={GuestNavigation} /> */}
+
+                {/* Add more screens for not signed in users here */}
+              </>
             )}
           </Stack.Navigator>
         </View>
