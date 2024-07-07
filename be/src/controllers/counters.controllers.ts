@@ -2,6 +2,7 @@ import {
   counterIdReqParams,
   createCounterReqBody,
   employeeIdReqBody,
+  updateCounterNameReqBody,
 } from "./../models/requests/Counters.request";
 import { NextFunction, Request, Response } from "express";
 import { ParamsDictionary } from "express-serve-static-core";
@@ -88,6 +89,23 @@ export const unAssignEmployeeToCounterController = async (
   );
   return res.json({
     message: "Assign employee to counter success",
+    data: counter,
+  });
+};
+
+export const updateCounterNameController = async (
+  req: Request<counterIdReqParams, any, updateCounterNameReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { counter_id } = req.params;
+  const { counter_name } = req.body;
+  const counter = await counterServices.updateCounterName(
+    counter_id,
+    counter_name
+  );
+  return res.json({
+    message: "Update counter name success",
     data: counter,
   });
 };

@@ -2,7 +2,9 @@ import { changePasswordValidator } from "./../middlewares/users.middlewares";
 import { wrapRequestHandler } from "./../utils/handlers";
 import { Router } from "express";
 import {
+  activeUserController,
   changePassWordController,
+  inactiveUserController,
   loginController,
   registerController,
 } from "~/controllers/users.controllers";
@@ -48,6 +50,26 @@ usersRouter.put(
   accessTokenValidator,
   changePasswordValidator,
   wrapRequestHandler(changePassWordController)
+);
+
+/**
+ * Description: Active User
+ * Route: [PUT] /users/:user_id/active
+ */
+usersRouter.put(
+  "/:user_id/active",
+  accessTokenValidator,
+  wrapRequestHandler(activeUserController)
+);
+
+/**
+ * Description: Inactive User
+ * Route: [PUT] /users/:user_id/active
+ */
+usersRouter.put(
+  "/:user_id/inactive",
+  accessTokenValidator,
+  wrapRequestHandler(inactiveUserController)
 );
 
 // /**

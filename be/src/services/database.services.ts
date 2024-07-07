@@ -5,6 +5,8 @@ import Product from "~/models/schemas/Product.chema";
 import { envConfig } from "~/constants/config";
 import GoldPrices from "~/models/schemas/GoldPrice.schema";
 import Counter from "~/models/schemas/Counters";
+import Customer from "~/models/schemas/Customers";
+import Order from "~/models/schemas/Orders.schema";
 config();
 
 const uri = `mongodb+srv://${envConfig.dbUsername}:${envConfig.dbPassword}@jewelry.9tiipyy.mongodb.net/`;
@@ -49,6 +51,14 @@ class DatabaseService {
 
   get counters(): Collection<Counter> {
     return this.db.collection("counters");
+  }
+
+  get customers(): Collection<Customer> {
+    return this.db.collection("customers");
+  }
+
+  get orders(): Collection<Order> {
+    return this.db.collection("orders");
   }
 }
 

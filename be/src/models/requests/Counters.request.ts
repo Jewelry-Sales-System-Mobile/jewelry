@@ -11,3 +11,7 @@ export interface counterIdReqParams extends ParamsDictionary {
 export interface employeeIdReqBody {
   employee_id: string;
 }
+
+export interface updateCounterNameReqBody {
+  counter_name: string;
+}

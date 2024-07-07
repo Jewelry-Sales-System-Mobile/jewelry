@@ -1,4 +1,4 @@
-import { View ,Text} from "react-native";
+import { View, Text } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SearchBar } from "@rneui/themed";
@@ -14,15 +14,21 @@ export default function ManageCounter() {
     setSearch(search);
   };
 
-  
-
- if (isLoading) {
-    return <View><Text>Loading...</Text></View>;
+  if (isLoading) {
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
   }
 
   if (error) {
-    console.error('Error loading counters:', error);
-    return <View><Text>Error loading data: {error.message}</Text></View>;
+    console.error("Error loading counters:", error);
+    return (
+      <View>
+        <Text>Error loading data: {error.message}</Text>
+      </View>
+    );
   }
 
   return (
@@ -37,7 +43,7 @@ export default function ManageCounter() {
             inputContainerStyle='bg-white rounded-xl'
           /> */}
         </View>
-        <CounterCard counters={data}/>
+        <CounterCard counters={data} />
       </View>
     </SafeAreaView>
   );

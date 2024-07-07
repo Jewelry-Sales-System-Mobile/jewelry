@@ -22,9 +22,13 @@ class CounterServices {
   }
 
   async getCounterById(counter_id: string) {
-    return await databaseService.counters.findOne({
+    const counter = await databaseService.counters.findOne({
       _id: new ObjectId(counter_id),
     });
+    if (!counter) {
+      throw new ErrorWithStatus("Counter not found", HTTP_STATUS.NOT_FOUND);
+    }
+    return counter;
   }
 
   async deleteCounterById(counter_id: string) {
@@ -114,6 +118,28 @@ class CounterServices {
       },
       { returnDocument: "after" }
     );
+    return updatedCounter;
+  }
+  async updateCounterName(counter_id: string, name: string) {
+    const counter = await databaseService.counters.findOne({
+      _id: new ObjectId(counter_id),
+    });
+
+    if (!counter) {
+      throw new ErrorWithStatus("Counter not found", HTTP_STATUS.NOT_FOUND);
+    }
+
+    const updatedCounter = await databaseService.counters.findOneAndUpdate(
+      { _id: new ObjectId(counter_id) },
+      {
+        $set: {
+          counter_name: name,
+        },
+        $currentDate: { updated_at: true },
+      },
+      { returnDocument: "after" }
+    );
+
     return updatedCounter;
   }
 }

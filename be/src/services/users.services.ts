@@ -220,6 +220,40 @@ class UserService {
     }
     return user;
   }
+
+  async activeUser(user_id: string) {
+    const user = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          verify: UserVerifyStatus.Verified,
+        },
+        $currentDate: { updated_at: true },
+      },
+      {
+        returnDocument: "after",
+        projection: projection,
+      }
+    );
+    return user;
+  }
+
+  async inactiveUser(user_id: string) {
+    const user = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          verify: UserVerifyStatus.Unverified,
+        },
+        $currentDate: { updated_at: true },
+      },
+      {
+        returnDocument: "after",
+        projection: projection,
+      }
+    );
+    return user;
+  }
 }
 
 const userService = new UserService();

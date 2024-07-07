@@ -6,10 +6,9 @@ import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import StaffNavigation from "../Screens/Staff/StaffNavigation";
 import UserNavigation from "../Screens/User/UserNavigation";
-import { useGetProducts } from "../API/test";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AdminNavigation from "../Screens/Admin/AdminNavigation";
-import GuestNavigation from "../Screens/Guest/GuestNavigation";
+import GuestNavigation from "../navigation/GuestNavigation";
 import { useRoleStore } from "../Zustand/Role";
 
 const Stack = createNativeStackNavigator();
@@ -22,8 +21,8 @@ export default function Main() {
   // const [role, setRole] = useState(0); // 0: admin, 1: staff , 2: user
   const { role, isSignedIn, token, setRole, setIsSignedIn, setToken } =
     useRoleStore();
-  const { data: products, isLoading, error } = useGetProducts();
-  console.log(products, "products");
+  // const { data: products, isLoading, error } = useGetProducts();
+  // console.log(products, "products");
 
   useEffect(() => {
     async () => {

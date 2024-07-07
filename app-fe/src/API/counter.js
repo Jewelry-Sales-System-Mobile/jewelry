@@ -14,3 +14,19 @@ const getCounters = async () => {
     );
     return { data, isLoading, error, isFetching };
   };
+
+  const getCounterById = async ({counterId}) => {
+    const { data } = await http.get(`${API_ENDPOINTS.COUNTER}/${counterId}`);
+    console.log("query counter detail:", data);
+    return data.data;
+  };
+  export const useGetCounterById = (counterId) => {
+    const { data, isLoading, isFetching, error } = useQuery(
+      ["counter", counterId],
+      () => getCounterById(counterId),
+      {
+        enabled: !!counterId, 
+      }
+    );
+    return { data, isLoading, error, isFetching };
+  };
