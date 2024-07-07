@@ -68,11 +68,11 @@ export const useCreateProduct = () => {
   const queryClient = useQueryClient();
   return useMutation(createProduct, {
     onSuccess: () => {
-      showSuccessMessage("Product created successfully!");
+      showSuccessMessage("Sản phẩm đã được tạo thành công!");
       queryClient.invalidateQueries("products");
     },
     onError: () => {
-      showErrorMessage("Failed to create product.");
+      showErrorMessage("Không thể tạo sản phẩm.");
     },
   });
 };
@@ -81,11 +81,11 @@ export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
   return useMutation(updateProduct, {
     onSuccess: () => {
-      showSuccessMessage("Product updated successfully!");
+      showSuccessMessage("Sản phẩm đã được cập nhật thành công!");
       queryClient.invalidateQueries("products");
     },
     onError: () => {
-      showErrorMessage("Failed to update product.");
+      showErrorMessage("Không thể cập nhật sản phẩm.");
     },
   });
 };
@@ -94,11 +94,11 @@ export const useDeleteProduct = () => {
   const queryClient = useQueryClient();
   return useMutation(deleteProduct, {
     onSuccess: () => {
-      showSuccessMessage("Product deleted successfully!");
+      showSuccessMessage("Sản phẩm đã được xóa thành công!");
       queryClient.invalidateQueries("products");
     },
     onError: () => {
-      showErrorMessage("Failed to delete product.");
+      showErrorMessage("Không thể xóa sản phẩm.");
     },
   });
 };
@@ -107,11 +107,11 @@ export const useAddProductImage = () => {
   const queryClient = useQueryClient();
   return useMutation(addProductImage, {
     onSuccess: () => {
-      showSuccessMessage("Image added successfully!");
+      showSuccessMessage("Ảnh đã được thêm vào thành công!");
       queryClient.invalidateQueries("products");
     },
     onError: () => {
-      showErrorMessage("Failed to add image.");
+      showErrorMessage("Không thể thêm ảnh.");
     },
   });
 };
@@ -120,14 +120,15 @@ export const useDeleteProductImage = () => {
   const queryClient = useQueryClient();
   return useMutation(deleteProductImage, {
     onSuccess: () => {
-      showSuccessMessage("Image deleted successfully!");
+      showSuccessMessage("Ảnh đã được xóa thành công!");
       queryClient.invalidateQueries("products");
     },
     onError: () => {
-      showErrorMessage("Failed to delete image.");
+      showErrorMessage("Không thể xóa ảnh.");
     },
   });
 };
+
 // Inactivate a product
 const inactivateProduct = async (productId) => {
   const { data } = await http.post(
@@ -148,11 +149,11 @@ export const useInactivateProduct = () => {
   const queryClient = useQueryClient();
   return useMutation(inactivateProduct, {
     onSuccess: () => {
-      showSuccessMessage("Product inactivated successfully!");
+      showSuccessMessage("Đã ngưng kích hoạt sản phẩm!");
       queryClient.invalidateQueries("products");
     },
     onError: () => {
-      showErrorMessage("Failed to inactivate product.");
+      showErrorMessage("Không thể ngưng kích hoạt sản phẩm.");
     },
   });
 };
@@ -161,11 +162,11 @@ export const useActivateProduct = () => {
   const queryClient = useQueryClient();
   return useMutation(activateProduct, {
     onSuccess: () => {
-      showSuccessMessage("Product activated successfully!");
+      showSuccessMessage("Kích hoạt sản phẩm thành công!");
       queryClient.invalidateQueries("products");
     },
     onError: () => {
-      showErrorMessage("Failed to activate product.");
+      showErrorMessage("Không thể kích hoạt sản phẩm.");
     },
   });
 };
