@@ -60,7 +60,6 @@ class UserService {
         updated_at: getBangkokTime(),
       })
     );
-    console.log(getBangkokTime());
 
     const access_token = await this.signAccessToken({
       user_id: user_id.toString(),
@@ -219,6 +218,40 @@ class UserService {
         HTTP_STATUS.NOT_FOUND
       );
     }
+    return user;
+  }
+
+  async activeUser(user_id: string) {
+    const user = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          verify: UserVerifyStatus.Verified,
+        },
+        $currentDate: { updated_at: true },
+      },
+      {
+        returnDocument: "after",
+        projection: projection,
+      }
+    );
+    return user;
+  }
+
+  async inactiveUser(user_id: string) {
+    const user = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          verify: UserVerifyStatus.Unverified,
+        },
+        $currentDate: { updated_at: true },
+      },
+      {
+        returnDocument: "after",
+        projection: projection,
+      }
+    );
     return user;
   }
 }

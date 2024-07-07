@@ -85,3 +85,7 @@ export interface UpdateAddressReqParams extends ParamsDictionary {
 export interface DeleteAddressReqParams extends ParamsDictionary {
   address_id: string;
 }
+
+export interface UserIdReqParams extends ParamsDictionary {
+  user_id: string;
+}

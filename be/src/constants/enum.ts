@@ -1,6 +1,6 @@
 export enum UserVerifyStatus {
-  Unverified, // chưa xác thực email, mặc định = 0
-  Verified, // đã xác thực email
+  Unverified, // chưa xác thực
+  Verified, // đã xác thực
   Banned, // bị khóa
 }
 
@@ -19,4 +19,10 @@ export enum ProductStatus {
 export enum Role {
   Manager,
   Staff,
+}
+
+export enum PaymentStatus {
+  Pending,
+  Paid,
+  Cancelled,
 }

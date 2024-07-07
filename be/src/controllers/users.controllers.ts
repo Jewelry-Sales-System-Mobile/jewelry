@@ -14,6 +14,7 @@ import {
   ResetPasswordReqBody,
   TokenPayload,
   UpdateProfileReqBody,
+  UserIdReqParams,
   VerifyForgotPassWordTokenRequestBody,
 } from "~/models/requests/Users.requests";
 import User from "~/models/schemas/User.schema";
@@ -124,6 +125,32 @@ export const getUserProfileController = async (
   const user = await userService.getUserProfile(username);
   return res.json({
     message: USERS_MESSAGES.GET_USER_PROFILE_SUCCESS,
+    data: user,
+  });
+};
+
+export const activeUserController = async (
+  req: Request<UserIdReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.params;
+  const user = await userService.activeUser(user_id);
+  return res.json({
+    message: USERS_MESSAGES.ACTIVE_USER_SUCCESS,
+    data: user,
+  });
+};
+
+export const inactiveUserController = async (
+  req: Request<UserIdReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.params;
+  const user = await userService.inactiveUser(user_id);
+  return res.json({
+    message: USERS_MESSAGES.INACTIVE_USER_SUCCESS,
     data: user,
   });
 };

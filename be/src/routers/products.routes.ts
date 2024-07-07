@@ -7,8 +7,11 @@ import {
   GetAllProductsController,
   GetProductByIdController,
   InActiveProductController,
+  UpdateProductController,
 } from "~/controllers/products.controllers";
+import { filterMiddleware } from "~/middlewares/common.middlewares";
 import { accessTokenValidator } from "~/middlewares/users.middlewares";
+import { UpdateProductReqBody } from "~/models/requests/Products.requests";
 import { wrapRequestHandler } from "~/utils/handlers";
 const productsRouter = Router();
 
@@ -91,4 +94,18 @@ productsRouter.put(
   accessTokenValidator,
   wrapRequestHandler(deleteProductImageController)
 );
+
+/**
+ * Description: Update Product
+ * Route: PUT /:product_id
+ * Body: UpdateProductReqBody
+ * Header: Authorization: Bearer ${token}
+ */
+productsRouter.put(
+  "/:product_id",
+  accessTokenValidator,
+  filterMiddleware<UpdateProductReqBody>(["name", "weight", "gemCost"]),
+  wrapRequestHandler(UpdateProductController)
+);
+
 export default productsRouter;

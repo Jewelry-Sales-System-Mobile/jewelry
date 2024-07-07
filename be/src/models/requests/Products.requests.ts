@@ -12,3 +12,9 @@ export interface ProductIdReqParams extends ParamsDictionary {
 export interface DeleteProductImageReqBody {
   url: string;
 }
+
+export interface UpdateProductReqBody {
+  name?: string;
+  weight?: number;
+  gemCost?: number;
+}

@@ -2,22 +2,22 @@ import { ObjectId } from "mongodb";
 
 interface CustomerType {
   _id?: ObjectId;
-  name: String;
-  phone: String;
+  name: string;
+  phone: string;
   dob: Date;
-  email: String;
-  points: Number;
+  email: string;
+  points?: number;
   createdAt: Date;
   updatedAt?: Date;
 }
 
 export default class Customer {
   _id?: ObjectId;
-  name: String;
-  phone: String;
+  name: string;
+  phone: string;
   dob: Date;
-  email: String;
-  points: Number;
+  email: string;
+  points?: number;
   createdAt?: Date;
   updatedAt?: Date;
 
@@ -28,7 +28,7 @@ export default class Customer {
     this.phone = customer.phone;
     this.dob = customer.dob;
     this.email = customer.email;
-    this.points = customer.points;
+    this.points = customer.points || 0;
     this.createdAt = customer.createdAt || date;
     this.updatedAt = customer.updatedAt || date;
   }

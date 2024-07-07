@@ -5,6 +5,7 @@ import {
   CreateProductReqBody,
   DeleteProductImageReqBody,
   ProductIdReqParams,
+  UpdateProductReqBody,
 } from "~/models/requests/Products.requests";
 import productServices from "~/services/products.services";
 
@@ -17,6 +18,20 @@ export const CreateProductController = async (
   const product = await productServices.createProduct(body);
   return res.json({
     message: "Create product successfully",
+    data: product,
+  });
+};
+
+export const UpdateProductController = async (
+  req: Request<ProductIdReqParams, any, UpdateProductReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { product_id } = req.params;
+  const body = req.body;
+  const product = await productServices.updateProduct(product_id, body);
+  return res.json({
+    message: "Update product successfully",
     data: product,
   });
 };
@@ -92,7 +107,6 @@ export const deleteProductImageController = async (
 ) => {
   const { product_id } = req.params;
   const { url } = req.body;
-  console.log("req", req);
 
   const product = await productServices.deleteProductImage(product_id, url);
   return res.json({

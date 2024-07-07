@@ -1,5 +1,8 @@
 import { LABOR_COST } from "./../constants/constant";
-import { CreateProductReqBody } from "~/models/requests/Products.requests";
+import {
+  CreateProductReqBody,
+  UpdateProductReqBody,
+} from "~/models/requests/Products.requests";
 import databaseService from "./database.services";
 import goldPricesServices from "./gold_prices.services";
 import { ONE_TEIL_GOLD } from "~/constants/constant";
@@ -28,11 +31,12 @@ class ProductServices {
   }
 
   generateRandomCode(length: number) {
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const numbers = "0123456789";
     let result = "PD"; // Start with PD
-    const charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    const numbersLength = numbers.length;
+    for (let i = 0; i < 6; i++) {
+      // Generate 6 random numeric characters
+      result += numbers.charAt(Math.floor(Math.random() * numbersLength));
     }
     return result;
   }
@@ -64,9 +68,57 @@ class ProductServices {
     return product;
   }
 
-  async activeProduct(productId: string) {
+  async updateProduct(product_id: string, body: UpdateProductReqBody) {
     const product = await databaseService.products.findOne({
-      _id: new ObjectId(productId),
+      _id: new ObjectId(product_id),
+    });
+
+    if (!product) {
+      throw new ErrorWithStatus("Product not found", HTTP_STATUS.NOT_FOUND);
+    }
+
+    const { name, weight, gemCost } = body;
+    const updatedFields: any = {};
+
+    if (name !== undefined) {
+      updatedFields.name = name;
+    }
+
+    if (weight !== undefined) {
+      updatedFields.weight = weight;
+    }
+
+    if (gemCost !== undefined) {
+      updatedFields.gemCost = gemCost;
+    }
+
+    if (weight !== undefined || gemCost !== undefined) {
+      const goldPrice = await goldPricesServices.getGoldPrices();
+      const goldPricePerTeil = goldPrice?.sell_price;
+      const teil = (weight ?? product.weight) / ONE_TEIL_GOLD;
+      const laborCost = teil * LABOR_COST * (goldPricePerTeil as number);
+      updatedFields.laborCost = laborCost;
+      updatedFields.basePrice =
+        (goldPricePerTeil as number) * teil +
+        laborCost +
+        (gemCost ?? product.gemCost);
+    }
+
+    const updatedProduct = await databaseService.products.findOneAndUpdate(
+      { _id: new ObjectId(product_id) },
+      {
+        $set: updatedFields,
+        $currentDate: { updated_at: true },
+      },
+      { returnDocument: "after" }
+    );
+
+    return updatedProduct;
+  }
+
+  async activeProduct(product_id: string) {
+    const product = await databaseService.products.findOne({
+      _id: new ObjectId(product_id),
     });
     if (!product)
       throw new ErrorWithStatus("Product not found", HTTP_STATUS.NOT_FOUND);
@@ -77,7 +129,7 @@ class ProductServices {
       );
     }
     const newProduct = await databaseService.products.findOneAndUpdate(
-      { _id: new ObjectId(productId) },
+      { _id: new ObjectId(product_id) },
       {
         $set: { status: ProductStatus.Active },
         $currentDate: { updated_at: true },
@@ -89,9 +141,9 @@ class ProductServices {
     return newProduct;
   }
 
-  async inActiveProduct(productId: string) {
+  async inActiveProduct(product_id: string) {
     const product = await databaseService.products.findOne({
-      _id: new ObjectId(productId),
+      _id: new ObjectId(product_id),
     });
     if (!product)
       throw new ErrorWithStatus("Product not found", HTTP_STATUS.NOT_FOUND);
@@ -102,7 +154,7 @@ class ProductServices {
       );
     }
     const newProduct = await databaseService.products.findOneAndUpdate(
-      { _id: new ObjectId(productId) },
+      { _id: new ObjectId(product_id) },
       {
         $set: { status: ProductStatus.Inactive },
         $currentDate: { updated_at: true },
@@ -114,9 +166,9 @@ class ProductServices {
     return newProduct;
   }
 
-  async getProductById(productId: string) {
+  async getProductById(product_id: string) {
     const product = await databaseService.products.findOne({
-      _id: new ObjectId(productId),
+      _id: new ObjectId(product_id),
     });
     if (!product)
       throw new ErrorWithStatus("Product not found", HTTP_STATUS.NOT_FOUND);
@@ -165,7 +217,6 @@ class ProductServices {
         HTTP_STATUS.NOT_FOUND
       );
     }
-    console.log(url);
 
     const filename = url.split("/").pop();
     await deleteFileFromS3(filename as string);
