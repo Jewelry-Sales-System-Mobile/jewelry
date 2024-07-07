@@ -4,6 +4,16 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [],
-}
-
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities(
+        {
+          ".focus\\:outline-none": {
+            outline: "none",
+          },
+        },
+        ["responsive", "hover", "focus"]
+      );
+    },
+  ],
+};

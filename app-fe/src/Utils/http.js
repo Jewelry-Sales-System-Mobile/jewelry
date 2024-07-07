@@ -3,8 +3,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const http = axios.create({
   baseURL: "http://localhost:4000/",
-  // baseURL: "https://nghich.id.vn",
-
   timeout: 30000,
   headers: {
     Accept: "application/json",
@@ -12,18 +10,26 @@ const http = axios.create({
   },
 });
 
-// Request interceptor to add the auth token header to requests
 http.interceptors.request.use(
   async (config) => {
-    // const token = await AsyncStorage.getItem("auth_token");
-    const token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjY4M2YxZGI4NmIzNDRjNWMwZWUwMTk4IiwidG9rZW5fdHlwZSI6MCwidmVyaWZ5IjoxLCJyb2xlIjoxLCJpYXQiOjE3MjAzNjY2MDIsImV4cCI6MTcyMDQ1MzAwMn0.VuGAMh6CB_q9xl7dypCHv0AXGSp_wRTzUWpBxV9NM18";
+    const token = await AsyncStorage.getItem("auth_token");
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor to handle 401 Unauthorized error globally
+http.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // navigator.navigate("SignIn");
+    }
     return Promise.reject(error);
   }
 );
@@ -45,5 +51,5 @@ export const getToken = async () => {
     return null;
   }
 };
-// Export the http instance to use in your application
+
 export default http;

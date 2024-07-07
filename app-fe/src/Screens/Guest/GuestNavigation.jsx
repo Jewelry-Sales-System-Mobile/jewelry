@@ -1,11 +1,5 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons } from "@expo/vector-icons";
-// import CustomTabIcon from "../../components/Navigation";
-import SignIn from "./SignIn";
-import SignUp from "./SignUp";
-import Welcome from "./Welcome";
-import SwitchRole from "../../components/SwitchRole";
 import CustomTabIconV2 from "./CustomIconTabV2";
 import ProductManagementScreen from "./TabNavigation/ProductManage";
 import DashboardScreen from "./TabNavigation/DashBoard";
@@ -27,12 +21,8 @@ export default function GuestNavigation({ navigation }) {
               "https://img.icons8.com/small/64/null/gender-neutral-user.png";
           } else if (route.name === "Product") {
             iconUri = "https://img.icons8.com/small/64/null/gear.png";
-          } else if (route.name === "Staff") {
-            iconUri = "https://static.thenounproject.com/png/4181324-200.png";
           } else if (route.name === "Order") {
             iconUri = "https://cdn-icons-png.flaticon.com/512/2977/2977924.png";
-          } else if (route.name === "Counter") {
-            iconUri = "https://img.icons8.com/small/64/null/switch.png";
           } else {
             // Default case
             iconUri = "https://img.icons8.com/small/64/null/home-page.png";
@@ -60,11 +50,6 @@ export default function GuestNavigation({ navigation }) {
         options={{ headerShown: false }}
       />
       <Tab.Screen
-        name="Staff"
-        component={EmployeeManagementScreen}
-        options={{ headerShown: false }}
-      />
-      <Tab.Screen
         name="Customer"
         component={CustomerManagementScreen}
         options={{ headerShown: false }}
@@ -77,11 +62,6 @@ export default function GuestNavigation({ navigation }) {
       <Tab.Screen
         name="Order"
         component={OrderManagementScreen}
-        options={{ headerShown: false }}
-      />
-      <Tab.Screen
-        name="Counter"
-        component={CounterManagementScreen}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>
