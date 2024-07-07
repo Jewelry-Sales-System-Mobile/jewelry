@@ -19,7 +19,7 @@ http.interceptors.request.use(
     try {
       const token = await AsyncStorage.getItem("auth_token");
       if (token) {
-        config.headers["Authorization"] = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjY4MTZjYjU0YWI1MGVkOGRmY2FhMmY0IiwidG9rZW5fdHlwZSI6MCwidmVyaWZ5IjoxLCJyb2xlIjowLCJpYXQiOjE3MjAyNTM2NzYsImV4cCI6MTcyMDM0MDA3Nn0.DM_IJJQwh6dhAUz-UAA3fp67Ts03M25I9Vqnu7WRXCg`;
+        config.headers["Authorization"] = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjY4MTZjYjU0YWI1MGVkOGRmY2FhMmY0IiwidG9rZW5fdHlwZSI6MCwidmVyaWZ5IjoxLCJyb2xlIjowLCJpYXQiOjE3MjAzNzIxMDAsImV4cCI6MTcyMDQ1ODUwMH0.FLOT-d-db8LD-j7LtD9MyRMDJU8zF7cFXZUlwN83ljE`;
       }
     } catch (error) {
       console.log("Error getting auth token", error);
