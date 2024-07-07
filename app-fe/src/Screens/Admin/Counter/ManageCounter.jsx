@@ -1,25 +1,20 @@
 import { View ,Text} from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SearchBar } from "@rneui/themed";
 import { tailwind } from "nativewind";
-import CounterCard from "../../components/Counter/CounterCard";
-import { useGetCounters } from "../../API/counter";
-import { API_ENDPOINTS } from "../../API/api-endpoint";
-import axios from "axios";
+import CounterCard from "../../../components/Counter/CounterCard";
+import { useGetCounters } from "../../../API/counter";
 
 export default function ManageCounter() {
   const { data, isLoading, error } = useGetCounters();
-  const [loading, setLoading] = useState(true);
-
 
   const [search, setSearch] = useState("");
   const updateSearch = (search) => {
     setSearch(search);
   };
 
-  const [counter, setCounter] = useState([])
-
+  
 
  if (isLoading) {
     return <View><Text>Loading...</Text></View>;
@@ -31,8 +26,8 @@ export default function ManageCounter() {
   }
 
   return (
-    <SafeAreaView className="bg-white flex-1">
-      <View className="bg-white flex flex-col items-center justify-center mx-auto">
+    <SafeAreaView className="bg-white flex flex-1 justify-center">
+      <View className="bg-white flex flex-1 items-center justify-center  p-3">
         <View className="m-3 rounded-xl w-[350px] bg-white">
           {/* <SearchBar
             placeholder="Type Here..."

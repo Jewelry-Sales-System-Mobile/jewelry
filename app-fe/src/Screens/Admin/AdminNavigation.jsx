@@ -7,7 +7,7 @@ import ManageStaff from "./ManageStaff";
 import ManageOrder from "./ManageOrder";
 import AccountSetting from "../AccountSetting";
 import SwitchRole from "../../components/SwitchRole";
-import ManageCounter from "./ManageCounter";
+import ManageCounter from "./Counter/ManageCounter";
 import { Text } from "react-native";
 
 const Tab = createBottomTabNavigator();

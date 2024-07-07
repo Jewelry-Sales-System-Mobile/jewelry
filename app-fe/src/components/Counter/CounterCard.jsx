@@ -6,31 +6,32 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React from "react";
+import { format } from "date-fns";
+
 
 export default function CounterCard({ counters  }) {
   return (
-    <View>
+    <View className="flex flex-1 w-full">
       <FlatList
-       data={counters}
+        data={counters}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <Pressable
-            //    style={styles.card}
+            className="bg-white w-full border-t-2 border-neutral-200 px-3 py-5 rounded-lg items-center shadow-lg shadow-black/25"
             onPress={() => navigation.navigate("Detail", { id:item._id })}
           >
             <Text
-              //    style={styles.perfumeName}
+              className="text-lg font-semibold"
               numberOfLines={2}
               ellipsizeMode="tail"
             >
               {item.counter_name}
             </Text>
             <View >
-              <Text >${item.updated_at}</Text>
+              <Text >Cập nhật lần cuối: {format(new Date(item.updated_at), "dd-MM-yyyy HH:mm")}</Text>
             </View>
           </Pressable>
         )}
-      //  contentContainerStyle={styles.flatListContainer}
       />
     </View>
   );
