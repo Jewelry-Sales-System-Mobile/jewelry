@@ -5,11 +5,12 @@ import { SearchBar } from "@rneui/themed";
 import { tailwind } from "nativewind";
 import CounterCard from "../../../components/Counter/CounterCard";
 import { useGetCounters } from "../../../API/counter";
+import { Searchbar } from "react-native-paper";
 
 export default function ManageCounter() {
   const { data, isLoading, error } = useGetCounters();
 
-  const [search, setSearch] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const updateSearch = (search) => {
     setSearch(search);
   };
@@ -32,16 +33,14 @@ export default function ManageCounter() {
   }
 
   return (
-    <SafeAreaView className="bg-white flex flex-1 justify-center">
-      <View className="bg-white flex flex-1 items-center justify-center  p-3">
-        <View className="m-3 rounded-xl w-[350px] bg-white">
-          {/* <SearchBar
-            placeholder="Type Here..."
-            onChangeText={updateSearch}
-            value={search}
-            containerStyle={'bg-white'}
-            inputContainerStyle='bg-white rounded-xl'
-          /> */}
+    <SafeAreaView className="bg-white flex flex-1 justify-center -mt-5">
+      <View className="bg-white flex flex-1 items-center justify-center px-3">
+        <View className="mx-3 mt-0 mb-2 rounded-xl w-[350px] bg-white">
+          <Searchbar
+            placeholder="Tìm kiếm..."
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+          />
         </View>
         <CounterCard counters={data} />
       </View>
