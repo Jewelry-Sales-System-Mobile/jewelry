@@ -18,11 +18,22 @@ import {
   useUpdateProduct,
 } from "../../../API/productApi";
 import { Image } from "react-native";
-import { Card, Title, Paragraph, Button, Modal } from "react-native-paper";
+import {
+  Card,
+  Title,
+  Paragraph,
+  Button,
+  Modal,
+  Searchbar,
+  Menu,
+  Provider,
+} from "react-native-paper";
 import moment from "moment";
 import { MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
 import * as ImagePicker from "react-native-image-picker";
 import Constants from "expo-constants";
+import ActionDropdown from "../Component/ActionSection";
+import FilterDropdown from "../Component/FilterDropdown";
 
 const ProductManagementScreen = () => {
   const { data: products, isLoading, error, isFetching } = useGetProducts();
@@ -38,13 +49,62 @@ const ProductManagementScreen = () => {
   const [modalVisible, setModalVisible] = useState(false); // State to control modal visibility
   const [imageSource, setImageSource] = useState(null); // State to hold selected image
   const [modalVisibleAdd, setModalVisibleAdd] = useState(false); // State để điều khiển hiển thị modal
+  const [modalVisibleUpdate, setModalVisibleUpdate] = useState(false);
   const [newProductData, setNewProductData] = useState({
     name: "",
     weight: "",
     gemCost: "",
   }); // State để lưu thông tin mới của sản phẩm
+  const [updatedProductData, setUpdatedProductData] = useState({
+    name: "",
+    weight: 0,
+    gemCost: 0,
+  });
   const [tooltipVisible, setTooltipVisible] = useState(false); // State to control tooltip visibility
   const [tooltipText, setTooltipText] = useState(""); // State to hold tooltip text
+  const [searchText, setSearchText] = useState(""); // State to hold search text
+  const [searchQuery, setSearchQuery] = useState("");
+  // Dropdown menu actions
+  const [visible, setVisible] = useState(false);
+  const [visibleProducts, setVisibleProducts] = useState(6); // Số sản phẩm hiển thị ban đầu
+  const [sortBy, setSortBy] = useState(null);
+
+  const filteredProducts = products?.filter((product) =>
+    product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredProductsSort = filteredProducts?.sort((a, b) => {
+    if (sortBy === "basePrice") {
+      return a.basePrice - b.basePrice;
+    }
+    if (sortBy === "-basePrice") {
+      return b.basePrice - a.basePrice;
+    }
+    if (sortBy === "created_at") {
+      return new Date(a.created_at) - new Date(b.created_at);
+    }
+    if (sortBy === "-created_at") {
+      return new Date(b.created_at) - new Date(a.created_at);
+    }
+    if (sortBy === "weight") {
+      return a.weight - b.weight;
+    }
+    if (sortBy === "-weight") {
+      return b.weight - a.weight;
+    }
+    return 0;
+  });
+
+  const handleFilterChange = (filter) => {
+    setSortBy(filter);
+  };
+
+  const handleLoadMore = () => {
+    setVisibleProducts(visibleProducts + 6); // Tăng số lượng sản phẩm hiển thị khi nhấn nút "Xem thêm"
+  };
+
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
 
   const handleToggleActive = (product) => {
     if (product.status === 0) {
@@ -74,18 +134,30 @@ const ProductManagementScreen = () => {
 
   // Hàm xử lý khi người dùng thay đổi dữ liệu nhập vào input
   const handleChange = (key, value) => {
+    // debugger;
     setNewProductData({
       ...newProductData,
       [key]: value,
     });
   };
 
-  const handleUpdateProduct = (product) => {
-    // Update product logic here
-    updateProduct({
-      productId: product._id,
-      updatedFields: { name: "Updated Name", weight: 100 },
+  const handleUpdateChange = (key, value) => {
+    setUpdatedProductData({
+      ...updatedProductData,
+      [key]: value,
     });
+  };
+
+  const handleSaveUpdate = () => {
+    updateProduct({
+      productId: selectedProduct._id,
+      updatedFields: {
+        name: updatedProductData.name,
+        weight: parseFloat(updatedProductData.weight),
+        gemCost: parseFloat(updatedProductData.gemCost),
+      },
+    });
+    setModalVisibleUpdate(false);
   };
 
   const handleDeleteProductImage = (product) => {
@@ -130,118 +202,161 @@ const ProductManagementScreen = () => {
     });
   };
 
+  const handleUpdateProduct = (product) => {
+    setSelectedProduct(product);
+    setUpdatedProductData({
+      name: product.name,
+      weight: +product.weight,
+      gemCost: +product.gemCost,
+    });
+    setModalVisibleUpdate(true);
+  };
+
   const handleCreateProduct = () => {
     // Gọi hàm tạo sản phẩm từ API với dữ liệu mới đã nhập
-    createProduct(newProductData);
+    createProduct({
+      name: newProductData.name,
+      weight: +newProductData.weight,
+      gemCost: +newProductData.gemCost,
+    });
     // Đóng modal sau khi tạo xong sản phẩm
     closeModalAdd();
   };
 
-  const renderItem = ({ item, index }) => (
-    <Card style={styles.card}>
-      <Card.Content>
-        <Image
-          source={{
-            uri: item.image
-              ? item.image
-              : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s",
-          }}
-          style={styles.image}
-        />
-        <View style={styles.cameraIconContainer2}>
-          <Feather
-            name="camera"
-            size={16}
-            color="black"
-            onPress={() => {
-              setSelectedProduct(item);
-              handleAddImage(item);
-            }}
-          />
-        </View>
-        <View style={styles.indexContainer}>
-          <Text style={styles.indexText}>{index + 1}</Text>
-        </View>
-        <Paragraph className="text-xs">
-          {moment(item.created_at).format("DD/MM/YYYY, hh:mm A")}
-        </Paragraph>
-        <Title className="font-semibold text-lg ">
-          [{item.productCode}] - {item.name}
-        </Title>
-        <Paragraph> {item.weight} Gram</Paragraph>
-        <Paragraph className="text-right text-lg font-semibold text-[#ccac00]">
-          {item.basePrice.toLocaleString("vi-VN", {
-            style: "currency",
-            currency: "VND",
-          })}
-        </Paragraph>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => handleToggleActive(item)}
-          >
-            <FontAwesome
-              name={item.status === 0 ? "toggle-on" : "toggle-off"}
-              size={20}
-              color={item.status === 0 ? "green" : "gray"}
+  const closeModalUpdate = () => {
+    setModalVisibleUpdate(false);
+    setModalVisible(false);
+    setSelectedProduct(null);
+  };
+
+  const renderItem = ({ item, index }) => {
+    const formatCurrency = (value) => {
+      // debugger;
+      if (value == null || isNaN(value)) return "0 VND";
+      return new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      }).format(Number(value?.toFixed(2)));
+    };
+
+    const formattedPrice = formatCurrency(item?.basePrice);
+
+    return (
+      <Card style={styles.card}>
+        <Card.Content>
+          <View style={styles.menuContainer}>
+            <ActionDropdown
+              item={item}
+              handleUpdateProduct={handleUpdateProduct}
+              setModalVisible={setModalVisible}
+              setSelectedProduct={setSelectedProduct}
+              handleDeleteProductImage={handleDeleteProductImage}
             />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <MaterialIcons
-              name="edit"
-              size={20}
-              color="gray"
+          </View>
+          <Title className="font-semibold  text-[14px] text-center ">
+            #{item.productCode}
+          </Title>
+          <Image
+            source={{
+              uri: item.image
+                ? item.image
+                : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s",
+            }}
+            style={styles.image}
+          />
+          <View style={styles.cameraIconContainer2}>
+            <Feather
+              name="camera"
+              size={16}
+              color="black"
               onPress={() => {
                 setSelectedProduct(item);
-                handleUpdateProduct(item);
+                handleAddImage(item);
               }}
             />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button]}
+          </View>
+          <View style={styles.indexContainer}>
+            <Text style={styles.indexText}>{index + 1}</Text>
+          </View>
+          <Paragraph className="text-xs">
+            {moment(item.created_at).format("DD/MM/YYYY, hh:mm A")}
+          </Paragraph>
+          <Title
+            className="font-semibold text-[16px] "
             onPress={() => {
               setSelectedProduct(item);
               setModalVisible(true);
             }}
           >
-            <Feather name="eye" size={20} color="#998100" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <FontAwesome
-              name="trash"
-              onPress={() => {
-                setSelectedProduct(item);
-                handleDeleteProductImage(item);
-              }}
-              size={20}
-              color="red"
-            />
-          </TouchableOpacity>
-        </View>
-      </Card.Content>
-    </Card>
-  );
+            {item.name}
+          </Title>
+
+          <Paragraph> {item.weight} Gram</Paragraph>
+          <View style={styles.buttonContainer}>
+            <Paragraph className="text-right text-base font-semibold text-[#ccac00]">
+              {formattedPrice}
+            </Paragraph>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleToggleActive(item)}
+            >
+              <FontAwesome
+                name={item.status === 0 ? "toggle-on" : "toggle-off"}
+                size={20}
+                color={item.status === 0 ? "green" : "gray"}
+              />
+            </TouchableOpacity>
+          </View>
+        </Card.Content>
+      </Card>
+    );
+  };
 
   const closeModal = () => {
     setModalVisible(false);
     setSelectedProduct(null);
   };
 
-  const viewDetails = (item) => {
-    // Navigate to the detail screen with item details
-    console.log("View details of:", item);
-    // Example navigation:
-    // navigation.navigate('ProductDetailScreen', { productId: item._id });
+  const renderFooter = () => {
+    // Kiểm tra nếu không còn sản phẩm để hiển thị thì không hiển thị nút "Xem thêm"
+    if (visibleProducts >= filteredProducts.length) {
+      return null;
+    }
+
+    return (
+      <TouchableOpacity
+        className="bg-[#ccac00] rounded-md p-1 text-center w-[40%] mt-4 mx-auto"
+        onPress={handleLoadMore}
+      >
+        <Title className="text-white text-center text-sm text-semibold">
+          Xem thêm
+        </Title>
+      </TouchableOpacity>
+    );
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Quản lý sản phẩm Trang sức</Text>
-      <View style={styles.buttonContainer2} onPress={openModalAdd}>
-        <TouchableOpacity style={styles.button1} onPress={openModalAdd}>
-          <FontAwesome name="plus" size={20} color="white" />
-          <Text style={{ color: "white", marginLeft: 10 }}>Tạo Sản Phẩm</Text>
-        </TouchableOpacity>
+      <View className="flex-row p-2 justify-between">
+        <Text style={styles.title}>Quản lý sản phẩm Trang Sức</Text>
+        <View style={styles.buttonContainer2} onPress={openModalAdd}>
+          <TouchableOpacity
+            className="flex-row  bg-[#ccac00] p-2 rounded-md mb-4 "
+            onPress={openModalAdd}
+          >
+            <FontAwesome name="plus" size={20} color="white" />
+            {/* <Text style={{ color: "white", marginLeft: 10 }}>Tạo Sản Phẩm</Text> */}
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={styles.searchContainer}>
+        <Searchbar
+          placeholder="Search"
+          onChangeText={setSearchQuery}
+          value={searchQuery}
+          style={styles.searchBar}
+        />
+        <FilterDropdown onFilterChange={handleFilterChange} />
       </View>
       <View style={styles.separator}></View> {/* Separator View */}
       {isLoading ? (
@@ -249,12 +364,16 @@ const ProductManagementScreen = () => {
       ) : error ? (
         <Text>Error: {error.message}</Text>
       ) : (
-        <FlatList
-          data={products}
-          renderItem={({ item, index }) => renderItem({ item, index })}
-          keyExtractor={(item) => item._id}
-          numColumns={2} // Adjust as needed for your grid layout
-        />
+        <View style={styles.container}>
+          <FlatList
+            data={filteredProductsSort.slice(0, visibleProducts)}
+            renderItem={({ item, index }) => renderItem({ item, index })}
+            keyExtractor={(item) => item._id}
+            numColumns={2} // Adjust as needed for your grid layout
+            contentContainerStyle={{ flexGrow: 1 }}
+            ListFooterComponent={renderFooter} // Thêm footer cho FlatList
+          />
+        </View>
       )}
       {/* Modal for displaying product details */}
       <Modal
@@ -338,20 +457,10 @@ const ProductManagementScreen = () => {
                         {selectedProduct.basePrice.toLocaleString("vi-VN", {
                           style: "currency",
                           currency: "VND",
-                        }).length > 11
-                          ? `${selectedProduct.basePrice
-                              .toLocaleString("vi-VN", {
-                                style: "currency",
-                                currency: "VND",
-                              })
-                              .substring(0, 11)}...`
-                          : selectedProduct.basePrice.toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })}
+                        })}
                       </Paragraph>
                     </TouchableOpacity>
-                    {tooltipVisible && (
+                    {/* {tooltipVisible && (
                       <Modal
                         visible={tooltipVisible}
                         onDismiss={() => setTooltipVisible(false)}
@@ -359,7 +468,7 @@ const ProductManagementScreen = () => {
                       >
                         <Text>{tooltipText} </Text>
                       </Modal>
-                    )}
+                    )} */}
                     <View style={styles.buttonContainer}>
                       <TouchableOpacity
                         style={styles.button}
@@ -393,7 +502,7 @@ const ProductManagementScreen = () => {
                         <FontAwesome
                           name="trash"
                           size={20}
-                          color="red"
+                          color="#8B0000"
                           onPress={() => {
                             setSelectedProduct(selectedProduct);
                             handleDeleteProductImage(selectedProduct);
@@ -409,10 +518,59 @@ const ProductManagementScreen = () => {
           </Card>
         </View>
       </Modal>
+      <Modal
+        visible={modalVisibleUpdate}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={closeModalUpdate}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Title className="font-semibold text-xl mb-10 text-[#ccac00]">
+              Cập Nhật Sản Phẩm
+            </Title>
+            <TextInput
+              style={styles.input}
+              placeholder="Tên sản phẩm"
+              value={updatedProductData.name}
+              onChangeText={(text) => handleUpdateChange("name", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Trọng lượng (Gram)"
+              value={updatedProductData.weight}
+              onChangeText={(text) => handleUpdateChange("weight", text)}
+              keyboardType="numeric"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Giá đá quý (VND)"
+              value={updatedProductData.gemCost}
+              onChangeText={(text) => handleUpdateChange("gemCost", text)}
+              keyboardType="numeric"
+            />
+            <TouchableOpacity
+              style={styles.addButton2}
+              onPress={handleSaveUpdate}
+            >
+              <Text style={styles.buttonText}>Lưu</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={closeModalUpdate}
+            >
+              <Text style={styles.buttonText}>Hủy</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       {/* Modal để nhập thông tin sản phẩm mới */}
       <Modal visible={modalVisibleAdd} animationType="slide" transparent={true}>
         <View style={[styles.modalContainer]}>
           <View style={styles.modalContent}>
+            <Title className="font-semibold text-xl mb-10 text-[#ccac00]">
+              Tạo Sản Phẩm Mới
+            </Title>
             <TextInput
               style={styles.input}
               placeholder="Tên sản phẩm"
@@ -453,20 +611,37 @@ const ProductManagementScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  menuContainer: {
+    position: "absolute",
+    top: 5,
+    right: -6,
+    zIndex: 3, // Đặt zIndex cao hơn để đảm bảo menu hiển thị trên cùng
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  searchBar: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  filterButton: {
+    marginLeft: 10,
+  },
   container: {
     flex: 1,
     padding: 10,
   },
   card: {
     margin: 5,
-    width: "45%", // Adjust width as per your design
+    width: "47%", // Adjust width as per your design
   },
   title: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 700,
     marginBottom: 20,
     marginTop: 10,
-    textAlign: "center",
   },
   image: {
     width: "100%",
@@ -481,8 +656,8 @@ const styles = StyleSheet.create({
   },
   indexContainer: {
     position: "absolute",
-    top: 5,
-    left: 5,
+    top: 14,
+    left: 13,
     backgroundColor: "#ccac00", // Yellow color
     borderRadius: 20,
     width: 20,
@@ -504,7 +679,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer2: {
     flexDirection: "row",
-    zIndex: 1,
+    zIndex: 2,
     alignItems: "center",
     marginTop: 10,
   },
@@ -552,7 +727,7 @@ const styles = StyleSheet.create({
   },
   cameraIconContainer2: {
     position: "absolute",
-    top: 150,
+    top: 175,
     right: 10,
     backgroundColor: "white",
     borderRadius: 50,
@@ -589,7 +764,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   addButton2: {
-    backgroundColor: "green",
+    backgroundColor: "#ccac00",
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
@@ -597,7 +772,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cancelButton: {
-    backgroundColor: "red",
+    backgroundColor: "#8B0000",
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
