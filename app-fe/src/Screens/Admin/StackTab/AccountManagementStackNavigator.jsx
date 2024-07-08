@@ -5,6 +5,7 @@ import AccountManagementScreen from "../TabNavigation/AccountManage";
 import ManageCustomer from "./CustomerAccountScreen";
 import ManageStaff from "./StaffAccountScreen";
 import CustomerDetailScreen from "../DetailScreen/CustomerDetailScreen";
+import StaffDetailScreen from "../DetailScreen/StaffDetailScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -44,6 +45,14 @@ export default function AccountManagementStackNavigator() {
         options={{
           headerShown: true,
           headerTitle: "Thông tin chi tiết Khách Hàng",
+        }}
+      />
+      <Stack.Screen
+        name="StaffDetail"
+        component={StaffDetailScreen}
+        options={{
+          headerShown: true,
+          headerTitle: "Thông tin chi tiết Nhân Viên",
         }}
       />
     </Stack.Navigator>

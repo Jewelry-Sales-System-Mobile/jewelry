@@ -12,6 +12,7 @@ import AccountManagementScreen from "./TabNavigation/AccountManage";
 import CounterManagementScreen from "./TabNavigation/CounterManage";
 import CounterStackNavigator from "../../navigation/stack-navigators/CounterStackNavigator";
 import Setttings from "./TabNavigation/Setttings";
+import AccountManagementStackNavigator from "./StackTab/AccountManagementStackNavigator";
 
 const Tab = createBottomTabNavigator();
 
