@@ -8,8 +8,6 @@ import ProductManagementScreen from "../Screens/Guest/TabNavigation/ProductManag
 import DashboardScreen from "../Screens/Guest/TabNavigation/DashBoard";
 import OrderManagementScreen from "../Screens/Guest/TabNavigation/OrderManage";
 import CustomerManagementScreen from "../Screens/Guest/TabNavigation/CustomerManage";
-import EmployeeManagementScreen from "../Screens/Guest/TabNavigation/EmployeeManage";
-import CounterManagementScreen from "../Screens/Guest/TabNavigation/CounterManage";
 import CounterStackNavigator from "./stack-navigators/CounterStackNavigator";
 import Setttings from "../Screens/Guest/TabNavigation/Settings";
 

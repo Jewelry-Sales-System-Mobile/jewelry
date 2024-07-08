@@ -8,7 +8,7 @@ import ProductManagementScreen from "./TabNavigation/ProductManage";
 import DashboardScreen from "./TabNavigation/DashBoard";
 import OrderManagementScreen from "./TabNavigation/OrderManage";
 import CustomerManagementScreen from "./TabNavigation/CustomerManage";
-import EmployeeManagementScreen from "./TabNavigation/EmployeeManage";
+import AccountManagementScreen from "./TabNavigation/AccountManage";
 import CounterManagementScreen from "./TabNavigation/CounterManage";
 import CounterStackNavigator from "../../navigation/stack-navigators/CounterStackNavigator";
 import Setttings from "./TabNavigation/Setttings";
@@ -60,7 +60,7 @@ export default function AdminNavigation({ navigation }) {
       />
       <Tab.Screen
         name="Account"
-        component={EmployeeManagementScreen}
+        component={AccountManagementStackNavigator}
         options={{ headerShown: false }}
       />
       {/* <Tab.Screen

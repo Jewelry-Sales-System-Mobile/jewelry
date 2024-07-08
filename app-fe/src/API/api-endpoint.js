@@ -5,4 +5,5 @@ export const API_ENDPOINTS = {
   COUNTER: "/counters",
   SIGN_IN: "/users/login",
   ALL_CUSTOMERS: "/customers",
+  CUSTOMERS: "/customers",
 };
