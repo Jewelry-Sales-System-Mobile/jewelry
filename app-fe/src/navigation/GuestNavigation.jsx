@@ -2,10 +2,7 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 // import CustomTabIcon from "../../components/Navigation";
-import SignIn from "../Screens/Guest/SignIn";
-import SignUp from "../Screens/Guest/SignUp";
-import Welcome from "../Screens/Guest/Welcome";
-import SwitchRole from "../components/SwitchRole";
+
 import CustomTabIconV2 from "./CustomIconTabV2";
 import ProductManagementScreen from "../Screens/Guest/TabNavigation/ProductManage";
 import DashboardScreen from "../Screens/Guest/TabNavigation/DashBoard";
