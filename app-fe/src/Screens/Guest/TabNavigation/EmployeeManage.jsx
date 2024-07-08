@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text } from "react-native";
 
-const EmployeeManagementScreen = () => {
+const AccountManagementScreen = () => {
   return (
     <View>
       <Text>Employee Management</Text>
@@ -9,4 +9,4 @@ const EmployeeManagementScreen = () => {
   );
 };
 
-export default EmployeeManagementScreen;
+export default AccountManagementScreen;

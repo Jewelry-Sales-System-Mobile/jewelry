@@ -931,10 +931,11 @@ const styles = StyleSheet.create({
   card: {
     margin: 5,
     width: "47%", // Adjust width as per your design
+    backgroundColor: "#ffffff",
   },
   title: {
-    fontSize: 20,
-    fontWeight: 700,
+    fontSize: 18,
+    fontWeight: 600,
     marginBottom: 20,
     marginTop: 10,
   },
