@@ -108,18 +108,26 @@ const CustomerDetailScreen = () => {
         Danh sách đơn hàng của {customer.name}:
       </Text>
 
-      <FlatList
-        data={orders.slice(0, limit)}
-        renderItem={({ item }) => <OrderItem item={item} />}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.orderListContainer}
-        ListFooterComponent={renderFooter} // Add footer to FlatList
-      />
+      <View
+        className="bg-white rounded-md flex"
+        style={styles.orderListContainer}
+      >
+        <FlatList
+          data={orders.slice(0, limit)}
+          renderItem={({ item, index }) => (
+            <OrderItem item={item} index={index} />
+          )}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.orderListContainer}
+          ListFooterComponent={renderFooter} // Add footer to FlatList
+          ind
+        />
+      </View>
     </View>
   );
 };
 
-const OrderItem = ({ item }) => {
+const OrderItem = ({ item, index }) => {
   const [expanded, setExpanded] = useState(false);
 
   const getStatusImage = (status) => {
@@ -165,6 +173,7 @@ const OrderItem = ({ item }) => {
     <View style={styles.orderRow}>
       <View className="flex-row justify-between items-center">
         <View className="flex-row items-center">
+          {/* <Text className="font-semibold text-sm mr-2">#{index + 1}</Text> */}
           <Image
             source={{ uri: getStatusImage(item.paymentStatus) }}
             style={styles.image}
@@ -184,10 +193,12 @@ const OrderItem = ({ item }) => {
         {moment(item.created_at).format("DD/MM/YYYY, hh:mm A")}
       </Text>
       <Text className="text-base font-semibold text-[#937C00] my-2 ml-8">
-        {item.total.toLocaleString("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        })}{" "}
+        {item.total
+          ? item.total.toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })
+          : 0}{" "}
       </Text>
 
       <TouchableOpacity
@@ -228,10 +239,12 @@ const OrderItem = ({ item }) => {
                 <View className="flex-row justify-between">
                   <Text className="text-left">Tạm tổng:</Text>
                   <Text className="text-right">
-                    {item.subtotal.toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })}
+                    {item.subtotal
+                      ? item.subtotal.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                      : 0}{" "}
                   </Text>
                 </View>
                 <View className="flex-row justify-between">
@@ -246,10 +259,12 @@ const OrderItem = ({ item }) => {
                 <View className="flex-row justify-between">
                   <Text className="text-left">Tổng thành tiền:</Text>
                   <Text className="text-right">
-                    {item.total.toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })}
+                    {item.total
+                      ? item.total.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
+                      : 0}{" "}
                   </Text>
                 </View>
               </View>
