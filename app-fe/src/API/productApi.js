@@ -63,6 +63,15 @@ const deleteProductImage = async ({ productId, imageUrl }) => {
   return data.data;
 };
 
+const getProductById = async (productId) => {
+  const { data } = await http.get(`${API_ENDPOINTS.PRODUCT}/${productId}`);
+  return data.data;
+};
+
+export const useGetProductById = (productId) => {
+  return useQuery(["product", productId], () => getProductById(productId));
+};
+
 export const useCreateProduct = () => {
   const queryClient = useQueryClient();
   return useMutation(createProduct, {
