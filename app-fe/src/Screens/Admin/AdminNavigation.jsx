@@ -14,18 +14,18 @@ import CounterStackNavigator from "../../navigation/stack-navigators/CounterStac
 
 const Tab = createBottomTabNavigator();
 
-export default function GuestNavigation({ navigation }) {
+export default function AdminNavigation({ navigation }) {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused }) => {
           let iconUri;
-          if (route.name === "Customer") {
+          if (route.name === "Setting") {
             iconUri =
-              "https://img.icons8.com/small/64/null/gender-neutral-user.png";
+              "https://www.iconpacks.net/icons/2/free-settings-icon-3110-thumb.png";
           } else if (route.name === "Product") {
             iconUri = "https://img.icons8.com/small/64/null/gear.png";
-          } else if (route.name === "Staff") {
+          } else if (route.name === "Account") {
             iconUri = "https://static.thenounproject.com/png/4181324-200.png";
           } else if (route.name === "Order") {
             iconUri = "https://cdn-icons-png.flaticon.com/512/2977/2977924.png";
@@ -52,22 +52,21 @@ export default function GuestNavigation({ navigation }) {
         },
       })}
     >
-      
       <Tab.Screen
         name="Dashboard"
         component={DashboardScreen}
         options={{ headerShown: false }}
       />
       <Tab.Screen
-        name="Staff"
+        name="Account"
         component={EmployeeManagementScreen}
         options={{ headerShown: false }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Customer"
         component={CustomerManagementScreen}
         options={{ headerShown: false }}
-      />
+      /> */}
       <Tab.Screen
         name="Product"
         component={ProductManagementScreen}
@@ -81,9 +80,12 @@ export default function GuestNavigation({ navigation }) {
       <Tab.Screen
         name="Quầy hàng"
         component={CounterStackNavigator}
-        options={{ headerShown: false ,
-        
-        }}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Setting"
+        component={EmployeeManagementScreen}
+        options={{ headerShown: false }}
       />
     </Tab.Navigator>
   );

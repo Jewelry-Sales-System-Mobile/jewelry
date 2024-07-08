@@ -1,7 +1,7 @@
-import { create } from 'zustand'
+import { create } from "zustand";
 
 export const useRoleStore = create((set) => ({
-  isSignedIn: true,
+  isSignedIn: false,
   role: 0, // Assuming default role is 'user'
   token: null, // Initial token state
   setIsSignedIn: (isSignedIn) => set(() => ({ isSignedIn })),
