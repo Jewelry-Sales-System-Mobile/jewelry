@@ -5,7 +5,6 @@ import { showErrorMessage, showSuccessMessage } from "../Utils/notifications";
 
 const getProducts = async () => {
   const { data } = await http.get(API_ENDPOINTS.PRODUCT);
-  console.log("query product:", data);
   return data.data;
 };
 

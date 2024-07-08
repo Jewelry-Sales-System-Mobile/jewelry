@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   FlatList,
   StyleSheet,
-  TouchableOpacity,
   TextInput,
+  TouchableOpacity,
 } from "react-native";
 import {
   useActivateProduct,
@@ -35,6 +35,13 @@ import Constants from "expo-constants";
 import ActionDropdown from "../Component/ActionSection";
 import FilterDropdown from "../Component/FilterDropdown";
 
+const MAX_NAME_LENGTH = 70;
+const MAX_WEIGHT = 1000; // in grams
+const MAX_GEM_COST = 1000000000; // 1 billion VND
+const WEIGHT_DECIMAL_PLACES = 2;
+const MIN_WEIGHT = 5; // Minimum weight in grams
+const MIN_GEM_COST = 50000; // Minimum gem cost in VND
+
 const ProductManagementScreen = () => {
   const { data: products, isLoading, error, isFetching } = useGetProducts();
   const { mutate: createProduct } = useCreateProduct();
@@ -43,7 +50,6 @@ const ProductManagementScreen = () => {
   const { mutate: addProductImage } = useAddProductImage();
   const { mutate: inactivateProduct } = useInactivateProduct();
   const { mutate: activateProduct } = useActivateProduct();
-  console.log(products, "products");
 
   const [selectedProduct, setSelectedProduct] = useState(null); // State to hold selected product
   const [modalVisible, setModalVisible] = useState(false); // State to control modal visibility
@@ -57,20 +63,35 @@ const ProductManagementScreen = () => {
   }); // State để lưu thông tin mới của sản phẩm
   const [updatedProductData, setUpdatedProductData] = useState({
     name: "",
-    weight: 0,
-    gemCost: 0,
+    weight: "",
+    gemCost: "",
+  });
+  const [initialProductData, setInitialProductData] = useState({
+    name: "",
+    weight: "",
+    gemCost: "",
   });
   const [tooltipVisible, setTooltipVisible] = useState(false); // State to control tooltip visibility
   const [tooltipText, setTooltipText] = useState(""); // State to hold tooltip text
   const [searchText, setSearchText] = useState(""); // State to hold search text
   const [searchQuery, setSearchQuery] = useState("");
+  const [errors, setErrors] = useState({});
   // Dropdown menu actions
   const [visible, setVisible] = useState(false);
   const [visibleProducts, setVisibleProducts] = useState(6); // Số sản phẩm hiển thị ban đầu
   const [sortBy, setSortBy] = useState(null);
 
-  const filteredProducts = products?.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  useEffect(() => {
+    if (modalVisibleUpdate) {
+      // Set the initial product data when the modal opens
+      setInitialProductData(updatedProductData);
+    }
+  }, [modalVisibleUpdate]);
+
+  const filteredProducts = products?.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.productCode.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const filteredProductsSort = filteredProducts?.sort((a, b) => {
@@ -132,20 +153,213 @@ const ProductManagementScreen = () => {
     });
   };
 
-  // Hàm xử lý khi người dùng thay đổi dữ liệu nhập vào input
   const handleChange = (key, value) => {
-    // debugger;
-    setNewProductData({
-      ...newProductData,
-      [key]: value,
-    });
+    if (key === "weight" || key === "gemCost") {
+      let numericValue = value.replace(/[^0-9.]/g, "");
+
+      if (key === "weight") {
+        if (numericValue.split(".").length > 2) {
+          return;
+        }
+        if (numericValue.includes(".")) {
+          const [intPart, decimalPart] = numericValue.split(".");
+          if (decimalPart.length > WEIGHT_DECIMAL_PLACES) {
+            numericValue = `${intPart}.${decimalPart.slice(
+              0,
+              WEIGHT_DECIMAL_PLACES
+            )}`;
+          }
+        }
+        const parsedWeight = parseFloat(numericValue);
+        if (parsedWeight > MAX_WEIGHT) {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            weight: `Trọng lượng không quá ${MAX_WEIGHT} Gram`,
+          }));
+          return;
+        } else if (parsedWeight < MIN_WEIGHT) {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            weight: `Trọng lượng tối thiểu là ${MIN_WEIGHT} Gram`,
+          }));
+        } else {
+          setErrors((prevErrors) => ({ ...prevErrors, weight: null }));
+        }
+      } else if (key === "gemCost") {
+        const parsedGemCost = parseInt(numericValue, 10);
+        if (parsedGemCost > MAX_GEM_COST) {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            gemCost: `Giá đá quý không quá ${MAX_GEM_COST.toLocaleString(
+              "vi-VN",
+              {
+                style: "currency",
+                currency: "VND",
+              }
+            )} VND`,
+          }));
+          return;
+        } else if (parsedGemCost < MIN_GEM_COST) {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            gemCost: `Giá đá quý tối thiểu là ${MIN_GEM_COST.toLocaleString(
+              "vi-VN",
+              {
+                style: "currency",
+                currency: "VND",
+              }
+            )} VND`,
+          }));
+        } else {
+          setErrors((prevErrors) => ({ ...prevErrors, gemCost: null }));
+        }
+      }
+
+      setNewProductData((prevState) => ({
+        ...prevState,
+        [key]: numericValue,
+      }));
+    } else if (key === "name") {
+      if (value.length > MAX_NAME_LENGTH) {
+        setErrors((prevErrors) => ({ ...prevErrors, name: "Tên quá dài" }));
+        return;
+      } else {
+        setErrors((prevErrors) => ({ ...prevErrors, name: null }));
+      }
+      setNewProductData((prevState) => ({
+        ...prevState,
+        [key]: value,
+      }));
+    }
   };
 
+  // Kiểm tra xem dữ liệu nhập vào có hợp lệ hay không cho TẠO SẢN PHẨM
+  const isFormValidAdd = () => {
+    // Kiểm tra các trường thông tin
+    if (!newProductData.name) {
+      return false;
+    }
+
+    // Kiểm tra trường weight
+    if (!newProductData.weight) {
+      return false;
+    }
+    const parsedWeight = parseFloat(newProductData.weight);
+    if (
+      isNaN(parsedWeight) ||
+      parsedWeight < MIN_WEIGHT ||
+      parsedWeight > MAX_WEIGHT
+    ) {
+      return false;
+    }
+
+    // Kiểm tra trường gemCost
+    if (!newProductData.gemCost) {
+      return false;
+    }
+    const parsedGemCost = parseInt(newProductData.gemCost, 10);
+    if (
+      isNaN(parsedGemCost) ||
+      parsedGemCost < MIN_GEM_COST ||
+      parsedGemCost > MAX_GEM_COST
+    ) {
+      return false;
+    }
+
+    // Nếu các trường đều hợp lệ
+    return true;
+  };
+
+  // Kiểm tra xem dữ liệu nhập vào có hợp lệ hay không cho CẬP NHẬT SẢN PHẨM
+  const isFormValidUpdate =
+    updatedProductData.name &&
+    updatedProductData.weight &&
+    updatedProductData.gemCost &&
+    (updatedProductData.name !== initialProductData.name ||
+      updatedProductData.weight !== initialProductData.weight ||
+      updatedProductData.gemCost !== initialProductData.gemCost) &&
+    !errors.name &&
+    !errors.weight &&
+    !errors.gemCost;
+
   const handleUpdateChange = (key, value) => {
-    setUpdatedProductData({
-      ...updatedProductData,
-      [key]: value,
-    });
+    if (key === "weight" || key === "gemCost") {
+      let numericValue = value.replace(/[^0-9.]/g, "");
+
+      if (key === "weight") {
+        if (numericValue.split(".").length > 2) {
+          return;
+        }
+        if (numericValue.includes(".")) {
+          const [intPart, decimalPart] = numericValue.split(".");
+          if (decimalPart.length > WEIGHT_DECIMAL_PLACES) {
+            numericValue = `${intPart}.${decimalPart.slice(
+              0,
+              WEIGHT_DECIMAL_PLACES
+            )}`;
+          }
+        }
+        const parsedWeight = parseFloat(numericValue);
+        if (parsedWeight > MAX_WEIGHT) {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            weight: `Trọng lượng không quá ${MAX_WEIGHT} Gram`,
+          }));
+          return;
+        } else if (parsedWeight < MIN_WEIGHT) {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            weight: `Trọng lượng tối thiểu là ${MIN_WEIGHT} Gram`,
+          }));
+        } else {
+          setErrors((prevErrors) => ({ ...prevErrors, weight: null }));
+        }
+      } else if (key === "gemCost") {
+        const parsedGemCost = parseInt(numericValue, 10);
+        if (parsedGemCost > MAX_GEM_COST) {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            gemCost: `Giá đá quý không quá ${MAX_GEM_COST.toLocaleString(
+              "vi-VN",
+              {
+                style: "currency",
+                currency: "VND",
+              }
+            )} VND`,
+          }));
+          return;
+        } else if (parsedGemCost < MIN_GEM_COST) {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            gemCost: `Giá đá quý tối thiểu là ${MIN_GEM_COST.toLocaleString(
+              "vi-VN",
+              {
+                style: "currency",
+                currency: "VND",
+              }
+            )} VND`,
+          }));
+        } else {
+          setErrors((prevErrors) => ({ ...prevErrors, gemCost: null }));
+        }
+      }
+
+      setUpdatedProductData((prevState) => ({
+        ...prevState,
+        [key]: numericValue,
+      }));
+    } else if (key === "name") {
+      if (value.length > MAX_NAME_LENGTH) {
+        setErrors((prevErrors) => ({ ...prevErrors, name: "Tên quá dài" }));
+        return;
+      } else {
+        setErrors((prevErrors) => ({ ...prevErrors, name: null }));
+      }
+      setUpdatedProductData((prevState) => ({
+        ...prevState,
+        [key]: value,
+      }));
+    }
   };
 
   const handleSaveUpdate = () => {
@@ -231,15 +445,24 @@ const ProductManagementScreen = () => {
 
   const renderItem = ({ item, index }) => {
     const formatCurrency = (value) => {
-      // debugger;
       if (value == null || isNaN(value)) return "0 VND";
+      const numValue = Number(value); // Convert value to a number
       return new Intl.NumberFormat("vi-VN", {
         style: "currency",
         currency: "VND",
-      }).format(Number(value?.toFixed(2)));
+      }).format(numValue.toFixed(2));
     };
 
     const formattedPrice = formatCurrency(item?.basePrice);
+
+    // const clearErrorAfterTimeout = (key) => {
+    //   setTimeout(() => {
+    //     setErrors((prevErrors) => ({
+    //       ...prevErrors,
+    //       [key]: null,
+    //     }));
+    //   }, 3000); // 3 seconds timeout
+    // };
 
     return (
       <Card style={styles.card}>
@@ -351,7 +574,7 @@ const ProductManagementScreen = () => {
       </View>
       <View style={styles.searchContainer}>
         <Searchbar
-          placeholder="Search"
+          placeholder="Tìm tên hoặc mã sản phẩm..."
           onChangeText={setSearchQuery}
           value={searchQuery}
           style={styles.searchBar}
@@ -460,15 +683,7 @@ const ProductManagementScreen = () => {
                         })}
                       </Paragraph>
                     </TouchableOpacity>
-                    {/* {tooltipVisible && (
-                      <Modal
-                        visible={tooltipVisible}
-                        onDismiss={() => setTooltipVisible(false)}
-                        contentContainerStyle={styles.tooltipContainer}
-                      >
-                        <Text>{tooltipText} </Text>
-                      </Modal>
-                    )} */}
+
                     <View style={styles.buttonContainer}>
                       <TouchableOpacity
                         style={styles.button}
@@ -526,32 +741,73 @@ const ProductManagementScreen = () => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Title className="font-semibold text-xl mb-10 text-[#ccac00]">
+            <Title className="font-semibold text-xl mb-5 text-[#ccac00]">
               Cập Nhật Sản Phẩm
             </Title>
-            <TextInput
-              style={styles.input}
-              placeholder="Tên sản phẩm"
-              value={updatedProductData.name}
-              onChangeText={(text) => handleUpdateChange("name", text)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Trọng lượng (Gram)"
-              value={updatedProductData.weight}
-              onChangeText={(text) => handleUpdateChange("weight", text)}
-              keyboardType="numeric"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Giá đá quý (VND)"
-              value={updatedProductData.gemCost}
-              onChangeText={(text) => handleUpdateChange("gemCost", text)}
-              keyboardType="numeric"
-            />
+            <View className="w-full">
+              <Text className="text-[12px] font-semibold mb-2">
+                Tên sản phẩm
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Tên sản phẩm"
+                value={updatedProductData.name}
+                onChangeText={(text) => handleUpdateChange("name", text)}
+                mode="outlined"
+              />
+              <Text className=" text-right text-[12px]">
+                {updatedProductData.name.length}/{MAX_NAME_LENGTH}
+              </Text>
+            </View>
+            <View className="w-full ">
+              <Text className="text-[12px] font-semibold mb-2">
+                Trọng lượng (Gram)
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Trọng lượng (Gram)"
+                value={updatedProductData.weight}
+                onChangeText={(text) => handleUpdateChange("weight", text)}
+                keyboardType="numeric"
+                mode="outlined"
+              />
+              {errors.weight && (
+                <Text style={styles.errorText}>{errors.weight}</Text>
+              )}
+            </View>
+
+            <View className="w-full ">
+              <Text className="text-[12px] font-semibold mb-2">
+                Giá đá quý (VND)
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Giá đá quý (VND)"
+                value={updatedProductData.gemCost}
+                onChangeText={(text) => handleUpdateChange("gemCost", text)}
+                keyboardType="numeric"
+                mode="outlined"
+              />
+              {errors.gemCost && (
+                <Text style={styles.errorText}>{errors.gemCost}</Text>
+              )}
+            </View>
             <TouchableOpacity
-              style={styles.addButton2}
+              style={[
+                styles.addButton2,
+                (!isFormValidUpdate ||
+                  errors.name ||
+                  errors.weight ||
+                  errors.gemCost) &&
+                  styles.disabledButton,
+              ]}
               onPress={handleSaveUpdate}
+              disabled={
+                !isFormValidUpdate ||
+                errors.name ||
+                errors.weight ||
+                errors.gemCost
+              }
             >
               <Text style={styles.buttonText}>Lưu</Text>
             </TouchableOpacity>
@@ -568,35 +824,67 @@ const ProductManagementScreen = () => {
       <Modal visible={modalVisibleAdd} animationType="slide" transparent={true}>
         <View style={[styles.modalContainer]}>
           <View style={styles.modalContent}>
-            <Title className="font-semibold text-xl mb-10 text-[#ccac00]">
+            <Title className="font-semibold text-xl mb-5 text-[#ccac00]">
               Tạo Sản Phẩm Mới
             </Title>
-            <TextInput
-              style={styles.input}
-              placeholder="Tên sản phẩm"
-              value={newProductData.name}
-              onChangeText={(text) => handleChange("name", text)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Khối lượng (gram)"
-              value={newProductData.weight}
-              onChangeText={(text) => handleChange("weight", text)}
-              keyboardType="numeric"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Chi phí đá (VND)"
-              value={newProductData.gemCost}
-              onChangeText={(text) => handleChange("gemCost", text)}
-              keyboardType="numeric"
-            />
+            <View className="w-full">
+              <Text className="text-[12px] font-semibold mb-2">
+                Tên sản phẩm
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Tên sản phẩm"
+                value={newProductData.name}
+                onChangeText={(text) => handleChange("name", text)}
+                mode="outlined"
+              />
+              <Text className=" text-right text-[12px]">
+                {newProductData.name.length}/{MAX_NAME_LENGTH}
+              </Text>
+            </View>
+            <View className="w-full ">
+              <Text className="text-[12px] font-semibold mb-2">
+                Khối lượng (gram)
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Khối lượng (gram)"
+                value={newProductData.weight}
+                onChangeText={(text) => handleChange("weight", text)}
+                keyboardType="numeric"
+                mode="outlined"
+              />
+              {errors.weight && (
+                <Text style={styles.errorText}>{errors.weight}</Text>
+              )}
+            </View>
+            <View className="w-full ">
+              <Text className="text-[12px] font-semibold mb-2">
+                Chi phí đá (VND)
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Chi phí đá (VND)"
+                value={newProductData.gemCost}
+                onChangeText={(text) => handleChange("gemCost", text)}
+                keyboardType="numeric"
+                mode="outlined"
+              />
+              {errors.gemCost && (
+                <Text style={styles.errorText}>{errors.gemCost}</Text>
+              )}
+            </View>
             <TouchableOpacity
-              style={styles.addButton2}
+              style={[
+                styles.addButton2,
+                !isFormValidAdd() && styles.disabledButton,
+              ]}
               onPress={handleCreateProduct}
+              disabled={!isFormValidAdd()}
             >
               <Text style={styles.buttonText}>Thêm sản phẩm</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               style={styles.cancelButton}
               onPress={closeModalAdd}
@@ -611,6 +899,13 @@ const ProductManagementScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  errorText: {
+    color: "red",
+    marginBottom: 10,
+  },
+  disabledButton: {
+    backgroundColor: "#9E9E9E",
+  },
   menuContainer: {
     position: "absolute",
     top: 5,
