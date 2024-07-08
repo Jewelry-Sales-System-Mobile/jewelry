@@ -42,6 +42,11 @@ const FilterDropdown = ({ onFilterChange }) => {
     showSuccessMessage("Đặt lại bộ lọc thành công");
   };
 
+  // Hàm đóng modal
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
   const getFilterText = () => {
     if (sortBy) {
       const type = sortBy.startsWith("-") ? sortBy.substring(1) : sortBy;
@@ -79,6 +84,10 @@ const FilterDropdown = ({ onFilterChange }) => {
       >
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
+            <Text className="font-semibold text-xl mb-2 text-[#ccac00] text-center">
+              {" "}
+              Lọc sản phẩm
+            </Text>
             <Text style={styles.filterInfoText}>{getFilterText()}</Text>
             <TouchableOpacity
               style={styles.option}
@@ -102,11 +111,16 @@ const FilterDropdown = ({ onFilterChange }) => {
             >
               <Text style={styles.optionText}>{getOptionText("weight")}</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.resetButton}
-              onPress={handleResetFilter}
-            >
-              <Text style={styles.resetButtonText}>Reset</Text>
+            {sortBy && (
+              <TouchableOpacity
+                style={styles.resetButton}
+                onPress={handleResetFilter}
+              >
+                <Text style={styles.resetButtonText}>Reset</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity style={styles.cancelButton} onPress={closeModal}>
+              <Text style={styles.buttonText}>Hủy</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -116,6 +130,18 @@ const FilterDropdown = ({ onFilterChange }) => {
 };
 
 const styles = StyleSheet.create({
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  cancelButton: {
+    backgroundColor: "#8B0000",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    width: "100%",
+    alignItems: "center",
+  },
   container: {
     flexDirection: "row",
     alignItems: "center",

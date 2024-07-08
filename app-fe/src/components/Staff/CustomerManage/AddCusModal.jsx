@@ -18,6 +18,9 @@ import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 const schema = Yup.object().shape({
+  name: Yup.string().required("Name is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  phone: Yup.number().required("Phone is required"),
   dob: Yup.date().required("Date of birth is required").nullable(),
   // Add other fields validation as needed
 });
@@ -68,6 +71,10 @@ export default function AddCusModal({
     },
     [setOpen, setDate]
   );
+  const onSubmit = (data) => {
+    console.log(data);
+    // Handle your form submission logic here
+  };
   return (
     <Modal visible={modalVisibleAdd} animationType="slide" transparent={true}>
       <View className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-black bg-opacity-50">
@@ -76,55 +83,92 @@ export default function AddCusModal({
             Them Khach Hang Moi
           </Title>
           <Text className="text-slate-500">Ten Khach Hang</Text>
-          <TextInput
+          <Controller
+            control={control}
             name="name"
-            placeholder="Ten Khach Hang"
-            onChangeText={(text) => handleChange("name", text)}
-            className="text-lg border-b-[1px] p-2 border-slate-500   w-full mb-3"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                placeholder="Ten Khach Hang"
+                onChangeText={onChange}
+                onBlur={onBlur}
+                value={value}
+                className="text-lg border-b-[1px] p-2 border-slate-500 w-full mb-3"
+              />
+            )}
           />
+          {errors.name && (
+            <Text className="text-red-500">{errors.name.message}</Text>
+          )}
           <Text className="text-slate-500">Email</Text>
-
-          <TextInput
+          <Controller
+            control={control}
             name="email"
-            placeholder="Email"
-            onChangeText={(text) => handleChange("email", text)}
-            className="text-lg border-b-[1px] p-2 border-slate-500  w-full mb-3"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                placeholder="Email"
+                onChangeText={onChange}
+                onBlur={onBlur}
+                value={value}
+                className="text-lg border-b-[1px] p-2 border-slate-500 w-full mb-3"
+              />
+            )}
           />
+          {errors.email && (
+            <Text className="text-red-500">{errors.email.message}</Text>
+          )}
           <Text className="text-slate-500">So Dien Thoai</Text>
-
-          <TextInput
+          <Controller
+            control={control}
             name="phone"
-            placeholder="So Dien Thoai"
-            onChangeText={(text) => handleChange("phone", text)}
-            className="text-lg border-b-[1px] p-2 border-slate-500   w-full mb-3"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                placeholder="So Dien Thoai"
+                onChangeText={onChange}
+                onBlur={onBlur}
+                value={value}
+                className="text-lg border-b-[1px] p-2 border-slate-500 w-full mb-3"
+              />
+            )}
           />
+          {errors.phone && (
+            <Text className="text-red-500">{errors.phone.message}</Text>
+          )}
           <Text className="text-slate-500">Ngay Sinh</Text>
 
-          <View className="flex flex-row justify-between items-center w-full mb-3">
-            <Text
-              name="dob"
-              className="w-2/3 border-b-[1px] border-slate-500 p-2"
-            >
-              {date}
-            </Text>
-            <TouchableOpacity
-              onPress={() => setOpen(true)}
-              className="text-white text-center bg-purple-400 ml-3 text-sm p-1 rounded-xl w-1/3"
-            >
-              Select Date
-            </TouchableOpacity>
-            <DatePickerModal
-              locale="en"
-              mode="single"
-              visible={open}
-              onDismiss={onDismissSingle}
-              date={date}
-              onConfirm={onConfirmSingle}
-            />
-          </View>
+          <Controller
+            control={control}
+            name="dob"
+            render={({ field: { onChange, value } }) => (
+              <View className="flex flex-row justify-between items-center w-full mb-3">
+                <Text
+                  className="w-2/3 border-b-[1px] border-slate-500 p-2"
+                  onPress={() => setOpen(true)}
+                >
+                  {value ? value.toLocaleDateString() : "Select Date"}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setOpen(true)}
+                  className="text-white text-center bg-purple-400 ml-3 text-sm p-1 rounded-xl w-1/3"
+                >
+                  Select Date
+                </TouchableOpacity>
+                <DatePickerModal
+                  locale="en"
+                  mode="single"
+                  visible={open}
+                  onDismiss={onDismissSingle}
+                  date={value}
+                  onConfirm={onConfirmSingle}
+                />
+              </View>
+            )}
+          />
+          {errors.dob && (
+            <Text className="text-red-500">{errors.dob.message}</Text>
+          )}
           <TouchableOpacity
             className="bg-[#ccac00] p-2.5 rounded-md mt-2.5 w-full items-center"
-            //   onPress={handleCreateProduct}
+            onPress={handleSubmit(onSubmit)}
           >
             <Text className="text-white">Thêm Khach Hang</Text>
           </TouchableOpacity>

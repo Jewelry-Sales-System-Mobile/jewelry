@@ -78,4 +78,13 @@ ordersRouter.put(
   accessTokenValidator,
   wrapRequestHandler(cancelOrderController)
 );
+
+/**
+ * Description: Get all orders of customer
+ * Route: GET /orders/by-customer/:customer_id
+ */
+ordersRouter.get(
+  "/by-customer/:customer_id",
+  wrapRequestHandler(getAllOrdersController)
+);
 export default ordersRouter;

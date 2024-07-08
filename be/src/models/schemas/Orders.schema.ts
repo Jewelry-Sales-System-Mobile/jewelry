@@ -10,6 +10,7 @@ export interface OrderDetail {
 interface OrderType {
   _id?: ObjectId;
   customer_id: ObjectId; // reference to Customers collection
+  staff_id: ObjectId; // reference to Users(Staff) collection
   order_details: OrderDetail[];
   order_code?: string;
   subtotal: number;
@@ -23,6 +24,7 @@ interface OrderType {
 export default class Order {
   _id?: ObjectId;
   customer_id: ObjectId;
+  staff_id: ObjectId;
   order_details: OrderDetail[];
   order_code?: string;
   subtotal: number;
@@ -36,6 +38,7 @@ export default class Order {
     const date = new Date();
     this._id = order._id || new ObjectId();
     this.customer_id = order.customer_id;
+    this.staff_id = order.staff_id;
     this.order_details = order.order_details;
     this.order_code = order.order_code || "";
     this.subtotal = order.subtotal;
