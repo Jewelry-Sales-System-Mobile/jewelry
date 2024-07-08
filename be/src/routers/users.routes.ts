@@ -4,9 +4,14 @@ import { Router } from "express";
 import {
   activeUserController,
   changePassWordController,
+  getAllUsersController,
+  getMyProfileController,
+  getUserByIdController,
+  getUserProfileController,
   inactiveUserController,
   loginController,
   registerController,
+  updateNameOfUserController,
 } from "~/controllers/users.controllers";
 import {
   accessTokenValidator,
@@ -72,6 +77,47 @@ usersRouter.put(
   wrapRequestHandler(inactiveUserController)
 );
 
+/**
+ * Description: Get All Users
+ * Route: [GET] /users/get-all
+ * Header: {Authorization: Bearer <access_token>}
+ */
+usersRouter.get(
+  "/get-all",
+  accessTokenValidator,
+  wrapRequestHandler(getAllUsersController)
+);
+
+/**
+ * Description: Update name of a user
+ * Route: [PUT] /users/update/:user_id
+ * Header: {Authorization: Bearer <access_token>}
+ */
+usersRouter.put(
+  "/update/:user_id",
+  accessTokenValidator,
+  wrapRequestHandler(updateNameOfUserController)
+);
+
+/**
+ * Description: Get user by id
+ * Route: [GET] /users/:user_id
+ * Body: {}
+ */
+usersRouter.get("/:user_id", wrapRequestHandler(getUserByIdController));
+
+/**
+ * Description: Get my profile
+ * Route: [GET] /users/profile
+ * Header: {Authorization: Bearer <access_token>}
+ * Body: {}
+ */
+usersRouter.get(
+  "/profile/my-profile",
+  accessTokenValidator,
+  wrapRequestHandler(getMyProfileController)
+);
+
 // /**
 //  * Description: verify email
 //  * Route: [POST] /users/verify-email
@@ -132,18 +178,6 @@ usersRouter.put(
 // );
 
 // /**
-//  * Description: Get my profile
-//  * Route: [GET] /users/profile
-//  * Header: {Authorization: Bearer <access_token>}
-//  * Body: {}
-//  */
-// usersRouter.get(
-//   "/profile",
-//   accessTokenValidator,
-//   wrapRequestHandler(getMyProfileController)
-// );
-
-// /**
 //  * Description: Update my profile
 //  * Route: [PATCH] /users/profile
 //  * Header: {Authorization: Bearer <access_token>}
@@ -156,16 +190,6 @@ usersRouter.put(
 //   updateProfileValidator,
 //   filterMiddleware<UpdateProfileReqBody>(["name", "date_of_birth", "username"]),
 //   wrapRequestHandler(updateMyProfileController)
-// );
-
-// /**
-//  * Description: Get user profile
-//  * Route: [GET] /users/profile/:user_id
-//  * Body: {}
-//  */
-// usersRouter.get(
-//   "/profile/:username",
-//   wrapRequestHandler(getUserProfileController)
 // );
 
 // /**

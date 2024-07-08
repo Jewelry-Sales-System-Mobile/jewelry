@@ -59,11 +59,12 @@ class OrderServices {
     return order;
   }
 
-  async createOrder(body: CreateOrderReqBody) {
+  async createOrder(body: CreateOrderReqBody, user_id: string) {
     const orderCode = await this.generateUniqueOrderCode();
     const newBody = {
       _id: new ObjectId(),
       customer_id: new ObjectId(body.customer_id),
+      staff_id: new ObjectId(user_id),
       order_details: body.order_details,
       order_code: orderCode,
       subtotal: body.subtotal,
@@ -77,8 +78,19 @@ class OrderServices {
     const { insertedId } = await databaseService.orders.insertOne(newBody);
 
     const order = await databaseService.orders.findOne({ _id: insertedId });
-
-    return order;
+    let addedPoints = Math.floor(body.total / 100000);
+    if (body.discount > 0) {
+      const discountPoints = Math.floor(body.discount / 100000) * 100;
+      await databaseService.users.updateOne(
+        { _id: new ObjectId(user_id) },
+        { $inc: { points: discountPoints } }
+      );
+    }
+    await databaseService.users.updateOne(
+      { _id: new ObjectId(user_id) },
+      { $inc: { points: addedPoints } }
+    );
+    return { order, addedPoints };
   }
 
   async confirmOrder(order_id: string) {
@@ -100,6 +112,7 @@ class OrderServices {
       {
         $set: {
           paymentStatus: PaymentStatus.Paid,
+          total: order.total * -1,
         },
         $currentDate: { updated_at: true },
       },
@@ -139,6 +152,12 @@ class OrderServices {
     );
 
     return updatedOrder;
+  }
+
+  async getAllOrdersOfACustomer(customer_id: string) {
+    return await databaseService.orders
+      .find({ customer_id: new ObjectId(customer_id) })
+      .toArray();
   }
 }
 

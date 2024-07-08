@@ -7,6 +7,8 @@ import {
   OrderCodeReqParams,
   OrderIdReqParams,
 } from "~/models/requests/Orders.requests";
+import { CustomerIdReqParams } from "~/models/requests/Customers.requests";
+import { TokenPayload } from "~/models/requests/Users.requests";
 
 export const getAllOrdersController = async (
   req: Request,
@@ -51,10 +53,16 @@ export const createOrderController = async (
   res: Response,
   next: NextFunction
 ) => {
-  const order = await orderServices.createOrder(req.body);
+  const { user_id } = req.decoded_authorization as TokenPayload;
+
+  const { order, addedPoints } = await orderServices.createOrder(
+    req.body,
+    user_id
+  );
   return res.json({
-    message: "Create order successfully",
+    message: `Create order successfully. You got ${addedPoints} points.`,
     data: order,
+    plus_points: addedPoints,
   });
 };
 
@@ -81,5 +89,18 @@ export const cancelOrderController = async (
   return res.json({
     message: "Cancel order successfully",
     data: order,
+  });
+};
+
+export const getAllOrdersOfACustomerController = async (
+  req: Request<CustomerIdReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { customer_id } = req.params;
+  const orders = await orderServices.getAllOrdersOfACustomer(customer_id);
+  return res.json({
+    message: "Get all orders of a customer successfully",
+    data: orders,
   });
 };
