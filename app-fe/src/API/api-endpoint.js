@@ -3,4 +3,5 @@ export const API_ENDPOINTS = {
   PRODUCT_DETAIL: "/products/",
   ORDER: "/orders",
   SIGN_IN: "/users/login",
+  ALL_CUSTOMERS: "/customers",
 };

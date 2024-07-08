@@ -51,5 +51,13 @@ export const getToken = async () => {
     return null;
   }
 };
+export const deleteAutoToken = async () => {
+  try {
+    await AsyncStorage.removeItem("auto_token");
+    console.log("auto_token removed successfully");
+  } catch (error) {
+    console.error("Failed to remove auto_token", error);
+  }
+};
 
 export default http;

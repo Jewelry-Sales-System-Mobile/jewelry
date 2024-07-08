@@ -45,6 +45,8 @@ export default function Main() {
           setIsSignedIn(true); // Corrected method call
         } else {
           // Handle token expiration
+          setIsSignedIn(false); // Corrected method call
+          deleteAutoToken();
         }
       }
     };
