@@ -1,5 +1,8 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
+import ManageCounter from "./Counter/ManageCounter";
+import { Text } from "react-native";
 import CustomTabIconV2 from "./CustomIconTabV2";
 import ProductManagementScreen from "./TabNavigation/ProductManage";
 import DashboardScreen from "./TabNavigation/DashBoard";
@@ -7,6 +10,7 @@ import OrderManagementScreen from "./TabNavigation/OrderManage";
 import CustomerManagementScreen from "./TabNavigation/CustomerManage";
 import EmployeeManagementScreen from "./TabNavigation/EmployeeManage";
 import CounterManagementScreen from "./TabNavigation/CounterManage";
+import CounterStackNavigator from "../../navigation/stack-navigators/CounterStackNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -25,7 +29,7 @@ export default function GuestNavigation({ navigation }) {
             iconUri = "https://static.thenounproject.com/png/4181324-200.png";
           } else if (route.name === "Order") {
             iconUri = "https://cdn-icons-png.flaticon.com/512/2977/2977924.png";
-          } else if (route.name === "Counter") {
+          } else if (route.name === "Quầy hàng") {
             iconUri = "https://img.icons8.com/small/64/null/switch.png";
           } else {
             // Default case
@@ -48,6 +52,7 @@ export default function GuestNavigation({ navigation }) {
         },
       })}
     >
+      
       <Tab.Screen
         name="Dashboard"
         component={DashboardScreen}
@@ -74,9 +79,11 @@ export default function GuestNavigation({ navigation }) {
         options={{ headerShown: false }}
       />
       <Tab.Screen
-        name="Counter"
-        component={CounterManagementScreen}
-        options={{ headerShown: false }}
+        name="Quầy hàng"
+        component={CounterStackNavigator}
+        options={{ headerShown: false ,
+        
+        }}
       />
     </Tab.Navigator>
   );

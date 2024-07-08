@@ -5,16 +5,18 @@ import { useRoleStore } from "../Zustand/Role";
 export default function SwitchRole() {
   const { role, isSignedIn, token, setRole, setIsSignedIn, setToken } =
     useRoleStore();
-  useEffect(() => {
-    async () => {
-      try {
-        const token = await AsyncStorage.getItem("auth_token");
-        setToken(token ? token : null);
-      } catch (error) {
-        console.log(error, "error");
-      }
-    };
-  }, []);
+    useEffect(() => {
+      const fetchToken = async () => {
+        try {
+          const token = await AsyncStorage.getItem("auth_token");
+          setToken(token ? token : null);
+        } catch (error) {
+          console.log(error, "error");
+        }
+      };
+  
+      fetchToken();
+    }, [setToken]);
   return (
     <View className="flex flex-col ">
       <Text

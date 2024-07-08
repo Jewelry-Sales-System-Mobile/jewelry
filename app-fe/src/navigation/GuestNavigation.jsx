@@ -1,12 +1,16 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Ionicons } from "@expo/vector-icons";
+// import CustomTabIcon from "../../components/Navigation";
+
 import CustomTabIconV2 from "./CustomIconTabV2";
-import ProductManagementScreen from "./TabNavigation/ProductManage";
-import DashboardScreen from "./TabNavigation/DashBoard";
-import OrderManagementScreen from "./TabNavigation/OrderManage";
-import CustomerManagementScreen from "./TabNavigation/CustomerManage";
-import EmployeeManagementScreen from "./TabNavigation/EmployeeManage";
-import CounterManagementScreen from "./TabNavigation/CounterManage";
+import ProductManagementScreen from "../Screens/Guest/TabNavigation/ProductManage";
+import DashboardScreen from "../Screens/Guest/TabNavigation/DashBoard";
+import OrderManagementScreen from "../Screens/Guest/TabNavigation/OrderManage";
+import CustomerManagementScreen from "../Screens/Guest/TabNavigation/CustomerManage";
+import EmployeeManagementScreen from "../Screens/Guest/TabNavigation/EmployeeManage";
+import CounterManagementScreen from "../Screens/Guest/TabNavigation/CounterManage";
+import CounterStackNavigator from "./stack-navigators/CounterStackNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -23,6 +27,8 @@ export default function GuestNavigation({ navigation }) {
             iconUri = "https://img.icons8.com/small/64/null/gear.png";
           } else if (route.name === "Order") {
             iconUri = "https://cdn-icons-png.flaticon.com/512/2977/2977924.png";
+          } else if (route.name === "Quầy hàng") {
+            iconUri = "https://img.icons8.com/small/64/null/switch.png";
           } else {
             // Default case
             iconUri = "https://img.icons8.com/small/64/null/home-page.png";
@@ -62,6 +68,11 @@ export default function GuestNavigation({ navigation }) {
       <Tab.Screen
         name="Order"
         component={OrderManagementScreen}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Quầy hàng"
+        component={CounterStackNavigator}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>
