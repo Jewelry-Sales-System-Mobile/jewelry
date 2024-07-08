@@ -4,7 +4,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 //http://192.168.1.12:4000/
 
 const http = axios.create({
-  baseURL: "http://localhost:4000/",
+  // baseURL: "http://192.168.1.12:4000",
+  baseURL: "http://localhost:4000",
+  //http://192.168.1.12:4000/
+  // baseURL: "https://nghich.id.vn",
+
   timeout: 30000,
   headers: {
     Accept: "application/json",
@@ -55,7 +59,7 @@ export const getToken = async () => {
 };
 export const deleteAutoToken = async () => {
   try {
-    await AsyncStorage.removeItem("auto_token");
+    await AsyncStorage.removeItem("auth_token");
     console.log("auto_token removed successfully");
   } catch (error) {
     console.error("Failed to remove auto_token", error);

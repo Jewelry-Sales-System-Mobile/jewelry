@@ -4,5 +4,6 @@ export const API_ENDPOINTS = {
   ORDER: "/orders",
   COUNTER: "/counters",
   SIGN_IN: "/users/login",
+  ALL_CUSTOMERS: "/customers",
   CUSTOMERS: "/customers",
 };

@@ -9,6 +9,7 @@ import DashboardScreen from "../Screens/Guest/TabNavigation/DashBoard";
 import OrderManagementScreen from "../Screens/Guest/TabNavigation/OrderManage";
 import CustomerManagementScreen from "../Screens/Guest/TabNavigation/CustomerManage";
 import CounterStackNavigator from "./stack-navigators/CounterStackNavigator";
+import Setttings from "../Screens/Guest/TabNavigation/Settings";
 
 const Tab = createBottomTabNavigator();
 
@@ -27,6 +28,9 @@ export default function GuestNavigation({ navigation }) {
             iconUri = "https://cdn-icons-png.flaticon.com/512/2977/2977924.png";
           } else if (route.name === "Quầy hàng") {
             iconUri = "https://img.icons8.com/small/64/null/switch.png";
+          } else if (route.name === "Setting") {
+            iconUri =
+              "https://www.iconpacks.net/icons/2/free-settings-icon-3110-thumb.png";
           } else {
             // Default case
             iconUri = "https://img.icons8.com/small/64/null/home-page.png";
@@ -71,6 +75,11 @@ export default function GuestNavigation({ navigation }) {
       <Tab.Screen
         name="Quầy hàng"
         component={CounterStackNavigator}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Setting"
+        component={Setttings}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>

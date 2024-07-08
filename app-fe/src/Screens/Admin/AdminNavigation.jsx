@@ -11,7 +11,7 @@ import CustomerManagementScreen from "./TabNavigation/CustomerManage";
 import AccountManagementScreen from "./TabNavigation/AccountManage";
 import CounterManagementScreen from "./TabNavigation/CounterManage";
 import CounterStackNavigator from "../../navigation/stack-navigators/CounterStackNavigator";
-import AccountManagementStackNavigator from "./StackTab/AccountManagementStackNavigator";
+import Setttings from "./TabNavigation/Setttings";
 
 const Tab = createBottomTabNavigator();
 
@@ -85,7 +85,7 @@ export default function AdminNavigation({ navigation }) {
       />
       <Tab.Screen
         name="Setting"
-        component={CustomerManagementScreen}
+        component={Setttings}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>
