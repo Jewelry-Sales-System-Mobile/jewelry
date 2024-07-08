@@ -1,15 +1,15 @@
 import { NativeWindStyleSheet } from "nativewind";
-
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
-import StaffNavigation from "../Screens/Staff/StaffNavigation";
-import UserNavigation from "../Screens/User/UserNavigation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AdminNavigation from "../Screens/Admin/AdminNavigation";
-import GuestNavigation from "../navigation/GuestNavigation";
+import GuestNavigation from "../Screens/Guest/GuestNavigation";
+import SignIn from "../Screens/Auth/SignIn";
 import { useRoleStore } from "../Zustand/Role";
+import { getToken } from "../Utils/http";
+import { jwtDecode } from "jwt-decode"; // Corrected import
 
 const Stack = createNativeStackNavigator();
 NativeWindStyleSheet.setOutput({
@@ -17,96 +17,60 @@ NativeWindStyleSheet.setOutput({
 });
 
 export default function Main() {
-  // const [isSignedIn, setIsSignedIn] = useState(true);
-  // const [role, setRole] = useState(0); // 0: admin, 1: staff , 2: user
-  const { role, isSignedIn, token, setRole, setIsSignedIn, setToken } =
-    useRoleStore();
-  // const { data: products, isLoading, error } = useGetProducts();
-  // console.log(products, "products");
+  const { role, isSignedIn, setRole, setToken, setIsSignedIn } = useRoleStore();
 
   useEffect(() => {
-    async () => {
+    (async () => {
+      // Fixed IIFE syntax
       try {
         const token = await AsyncStorage.getItem("auth_token");
-        setToken(token ? token : null);
+        setToken(token ? token : "");
       } catch (error) {
         console.log(error, "error");
       }
-    };
+    })();
   }, []);
 
-  console.log("token", token); // This will log the token value
+  useEffect(() => {
+    const fetchToken = async () => {
+      const token = await getToken();
+      if (token) {
+        const decodeToken = jwtDecode(token); // Corrected variable declaration
+        const currentTime = Math.floor(Date.now() / 1000);
+        console.log("check exp", decodeToken);
+        console.log("check exp", decodeToken.exp, currentTime);
+        if (currentTime < decodeToken.exp) {
+          // Corrected property access
+          setRole(decodeToken.role);
+          setIsSignedIn(true); // Corrected method call
+        } else {
+          // Handle token expiration
+        }
+      }
+    };
+
+    fetchToken();
+  }, [isSignedIn, role]);
+  const renderScreenBasedOnRole = () => {
+    switch (role) {
+      case 0:
+        return <Stack.Screen name="Admin" component={AdminNavigation} />;
+      case 1:
+        return <Stack.Screen name="Staff" component={GuestNavigation} />;
+      default:
+        return <Stack.Screen name="SignIn" component={SignIn} />;
+    }
+  };
+
   return (
-    <View
-      className=" w-full h-full  bg-white"
-      style={{ backgroundColor: "white" }}
-    >
-      {/* <View className="flex flex-row ">
-        <Text
-          onPress={() => setRole(0)}
-          className="w-1/4 cursor-pointer text-blue-500"
-        >
-          User
-        </Text>
-        <Text
-          onPress={() => setRole(1)}
-          className="w-1/4 cursor-pointer text-yellow-500"
-        >
-          Staff
-        </Text>
-        <Text
-          onPress={() => setRole(2)}
-          className="w-1/4 cursor-pointer text-red-500"
-        >
-          Admin
-        </Text>
-        <Text
-          onPress={() => setIsSignedIn(!isSignedIn)}
-          className="w-1/4 cursor-pointer text-green-500"
-        >
-          Sign In
-        </Text>
-        <Text onPress={() => setToken("123456")} className="cursor-pointer">
-          Set {token} Token
-        </Text>
-      </View> */}
-      <NavigationContainer>
-        <View className="w-full h-full">
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            {isSignedIn ? (
-              (() => {
-                switch (role) {
-                  case 0:
-                    return (
-                      <Stack.Screen
-                        name="UserNavigate"
-                        component={UserNavigation}
-                      />
-                    );
-                  case 1:
-                    return (
-                      <Stack.Screen
-                        name="StaffNavigate"
-                        component={StaffNavigation}
-                      />
-                    );
-                  case 2:
-                    return (
-                      <Stack.Screen
-                        name="AdminNavigate"
-                        component={AdminNavigation}
-                      />
-                    );
-                  default:
-                    return null;
-                }
-              })()
-            ) : (
-              <Stack.Screen name="Guest" component={GuestNavigation} />
-            )}
-          </Stack.Navigator>
-        </View>
-      </NavigationContainer>
+    <View style={{ flex: 1, backgroundColor: "white" }}>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {isSignedIn ? (
+          renderScreenBasedOnRole()
+        ) : (
+          <Stack.Screen name="SignIn" component={SignIn} />
+        )}
+      </Stack.Navigator>
     </View>
   );
 }
