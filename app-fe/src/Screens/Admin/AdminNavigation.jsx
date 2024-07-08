@@ -57,14 +57,7 @@ export default function GuestNavigation({ navigation }) {
         },
       })}
     >
-      <Tab.Screen
-        name="Quầy hàng"
-        component={ManageCounter}
-        options={{ headerShown: true ,
-          headerTitleAlign: "center",
-          headerTitle: () => <Text className="text-lg font-medium">Quản lý quầy hàng</Text>
-        }}
-      />
+      
       <Tab.Screen
         name="Dashboard"
         component={DashboardScreen}
@@ -90,10 +83,13 @@ export default function GuestNavigation({ navigation }) {
         component={OrderManagementScreen}
         options={{ headerShown: false }}
       />
-      <Tab.Screen
-        name="Counter"
-        component={CounterManagementScreen}
-        options={{ headerShown: false }}
+     <Tab.Screen
+        name="Quầy hàng"
+        component={ManageCounter}
+        options={{ headerShown: true ,
+          headerTitleAlign: "center",
+          headerTitle: () => <Text className="text-lg font-medium">Quản lý quầy hàng</Text>
+        }}
       />
     </Tab.Navigator>
   );

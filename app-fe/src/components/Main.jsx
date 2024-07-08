@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AdminNavigation from "../Screens/Admin/AdminNavigation";
-import GuestNavigation from "../Screens/Guest/GuestNavigation";
+import GuestNavigation from "../navigation/GuestNavigation";
 import SignIn from "../Screens/Auth/SignIn";
 import { useRoleStore } from "../Zustand/Role";
 import { getToken } from "../Utils/http";
