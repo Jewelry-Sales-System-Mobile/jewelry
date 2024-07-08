@@ -73,7 +73,6 @@ const ProductManagementScreen = () => {
   });
   const [tooltipVisible, setTooltipVisible] = useState(false); // State to control tooltip visibility
   const [tooltipText, setTooltipText] = useState(""); // State to hold tooltip text
-  const [searchText, setSearchText] = useState(""); // State to hold search text
   const [searchQuery, setSearchQuery] = useState("");
   const [errors, setErrors] = useState({});
   // Dropdown menu actions
