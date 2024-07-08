@@ -8,8 +8,9 @@ import AdminNavigation from "../Screens/Admin/AdminNavigation";
 import GuestNavigation from "../navigation/GuestNavigation";
 import SignIn from "../Screens/Auth/SignIn";
 import { useRoleStore } from "../Zustand/Role";
-import { getToken } from "../Utils/http";
+import { getToken, deleteAutoToken } from "../Utils/http";
 import { jwtDecode } from "jwt-decode"; // Corrected import
+import CustomerDetail from "../Screens/Guest/TabNavigation/CustomerDetail";
 
 const Stack = createNativeStackNavigator();
 NativeWindStyleSheet.setOutput({
@@ -56,9 +57,18 @@ export default function Main() {
   const renderScreenBasedOnRole = () => {
     switch (role) {
       case 0:
-        return <Stack.Screen name="Admin" component={AdminNavigation} />;
+        return (
+          <>
+            <Stack.Screen name="Admin" component={AdminNavigation} />
+          </>
+        );
       case 1:
-        return <Stack.Screen name="Staff" component={GuestNavigation} />;
+        return (
+          <>
+            <Stack.Screen name="Staff" component={GuestNavigation} />
+            <Stack.Screen name="CustomerDetail" component={CustomerDetail} />
+          </>
+        );
       default:
         return <Stack.Screen name="SignIn" component={SignIn} />;
     }
