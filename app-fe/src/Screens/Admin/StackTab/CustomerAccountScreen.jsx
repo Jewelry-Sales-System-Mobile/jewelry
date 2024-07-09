@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -10,10 +10,23 @@ import {
 import { useGetCustomers } from "../../../API/customerApi";
 import moment from "moment";
 import { useNavigation } from "@react-navigation/native";
+import { Searchbar } from "react-native-paper";
+import { MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
 
 const ManageCustomer = () => {
   const { data: customers, isLoading, error } = useGetCustomers();
+  const [searchQuery, setSearchQuery] = useState("");
+
   const navigation = useNavigation(); // Initialize useNavigation hook
+
+  const onChangeSearch = (query) => setSearchQuery(query);
+
+  const filteredSearch = customers?.filter(
+    (item) =>
+      item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const renderItem = ({ item, index }) => (
     <TouchableOpacity style={styles.customerCard}>
@@ -46,8 +59,18 @@ const ManageCustomer = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.searchContainer} className="items-center">
+        <Searchbar
+          placeholder="Tìm tên, email hoặc số điện thoại ..."
+          onChangeText={onChangeSearch}
+          value={searchQuery}
+          style={styles.searchBar}
+          className="h-12"
+        />
+      </View>
+
       <FlatList
-        data={customers}
+        data={filteredSearch}
         renderItem={renderItem}
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.listContainer}
@@ -57,6 +80,15 @@ const ManageCustomer = () => {
 };
 
 const styles = StyleSheet.create({
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "between",
+    marginBottom: 20,
+  },
+  searchBar: {
+    flex: 1,
+    width: "90%",
+  },
   container: {
     flex: 1,
     paddingHorizontal: 20,
