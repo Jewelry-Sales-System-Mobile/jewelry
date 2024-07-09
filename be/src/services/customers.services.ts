@@ -52,6 +52,16 @@ class CustomerServices {
     );
     return updatedCustomer;
   }
+
+  async checkEmailExists(email: string) {
+    return Boolean(await databaseService.customers.findOne({ email }));
+  }
+
+  async checkPhoneNumberExists(phoneNumber: string) {
+    return Boolean(
+      await databaseService.customers.findOne({ phone: phoneNumber })
+    );
+  }
 }
 
 const customerServices = new CustomerServices();

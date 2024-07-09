@@ -13,6 +13,7 @@ import { ObjectId } from "mongodb";
 import { REGEX_PHONENUMBER_VN, REGEX_USERNAME } from "~/constants/regex";
 import { TokenPayload } from "~/models/requests/Users.requests";
 import { Role, UserVerifyStatus } from "~/constants/enum";
+import customerServices from "~/services/customers.services";
 
 const passwordSchema: ParamSchema = {
   isString: {
@@ -342,6 +343,49 @@ export const updateProfileValidator = validate(
         },
       },
       avatar: imageUrlSchema,
+    },
+    ["body"]
+  )
+);
+
+export const createCustomerValidator = validate(
+  checkSchema(
+    {
+      name: nameSchema,
+      phone: {
+        notEmpty: {
+          errorMessage: USERS_MESSAGES.PHONENUMBER_IS_REQUIRED,
+        },
+        isString: {
+          errorMessage: USERS_MESSAGES.PHONENUMBER_MUST_BE_STRING,
+        },
+        custom: {
+          options: async (value) => {
+            const isExist =
+              await customerServices.checkPhoneNumberExists(value);
+
+            if (isExist) {
+              throw new Error(USERS_MESSAGES.PHONENUMBER_ALREADY_EXISTS);
+            }
+            return true;
+          },
+        },
+      },
+      email: {
+        ...emailSchema,
+        custom: {
+          options: async (value) => {
+            const isExist = await customerServices.checkEmailExists(value);
+            if (isExist) {
+              throw new Error(USERS_MESSAGES.EMAIL_ALREADY_EXISTS);
+            }
+            return true;
+          },
+        },
+      },
+      dob: {
+        ...dateOfBirthSchema,
+      },
     },
     ["body"]
   )

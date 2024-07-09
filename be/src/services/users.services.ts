@@ -17,8 +17,6 @@ import { getBangkokTime } from "~/utils/handlers";
 
 const projection = {
   password: 0,
-  email_verify_token: 0,
-  forgot_password_token: 0,
 };
 
 class UserService {
@@ -244,6 +242,93 @@ class UserService {
       {
         $set: {
           verify: UserVerifyStatus.Unverified,
+        },
+        $currentDate: { updated_at: true },
+      },
+      {
+        returnDocument: "after",
+        projection: projection,
+      }
+    );
+    return user;
+  }
+
+  async getAllUsers() {
+    const users = await databaseService.users
+      .find({}, { projection: projection })
+      .toArray();
+    return users;
+  }
+
+  async getUserById(user_id: string) {
+    const user = await databaseService.users.findOne(
+      { _id: new ObjectId(user_id) },
+      { projection: projection }
+    );
+    return user;
+  }
+
+  async updateNameOfUser(user_id: string, name: string) {
+    const user = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          name,
+        },
+        $currentDate: { updated_at: true },
+      },
+      {
+        returnDocument: "after",
+        projection: projection,
+      }
+    );
+    return user;
+  }
+
+  async setToManager(user_id: string) {
+    const existingUser = await databaseService.users.findOne({
+      _id: new ObjectId(user_id),
+      role: Role.Manager,
+    });
+    if (existingUser) {
+      throw new ErrorWithStatus(
+        USERS_MESSAGES.USER_ALREADY_MANAGER,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+    const user = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          role: Role.Manager,
+        },
+        $currentDate: { updated_at: true },
+      },
+      {
+        returnDocument: "after",
+        projection: projection,
+      }
+    );
+    return user;
+  }
+
+  async setToStaff(user_id: string) {
+    const existingUser = await databaseService.users.findOne({
+      _id: new ObjectId(user_id),
+      role: Role.Staff,
+    });
+    if (existingUser) {
+      throw new ErrorWithStatus(
+        USERS_MESSAGES.USER_ALREADY_STAFF,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const user = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          role: Role.Staff,
         },
         $currentDate: { updated_at: true },
       },

@@ -1,8 +1,7 @@
 import { View, Text } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { SearchBar } from "@rneui/themed";
-import { tailwind } from "nativewind";
+
 import CounterCard from "../../../components/Counter/CounterCard";
 import { useGetCounters } from "../../../API/counter";
 import { Searchbar } from "react-native-paper";

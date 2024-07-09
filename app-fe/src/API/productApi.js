@@ -5,7 +5,6 @@ import { showErrorMessage, showSuccessMessage } from "../Utils/notifications";
 
 const getProducts = async () => {
   const { data } = await http.get(API_ENDPOINTS.PRODUCT);
-  console.log("query product:", data);
   return data.data;
 };
 
@@ -62,6 +61,15 @@ const deleteProductImage = async ({ productId, imageUrl }) => {
     { url: imageUrl }
   );
   return data.data;
+};
+
+const getProductById = async (productId) => {
+  const { data } = await http.get(`${API_ENDPOINTS.PRODUCT}/${productId}`);
+  return data.data;
+};
+
+export const useGetProductById = (productId) => {
+  return useQuery(["product", productId], () => getProductById(productId));
 };
 
 export const useCreateProduct = () => {

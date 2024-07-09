@@ -31,7 +31,7 @@ export default class User {
     this.email = user.email;
     this.password = user.password;
     this.role = user.role;
-    this.assigned_counter = user.assigned_counter || new ObjectId() || "";
+    this.assigned_counter = user.assigned_counter || "";
     this.verify = user.verify || UserVerifyStatus.Unverified;
     this.created_at = user.created_at || date;
     this.updated_at = user.updated_at || date;

@@ -76,6 +76,17 @@ class CounterServices {
       },
       { returnDocument: "after" }
     );
+
+    await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(employee_id) },
+      {
+        $set: {
+          assigned_counter: new ObjectId(counter_id),
+        },
+        $currentDate: { updated_at: true },
+      }
+    );
+
     return updatedCounter;
   }
 
@@ -118,6 +129,17 @@ class CounterServices {
       },
       { returnDocument: "after" }
     );
+
+    await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(employee_id) },
+      {
+        $set: {
+          assigned_counter: "",
+        },
+        $currentDate: { updated_at: true },
+      }
+    );
+
     return updatedCounter;
   }
   async updateCounterName(counter_id: string, name: string) {

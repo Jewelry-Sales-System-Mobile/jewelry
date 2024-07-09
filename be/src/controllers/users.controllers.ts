@@ -13,6 +13,7 @@ import {
   RegisterRequestBody,
   ResetPasswordReqBody,
   TokenPayload,
+  UpdateNameOfUserReqBody,
   UpdateProfileReqBody,
   UserIdReqParams,
   VerifyForgotPassWordTokenRequestBody,
@@ -151,6 +152,71 @@ export const inactiveUserController = async (
   const user = await userService.inactiveUser(user_id);
   return res.json({
     message: USERS_MESSAGES.INACTIVE_USER_SUCCESS,
+    data: user,
+  });
+};
+
+export const getAllUsersController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const users = await userService.getAllUsers();
+  return res.json({
+    message: USERS_MESSAGES.GET_ALL_USERS_SUCCESS,
+    data: users,
+  });
+};
+
+export const updateNameOfUserController = async (
+  req: Request<UserIdReqParams, any, UpdateNameOfUserReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.params;
+  const { name } = req.body;
+  const user = await userService.updateNameOfUser(user_id, name);
+  return res.json({
+    message: USERS_MESSAGES.UPDATE_NAME_OF_USER_SUCCESS,
+    data: user,
+  });
+};
+
+export const getUserByIdController = async (
+  req: Request<UserIdReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.params;
+  const user = await userService.getUserById(user_id);
+  return res.json({
+    message: USERS_MESSAGES.GET_USER_PROFILE_SUCCESS,
+    data: user,
+  });
+};
+
+export const setToManagerController = async (
+  req: Request<UserIdReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.params;
+  const user = await userService.setToManager(user_id);
+  return res.json({
+    message: USERS_MESSAGES.SET_TO_MANAGER_SUCCESS,
+    data: user,
+  });
+};
+
+export const setToStaffController = async (
+  req: Request<UserIdReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.params;
+  const user = await userService.setToStaff(user_id);
+  return res.json({
+    message: USERS_MESSAGES.SET_TO_STAFF_SUCCESS,
     data: user,
   });
 };

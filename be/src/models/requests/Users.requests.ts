@@ -1,6 +1,5 @@
 import { JwtPayload } from "jsonwebtoken";
 import { ParamsDictionary } from "express-serve-static-core";
-import { extend } from "lodash";
 import { TokenType } from "~/constants/enum";
 
 export interface RegisterRequestBody {
@@ -88,4 +87,8 @@ export interface DeleteAddressReqParams extends ParamsDictionary {
 
 export interface UserIdReqParams extends ParamsDictionary {
   user_id: string;
+}
+
+export interface UpdateNameOfUserReqBody {
+  name: string;
 }
