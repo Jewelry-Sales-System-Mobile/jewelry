@@ -36,16 +36,6 @@ const changePassword = async (passwords) => {
   return data.data;
 };
 
-// Update an existing staff account
-const updateStaff = async ({ staffId, updatedFields }) => {
-  const { data } = await http.put(
-    `${API_ENDPOINTS.USERS}/update/${staffId}`,
-    updatedFields
-  );
-
-  return data.data;
-};
-
 // Activate a staff account
 const activateStaff = async (staffId) => {
   const { data } = await http.put(`${API_ENDPOINTS.USERS}/${staffId}/active`);
@@ -145,6 +135,80 @@ export const useInactivateStaff = () => {
     },
     onError: () => {
       showErrorMessage("Có lỗi xảy ra khi vô hiệu hóa tài khoản");
+    },
+  });
+};
+
+// Update an existing staff account
+const updateStaff = async ({ staffId, updatedFields }) => {
+  const { data } = await http.put(
+    `${API_ENDPOINTS.USERS}/update/${staffId}`,
+    updatedFields
+  );
+  return data.data;
+};
+
+// API functions
+const setToManager = async (staffId) => {
+  const response = await http.put(
+    `${API_ENDPOINTS.USERS}/${staffId}/set-to-manager`
+  );
+  if (response.status !== 200) {
+    throw new Error("Failed to set to manager");
+  }
+  return response.data.data;
+};
+
+const setToStaff = async (staffId) => {
+  const response = await http.put(
+    `${API_ENDPOINTS.USERS}/${staffId}/set-to-staff`
+  );
+  if (response.status !== 200) {
+    throw new Error("Failed to set to staff");
+  }
+  return response.data.data;
+};
+
+// Custom hooks for using these APIs
+export const useUpdateToStaff = () => {
+  const queryClient = useQueryClient();
+  return useMutation(updateStaff, {
+    onSuccess: () => {
+      showSuccessMessage("Cập nhật nhân viên thành công");
+      queryClient.invalidateQueries("staffs");
+    },
+    onError: () => {
+      showErrorMessage("Có lỗi xảy ra khi cập nhật nhân viên");
+    },
+  });
+};
+
+export const useSetToManager = () => {
+  const queryClient = useQueryClient();
+  return useMutation(setToManager, {
+    onSuccess: () => {
+      console.log("Set to manager success"); // Thêm logging
+      showSuccessMessage("Cấp quyền quản lý thành công");
+      queryClient.invalidateQueries("staffs");
+    },
+    onError: (error) => {
+      console.error("Set to manager error:", error); // Thêm logging
+      showErrorMessage("Có lỗi xảy ra khi cấp quyền quản lý");
+    },
+  });
+};
+
+export const useSetToStaff = () => {
+  const queryClient = useQueryClient();
+  return useMutation(setToStaff, {
+    onSuccess: () => {
+      console.log("Set to staff success"); // Thêm logging
+      showSuccessMessage("Chuyển quyền nhân viên thành công");
+      queryClient.invalidateQueries("staffs");
+    },
+    onError: (error) => {
+      console.error("Set to staff error:", error); // Thêm logging
+      showErrorMessage("Có lỗi xảy ra khi chuyển quyền nhân viên");
     },
   });
 };
