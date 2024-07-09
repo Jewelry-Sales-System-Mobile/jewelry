@@ -11,6 +11,8 @@ import {
   inactiveUserController,
   loginController,
   registerController,
+  setToManagerController,
+  setToStaffController,
   updateNameOfUserController,
 } from "~/controllers/users.controllers";
 import {
@@ -116,6 +118,28 @@ usersRouter.get(
   "/profile/my-profile",
   accessTokenValidator,
   wrapRequestHandler(getMyProfileController)
+);
+
+/**
+ * Description: Set to Manager
+ * Route: [PUT] /users/:user_id/set-to-manager
+ * Header: {Authorization: Bearer <access_token>}
+ */
+usersRouter.put(
+  "/:user_id/set-to-manager",
+  accessTokenValidator,
+  wrapRequestHandler(setToManagerController)
+);
+
+/**
+ * Description: Set To Staff
+ * Route: [PUT] /users/:user_id/set-to-staff
+ * Header: {Authorization: Bearer <access_token>}
+ */
+usersRouter.put(
+  "/:user_id/set-to-staff",
+  accessTokenValidator,
+  wrapRequestHandler(setToStaffController)
 );
 
 // /**

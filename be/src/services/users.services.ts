@@ -284,6 +284,61 @@ class UserService {
     );
     return user;
   }
+
+  async setToManager(user_id: string) {
+    const existingUser = await databaseService.users.findOne({
+      _id: new ObjectId(user_id),
+      role: Role.Manager,
+    });
+    if (existingUser) {
+      throw new ErrorWithStatus(
+        USERS_MESSAGES.USER_ALREADY_MANAGER,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+    const user = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          role: Role.Manager,
+        },
+        $currentDate: { updated_at: true },
+      },
+      {
+        returnDocument: "after",
+        projection: projection,
+      }
+    );
+    return user;
+  }
+
+  async setToStaff(user_id: string) {
+    const existingUser = await databaseService.users.findOne({
+      _id: new ObjectId(user_id),
+      role: Role.Staff,
+    });
+    if (existingUser) {
+      throw new ErrorWithStatus(
+        USERS_MESSAGES.USER_ALREADY_STAFF,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const user = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          role: Role.Staff,
+        },
+        $currentDate: { updated_at: true },
+      },
+      {
+        returnDocument: "after",
+        projection: projection,
+      }
+    );
+    return user;
+  }
 }
 
 const userService = new UserService();

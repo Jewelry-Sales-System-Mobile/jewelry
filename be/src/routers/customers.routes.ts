@@ -6,7 +6,10 @@ import {
   updateCustomerController,
 } from "~/controllers/customers.controllers";
 import { filterMiddleware } from "~/middlewares/common.middlewares";
-import { accessTokenValidator } from "~/middlewares/users.middlewares";
+import {
+  accessTokenValidator,
+  createCustomerValidator,
+} from "~/middlewares/users.middlewares";
 import { UpdateCustomerReqBody } from "~/models/requests/Customers.requests";
 import { wrapRequestHandler } from "~/utils/handlers";
 
@@ -43,6 +46,7 @@ customerRouter.get(
 customerRouter.post(
   "/",
   accessTokenValidator,
+  createCustomerValidator,
   wrapRequestHandler(createCustomerController)
 );
 

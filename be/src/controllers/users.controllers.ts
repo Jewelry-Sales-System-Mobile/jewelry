@@ -194,3 +194,29 @@ export const getUserByIdController = async (
     data: user,
   });
 };
+
+export const setToManagerController = async (
+  req: Request<UserIdReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.params;
+  const user = await userService.setToManager(user_id);
+  return res.json({
+    message: USERS_MESSAGES.SET_TO_MANAGER_SUCCESS,
+    data: user,
+  });
+};
+
+export const setToStaffController = async (
+  req: Request<UserIdReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.params;
+  const user = await userService.setToStaff(user_id);
+  return res.json({
+    message: USERS_MESSAGES.SET_TO_STAFF_SUCCESS,
+    data: user,
+  });
+};

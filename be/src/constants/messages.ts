@@ -67,6 +67,11 @@ export const USERS_MESSAGES = {
   INACTIVE_USER_SUCCESS: "Inactive user success",
   GET_ALL_USERS_SUCCESS: "Get all users success",
   UPDATE_NAME_OF_USER_SUCCESS: "Update name of user success",
+  PHONENUMBER_ALREADY_EXISTS: "Phone number already exists",
+  USER_ALREADY_STAFF: "User already staff",
+  USER_ALREADY_MANAGER: "User already manager",
+  SET_TO_MANAGER_SUCCESS: "Set to manager success",
+  SET_TO_STAFF_SUCCESS: "Set to staff success",
 } as const;
 
 export const COLLECTIONS_MESSAGES = {
