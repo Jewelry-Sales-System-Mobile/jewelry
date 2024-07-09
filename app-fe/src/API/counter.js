@@ -50,3 +50,23 @@ const getCounters = async () => {
     });
   };
   
+  //========== assign ==========
+  const assignEmployee = async ({ counterId, employeeId }) => {
+    const { data } = await http.post(`${API_ENDPOINTS.COUNTER}/${counterId}/assign`, {
+      employee_id: employeeId
+    });
+    return data.data;
+  };
+  
+  export const useAssignEmployee = () => {
+    const queryClient = useQueryClient();
+    return useMutation(assignEmployee, {
+      onSuccess: () => {
+        showSuccessMessage("Employee assigned successfully!");
+        queryClient.invalidateQueries("counters");
+      },
+      onError: () => {
+        showErrorMessage("Failed to assign employee.");
+      },
+    });
+  };

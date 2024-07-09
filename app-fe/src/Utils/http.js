@@ -1,8 +1,11 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+//http://192.168.1.12:4000/
+
 const http = axios.create({
-  baseURL: "http://192.168.1.12:4000",
+   baseURL: "http://192.168.1.12:4000",
+ // baseURL: "http://localhost:4000",
   //http://192.168.1.12:4000/
   // baseURL: "https://nghich.id.vn",
 
@@ -15,13 +18,9 @@ const http = axios.create({
 
 http.interceptors.request.use(
   async (config) => {
-    try {
-      const token = await AsyncStorage.getItem("auth_token");
-      if (token) {
-        config.headers["Authorization"] = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjY4MTZjYjU0YWI1MGVkOGRmY2FhMmY0IiwidG9rZW5fdHlwZSI6MCwidmVyaWZ5IjoxLCJyb2xlIjowLCJpYXQiOjE3MjAzNzIxMDAsImV4cCI6MTcyMDQ1ODUwMH0.FLOT-d-db8LD-j7LtD9MyRMDJU8zF7cFXZUlwN83ljE`;
-      }
-    } catch (error) {
-      console.log("Error getting auth token", error);
+    const token = await AsyncStorage.getItem("auth_token");
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   },
@@ -56,6 +55,14 @@ export const getToken = async () => {
   } catch (error) {
     console.log("Error getting the auth token", error);
     return null;
+  }
+};
+export const deleteAutoToken = async () => {
+  try {
+    await AsyncStorage.removeItem("auth_token");
+    console.log("auto_token removed successfully");
+  } catch (error) {
+    console.error("Failed to remove auto_token", error);
   }
 };
 
