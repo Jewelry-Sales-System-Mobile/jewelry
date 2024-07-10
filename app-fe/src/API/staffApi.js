@@ -104,6 +104,7 @@ export const useUpdateStaff = () => {
     onSuccess: () => {
       showSuccessMessage("Cập nhật thông tin thành công");
       queryClient.invalidateQueries("staffs");
+      queryClient.invalidateQueries("myProfile");
     },
     onError: () => {
       showErrorMessage("Có lỗi xảy ra khi cập nhật thông tin");

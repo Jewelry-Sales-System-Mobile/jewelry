@@ -6,13 +6,14 @@ import { deleteAutoToken, getToken } from "../../../Utils/http";
 import { showSuccessMessage } from "../../../Utils/notifications";
 import { StyleSheet, Text, View, Image } from "react-native";
 import { jwtDecode } from "jwt-decode";
-import { useGetStaffById } from "../../../API/staffApi";
+import { useGetMyProfile, useGetStaffById } from "../../../API/staffApi";
 import { useNavigation } from "@react-navigation/native";
 
 export default function Setttings() {
   const { setIsSignedIn } = useRoleStore();
   const [userId, setuserId] = useState("");
-  const { data: staff, isLoading, error } = useGetStaffById(userId);
+  // const { data: staff, isLoading, error } = useGetStaffById(userId);
+  const { data: staff, isLoading, error } = useGetMyProfile();
   const navigation = useNavigation();
 
   console.log("staff", staff);
