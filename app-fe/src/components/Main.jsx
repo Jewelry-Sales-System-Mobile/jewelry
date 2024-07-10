@@ -33,23 +33,27 @@ export default function Main() {
   }, []);
 
   useEffect(() => {
+    console.log("check role", role, isSignedIn);
     const fetchToken = async () => {
       const token = await getToken();
       if (token) {
         const decodeToken = jwtDecode(token); // Corrected variable declaration
         const currentTime = Math.floor(Date.now() / 1000);
-        console.log("check exp", decodeToken);
-        console.log("check exp", decodeToken.exp, currentTime);
+        // console.log("check exp", decodeToken);
+        // console.log("check exp", decodeToken.exp, currentTime);
         if (currentTime < decodeToken.exp) {
           // Corrected property access
+          // console.log("check role", decodeToken.role, isSignedIn, role);
           setRole(decodeToken.role);
           setIsSignedIn(true); // Corrected method call
         } else {
           // Handle token expiration
+          console.log("Token expired");
           setIsSignedIn(false); // Corrected method call
           deleteAutoToken();
         }
       }
+      console.log("check token", token);
     };
 
     fetchToken();
@@ -70,7 +74,11 @@ export default function Main() {
           </>
         );
       default:
-        return <Stack.Screen name="SignIn" component={SignIn} />;
+        return (
+          <>
+            <Stack.Screen name="SignIn" component={SignIn} />
+          </>
+        );
     }
   };
 
@@ -80,7 +88,11 @@ export default function Main() {
         {isSignedIn ? (
           renderScreenBasedOnRole()
         ) : (
-          <Stack.Screen name="SignIn" component={SignIn} />
+          <>
+            <Stack.Screen name="SignIn" component={SignIn} />
+
+            {/* <Stack.Screen name="Staff" component={GuestNavigation} /> */}
+          </>
         )}
       </Stack.Navigator>
     </View>

@@ -8,10 +8,16 @@ import {
 import React, { useState } from "react";
 import { format } from "date-fns";
 import { useNavigation } from "@react-navigation/native";
+import { useCartStore } from "../../../Zustand/CartForStaff";
 
 export default function CustomerCard({ item }) {
   const navigation = useNavigation();
-
+  const { setCustomerId } = useCartStore();
+  const selectCustomer = () => {
+    console.log("selectCustomer", item._id);
+    setCustomerId(item._id); // Assuming item._id is the customer ID you want to set
+    navigation.navigate("Order"); // Navigate to CustomerDetail screen
+  };
   return (
     <View className="flex w-full px-2">
       <View
@@ -41,7 +47,11 @@ export default function CustomerCard({ item }) {
               {format(new Date(item?.updatedAt), "dd-MM-yyyy HH:mm")}
             </Text>
           </View>
-
+          <TouchableOpacity onPress={selectCustomer}>
+            <Text className="text-center my-2 rounded-2xl py-2 text-white  bg-yellow-600">
+              Tao Don Hang
+            </Text>
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() =>
               navigation.navigate("CustomerDetail", { id: item._id })
