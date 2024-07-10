@@ -1,5 +1,6 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
 
 //http://192.168.1.12:4000/
 
@@ -51,6 +52,7 @@ export const setToken = async (token) => {
 export const getToken = async () => {
   try {
     const token = await AsyncStorage.getItem("auth_token");
+
     return token;
   } catch (error) {
     console.log("Error getting the auth token", error);

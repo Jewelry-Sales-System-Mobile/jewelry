@@ -38,6 +38,14 @@ const getOrdersByCustomerId = async (customerId) => {
   return data.data;
 };
 
+export {
+  getCustomers,
+  getCustomerById,
+  createCustomer,
+  updateCustomer,
+  getOrdersByCustomerId,
+};
+
 export const useGetOrdersByCustomerId = (customerId) => {
   const { data, isLoading, error } = useQuery(["orders", customerId], () =>
     getOrdersByCustomerId(customerId)
