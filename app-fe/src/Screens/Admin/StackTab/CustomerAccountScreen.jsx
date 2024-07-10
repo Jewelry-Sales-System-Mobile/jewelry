@@ -91,7 +91,11 @@ const ManageCustomer = () => {
           className="h-12"
         />
       </View>
-
+      {customers && (
+        <Text className="my-2 ml-2 font-semibold">
+          Tổng có: {customers.length} Nhân viên
+        </Text>
+      )}
       <FlatList
         data={filteredSearch.slice(0, visibleCus)}
         ListFooterComponent={renderFooter} // Thêm footer cho FlatList
