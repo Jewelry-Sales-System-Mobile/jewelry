@@ -54,7 +54,7 @@ export default function CustomerCard({ item }) {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() =>
-              navigation.navigate("CustomerDetail", { id: item._id })
+              navigation.navigate("CustomerDetails", { id: item._id })
             }
           >
             <Text className="text-center my-2 rounded-2xl py-2 text-white  bg-yellow-600">

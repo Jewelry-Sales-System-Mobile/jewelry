@@ -11,6 +11,11 @@ import { useRoleStore } from "../Zustand/Role";
 import { getToken, deleteAutoToken } from "../Utils/http";
 import { jwtDecode } from "jwt-decode"; // Corrected import
 import CustomerDetail from "../Screens/Guest/TabNavigation/CustomerDetail";
+import CustomerDetailScreen from "../Screens/Admin/DetailScreen/CustomerDetailScreen";
+import { TouchableOpacity } from "react-native";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import StaffDetailScreen from "../Screens/Admin/DetailScreen/StaffDetailScreen";
 
 const Stack = createNativeStackNavigator();
 NativeWindStyleSheet.setOutput({
@@ -64,13 +69,51 @@ export default function Main() {
         return (
           <>
             <Stack.Screen name="Admin" component={AdminNavigation} />
+            <Stack.Screen
+              name="CustomerDetail"
+              component={CustomerDetailScreen}
+              options={({ navigation }) => ({
+                headerShown: true,
+                headerTitle: "Thông tin chi tiết Khách Hàng",
+                headerLeft: () => (
+                  // Sử dụng headerLeft để đặt nút back
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <FontAwesomeIcon
+                      icon={faArrowLeft}
+                      size={20}
+                      style={{ marginLeft: 16 }}
+                    />
+                  </TouchableOpacity>
+                ),
+                tabBarVisible: false, // Ẩn bottom navigation bar khi vào CustomerDetail
+              })}
+            />
+            <Stack.Screen
+              name="StaffDetail"
+              component={StaffDetailScreen}
+              options={({ navigation }) => ({
+                headerShown: true,
+                headerTitle: "Thông tin chi tiết Nhân Viên",
+                headerLeft: () => (
+                  // Sử dụng headerLeft để đặt nút back
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <FontAwesomeIcon
+                      icon={faArrowLeft}
+                      size={20}
+                      style={{ marginLeft: 16 }}
+                    />
+                  </TouchableOpacity>
+                ),
+                tabBarVisible: false, // Ẩn bottom navigation bar khi vào CustomerDetail
+              })}
+            />
           </>
         );
       case 1:
         return (
           <>
             <Stack.Screen name="Staff" component={GuestNavigation} />
-            <Stack.Screen name="CustomerDetail" component={CustomerDetail} />
+            <Stack.Screen name="CustomerDetails" component={CustomerDetail} />
           </>
         );
       default:

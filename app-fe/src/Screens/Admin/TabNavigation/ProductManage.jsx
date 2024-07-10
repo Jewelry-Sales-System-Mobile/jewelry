@@ -643,6 +643,11 @@ const ProductManagementScreen = () => {
         />
         <FilterDropdown onFilterChange={handleFilterChange} />
       </View>
+      {products && (
+        <Text className="my-2 ml-2 font-semibold">
+          Tổng có: {products.length} Sản phẩm
+        </Text>
+      )}
       <View style={styles.separator}></View> {/* Separator View */}
       {isLoading ? (
         <Text>Loading...</Text>
