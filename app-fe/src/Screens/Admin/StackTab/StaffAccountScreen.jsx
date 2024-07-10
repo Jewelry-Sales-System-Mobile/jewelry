@@ -255,6 +255,11 @@ const ManageStaff = () => {
           {/* <Text style={{ color: "white", marginLeft: 10 }}>Tạo Sản Phẩm</Text> */}
         </TouchableOpacity>
       </View>
+      {staff && (
+        <Text className="my-2 ml-2 font-semibold">
+          Tổng có: {staff.length} Nhân viên
+        </Text>
+      )}
       <FlatList
         data={filteredStaff.slice(0, visibleStaffs)}
         ListFooterComponent={renderFooter} // Thêm footer cho FlatList

@@ -211,7 +211,10 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
-    width1: "100%",
+    width: "100%",
+    backgroundColor: "#ffffff",
+    marginBottom: 10,
+    borderRadius: 8,
   },
   orderText: {
     fontSize: 16,

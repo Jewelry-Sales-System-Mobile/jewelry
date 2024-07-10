@@ -23,7 +23,7 @@ const DashboardStackNavigator = () => {
           ),
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="CustomerDetail"
         component={CustomerDetailScreen}
         options={({ navigation }) => ({
@@ -41,7 +41,7 @@ const DashboardStackNavigator = () => {
           ),
           tabBarVisible: false, // Ẩn bottom navigation bar khi vào CustomerDetail
         })}
-      />
+      /> */}
     </Stack.Navigator>
   );
 };
