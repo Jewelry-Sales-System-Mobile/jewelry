@@ -96,6 +96,11 @@ const ProductManagementScreen = () => {
       product.productCode.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Sắp xếp danh sách đơn hàng theo created_at từ mới nhất đến cũ nhất
+  filteredProducts?.sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+  );
+
   const filteredProductsSort = filteredProducts?.sort((a, b) => {
     if (sortBy === "basePrice") {
       return a.basePrice - b.basePrice;
@@ -104,10 +109,10 @@ const ProductManagementScreen = () => {
       return b.basePrice - a.basePrice;
     }
     if (sortBy === "created_at") {
-      return new Date(a.created_at) - new Date(b.created_at);
+      return new Date(b.created_at) - new Date(a.created_at); // Sắp xếp từ mới nhất đến cũ nhất
     }
     if (sortBy === "-created_at") {
-      return new Date(b.created_at) - new Date(a.created_at);
+      return new Date(a.created_at) - new Date(b.created_at); // Sắp xếp từ cũ nhất đến mới nhất
     }
     if (sortBy === "weight") {
       return a.weight - b.weight;
@@ -405,7 +410,9 @@ const ProductManagementScreen = () => {
             byteNumbers[i] = byteCharacters.charCodeAt(i);
           }
           const byteArray = new Uint8Array(byteNumbers);
-          const blob = new Blob([byteArray], { type: selectedImage.type });
+          const blob = new Blob([byteArray], {
+            type: selectedImage.type || "image/jpeg",
+          });
 
           // Compress Blob (if needed)
           const compressedBlob = await compressBlob(blob);

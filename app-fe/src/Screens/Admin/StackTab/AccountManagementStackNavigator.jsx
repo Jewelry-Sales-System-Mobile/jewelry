@@ -40,30 +40,6 @@ export default function AccountManagementStackNavigator() {
           headerTitle: "Quản lý Khách Hàng",
         }}
       />
-      {/* <Stack.Screen
-        name="CustomerDetail"
-        component={CustomerDetailScreen}
-        options={{
-          headerShown: true,
-          headerTitle: "Thông tin chi tiết Khách Hàng",
-        }}
-      /> */}
-      {/* <Stack.Screen
-        name="StaffDetail"
-        component={StaffDetailScreen}
-        options={{
-          headerShown: true,
-          headerTitle: "Thông tin chi tiết Nhân Viên",
-        }}
-      /> */}
-      <Stack.Screen
-        name="Chi tiết quầy hàng"
-        component={CounterDetails}
-        options={{
-          headerShown: true,
-          headerTitle: "Chi tiết quầy hàng",
-        }}
-      />
     </Stack.Navigator>
   );
 }

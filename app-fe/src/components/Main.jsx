@@ -16,6 +16,9 @@ import { TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import StaffDetailScreen from "../Screens/Admin/DetailScreen/StaffDetailScreen";
+import CounterDetails from "../Screens/Admin/Counter/CounterDetails";
+import AssignEmployee from "../Screens/Admin/Counter/AssignEmployee";
+import UpdateCounter from "../Screens/Admin/Counter/UpdateCounter";
 
 const Stack = createNativeStackNavigator();
 NativeWindStyleSheet.setOutput({
@@ -94,6 +97,63 @@ export default function Main() {
               options={({ navigation }) => ({
                 headerShown: true,
                 headerTitle: "Thông tin chi tiết Nhân Viên",
+                headerLeft: () => (
+                  // Sử dụng headerLeft để đặt nút back
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <FontAwesomeIcon
+                      icon={faArrowLeft}
+                      size={20}
+                      style={{ marginLeft: 16 }}
+                    />
+                  </TouchableOpacity>
+                ),
+                tabBarVisible: false, // Ẩn bottom navigation bar khi vào CustomerDetail
+              })}
+            />
+            <Stack.Screen
+              name="Chi tiết quầy hàng"
+              component={CounterDetails}
+              options={({ navigation }) => ({
+                headerShown: true,
+                headerTitle: "Chi tiết quầy hàng",
+                headerLeft: () => (
+                  // Sử dụng headerLeft để đặt nút back
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <FontAwesomeIcon
+                      icon={faArrowLeft}
+                      size={20}
+                      style={{ marginLeft: 16 }}
+                    />
+                  </TouchableOpacity>
+                ),
+                tabBarVisible: false, // Ẩn bottom navigation bar khi vào CustomerDetail
+              })}
+            />
+            <Stack.Screen
+              name="Phân công nhân viên"
+              component={AssignEmployee}
+              options={({ navigation }) => ({
+                headerShown: true,
+                headerTitle: "Phân công nhân viên",
+                headerLeft: () => (
+                  // Sử dụng headerLeft để đặt nút back
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <FontAwesomeIcon
+                      icon={faArrowLeft}
+                      size={20}
+                      style={{ marginLeft: 16 }}
+                    />
+                  </TouchableOpacity>
+                ),
+                tabBarVisible: false, // Ẩn bottom navigation bar khi vào CustomerDetail
+              })}
+            />
+            <Stack.Screen
+              name="Cập nhật thông tin quầy hàng"
+              component={UpdateCounter}
+              options={({ navigation }) => ({
+                headerShown: true,
+                headerTitle: "Cập nhật thông tin quầy hàng",
                 headerLeft: () => (
                   // Sử dụng headerLeft để đặt nút back
                   <TouchableOpacity onPress={() => navigation.goBack()}>

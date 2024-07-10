@@ -349,15 +349,14 @@ const ProductManagementScreen = () => {
     <View style={styles.container}>
       <View className="flex-row p-2 justify-between">
         <Text style={styles.title}>Quản lý sản phẩm Trang Sức</Text>
-        <View style={styles.buttonContainer2} onPress={openModalAdd}>
+        {/* <View style={styles.buttonContainer2} onPress={openModalAdd}>
           <TouchableOpacity
             className="flex-row  bg-[#ccac00] p-2 rounded-md mb-4 "
             onPress={openModalAdd}
           >
             <FontAwesome name="plus" size={20} color="white" />
-            {/* <Text style={{ color: "white", marginLeft: 10 }}>Tạo Sản Phẩm</Text> */}
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
       <View style={styles.searchContainer}>
         <Searchbar
@@ -634,7 +633,7 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    // backgroundColor: "#ffffff",
   },
   filterButton: {
     marginLeft: 10,
@@ -642,6 +641,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
+    backgroundColor: "#ffffff",
   },
   card: {
     margin: 5,
