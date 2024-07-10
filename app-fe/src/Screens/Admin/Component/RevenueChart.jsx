@@ -4,10 +4,13 @@ import { View, Text, Dimensions } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { useGetAllOrders } from "../../../API/orderApi";
 import { format, startOfWeek } from "date-fns";
+import { useNavigation } from "@react-navigation/native";
 
 const screenWidth = Dimensions.get("window").width;
 
 const RevenueChart = () => {
+  const navigation = useNavigation();
+
   const [weeklyData, setWeeklyData] = useState([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [totalOrder, setTotalOrder] = useState(0);
@@ -135,15 +138,31 @@ const RevenueChart = () => {
     0
   );
 
+  const listOrder = () => {
+    navigation.navigate("Order"); // Navigate to CustomerDetail screen
+  };
+
   return (
     <View className="w-[90%]">
-      <Text className="my-2 p-4 bg-white rounded-md w-full font-bold ">
+      <View className="my-2 p-4 bg-white rounded-md w-full font-bold ">
         {" "}
-        <Text className="text-sm">Tổng doanh thu :</Text>
-        <Text className="text-base text-[#ccac00] ml-3 ">
-          {formatCurrencyVND(totalRevenue)} / {totalOrder} đơn
+        <View className="  flex-row items-center">
+          <Text className="text-sm font-bold">Tổng doanh thu :</Text>
+          <Text
+            className="text-base text-[#ccac00] ml-3 font-bold "
+            onPress={() => navigation.navigate("CustomerAccount")}
+          >
+            {formatCurrencyVND(totalRevenue)} / {totalOrder} đơn
+          </Text>
+        </View>
+        <Text
+          className="text-sm underline font-medium mrs-4 text-right"
+          onPress={listOrder}
+        >
+          {" "}
+          Tất cả
         </Text>
-      </Text>
+      </View>
 
       <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 10 }}>
         Doanh thu tổng quan theo tuần

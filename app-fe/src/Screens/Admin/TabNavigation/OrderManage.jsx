@@ -25,6 +25,9 @@ const OrderManagementScreen = () => {
     item.order_code.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Sắp xếp danh sách đơn hàng theo created_at từ mới nhất đến cũ nhất
+  filteredOrder.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
   const handleLoadMore = () => {
     setVisibleOrders(visibleOrders + 5); // Tăng số lượng sản phẩm hiển thị khi nhấn nút "Xem thêm"
   };

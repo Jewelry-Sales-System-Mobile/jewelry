@@ -6,6 +6,8 @@ import CustomerDetailScreen from "../DetailScreen/CustomerDetailScreen";
 import DashboardScreen from "../TabNavigation/DashBoard";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import ManageCustomer from "./CustomerAccountScreen";
+import OrderManagementScreen from "../TabNavigation/OrderManage";
 
 const Stack = createStackNavigator();
 
@@ -23,24 +25,21 @@ const DashboardStackNavigator = () => {
           ),
         }}
       />
-      {/* <Stack.Screen
-        name="CustomerDetail"
-        component={CustomerDetailScreen}
-        options={({ navigation }) => ({
+      <Stack.Screen
+        name="CustomerAccount"
+        component={ManageCustomer}
+        options={{
           headerShown: true,
-          headerTitle: "Thông tin chi tiết Khách Hàng",
-          headerLeft: () => (
-            // Sử dụng headerLeft để đặt nút back
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <FontAwesomeIcon
-                icon={faArrowLeft}
-                size={20}
-                style={{ marginLeft: 16 }}
-              />
-            </TouchableOpacity>
-          ),
-          tabBarVisible: false, // Ẩn bottom navigation bar khi vào CustomerDetail
-        })}
+          headerTitle: "Quản lý Khách Hàng",
+        }}
+      />
+      {/* <Stack.Screen
+        name="OrderManagement"
+        component={OrderManagementScreen}
+        options={{
+          headerShown: true,
+          headerTitle: "Quản lý Đơn Hàng",
+        }}
       /> */}
     </Stack.Navigator>
   );

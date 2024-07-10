@@ -75,13 +75,26 @@ const VIPCustomerStats = () => {
   if (customersError)
     return <Text>Error fetching data: {customersError.message}</Text>;
 
+  const listOrder = () => {
+    navigation.navigate("Account", {
+      screen: "CustomerAccount", // Specify the screen inside the AccountManagementStackNavigator
+    });
+  };
+
   return (
     <View style={{ padding: 20 }}>
       <Text className="mt-2 mb-4 p-4 bg-white rounded-md w-full font-bold ">
         {" "}
         <Text className="text-sm">Tổng số lượng khách hàng:</Text>
         <Text className="text-base text-[#ccac00] ml-3 ">
-          {customers.length} Thượng đế
+          {customers.length} người
+        </Text>
+        <Text
+          className="text-sm underline font-medium ml-4"
+          onPress={listOrder}
+        >
+          {" "}
+          Tất cả{" "}
         </Text>
       </Text>
       {renderTable(
