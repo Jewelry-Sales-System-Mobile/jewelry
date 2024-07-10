@@ -69,7 +69,9 @@ export default function Setttings() {
           <View style={styles.body}>
             <TouchableOpacity
               className="w-[90%] mb-2 mt-5 py-3 bg-white flex-row justify-center items-center rounded-lg shadow-md"
-              onPress={() => navigation.navigate("MyInformation")}
+              onPress={() =>
+                navigation.navigate("MyInformation", { info: staff })
+              }
             >
               <Text className="text-xl font-semibold text-[#937C00]">
                 Thông tin của tôi

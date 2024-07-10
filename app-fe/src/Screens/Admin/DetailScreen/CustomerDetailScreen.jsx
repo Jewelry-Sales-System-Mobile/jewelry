@@ -149,7 +149,7 @@ const CustomerDetailScreen = () => {
       </ImageBackground>
 
       <Text className="uppercase font-semibold text-sm mb-5">
-        Danh sách đơn hàng của {customer.name}:
+        Danh sách đơn hàng của {customer.name} ({orders.length} đơn):
       </Text>
 
       <View

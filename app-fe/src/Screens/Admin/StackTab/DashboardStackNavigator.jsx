@@ -28,10 +28,25 @@ const DashboardStackNavigator = () => {
       <Stack.Screen
         name="CustomerAccount"
         component={ManageCustomer}
-        options={{
+        options={({ navigation }) => ({
           headerShown: true,
           headerTitle: "Quản lý Khách Hàng",
-        }}
+          headerLeft: () => (
+            // Sử dụng headerLeft để đặt nút back
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <FontAwesomeIcon
+                icon={faArrowLeft}
+                size={20}
+                style={{ marginLeft: 16 }}
+              />
+            </TouchableOpacity>
+          ),
+          tabBarVisible: false, // Ẩn bottom navigation bar khi vào CustomerDetail
+        })}
+        // options={{
+        //   headerShown: true,
+        //   headerTitle: "Quản lý Khách Hàng",
+        // }}
       />
       {/* <Stack.Screen
         name="OrderManagement"
