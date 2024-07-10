@@ -42,7 +42,7 @@ export const useGetCounterById = (counterId) => {
     return useMutation(deleteCounter, {
       onSuccess: () => {
         showSuccessMessage("Counter deleted successfully!");
-        queryClient.invalidateQueries("Counters");
+        queryClient.invalidateQueries("counters");
       },
       onError: () => {
         showErrorMessage("Failed to delete Counter.");

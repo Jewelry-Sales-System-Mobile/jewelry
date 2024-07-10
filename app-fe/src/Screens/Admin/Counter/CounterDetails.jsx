@@ -7,8 +7,8 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { showSuccessMessage, showErrorMessage } from "../../../Utils/notifications";
 
-export default function CounterDetails() {
-  const navigation = useNavigation();
+export default function CounterDetails({navigation}) {
+  //const navigation = useNavigation();
   const route = useRoute();
   const { id: counterId } = route.params;
   const { data, isLoading, error } = useGetCounterById(counterId);
