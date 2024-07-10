@@ -5,6 +5,7 @@ import {
   showErrorMessage,
   showSuccessMessage,
 } from "../../../Utils/notifications.js";
+import { useMakerOrder } from "../../../API/order.js";
 
 const OrderManagementScreen = () => {
   const {
@@ -15,6 +16,7 @@ const OrderManagementScreen = () => {
     total,
     applyDiscount,
   } = useCartStore();
+  const { mutate: makerOrder } = useMakerOrder();
   console.log("order_details_manage", order_details);
   const CheckOut = () => {
     const checkOut = {
@@ -31,9 +33,7 @@ const OrderManagementScreen = () => {
       showErrorMessage("No customer selected");
       console.log("No customer selected");
     } else {
-      showSuccessMessage("Check Out success");
-
-      console.log("CheckOut", checkOut);
+      makerOrder(checkOut);
     }
   };
   return (
