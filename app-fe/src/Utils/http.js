@@ -4,8 +4,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 //http://192.168.1.12:4000/
 
 const http = axios.create({
-   baseURL: "http://192.168.1.12:4000",
- // baseURL: "http://localhost:4000",
+   baseURL: "http://192.168.56.2:4000",
+//  baseURL: "http://localhost:4000",
   //http://192.168.1.12:4000/
   // baseURL: "https://nghich.id.vn",
 

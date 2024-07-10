@@ -64,9 +64,33 @@ export const useGetCounterById = (counterId) => {
       onSuccess: () => {
         showSuccessMessage("Employee assigned successfully!");
         queryClient.invalidateQueries("counters");
+        queryClient.invalidateQueries("counter");
       },
       onError: () => {
         showErrorMessage("Failed to assign employee.");
       },
     });
   };
+
+  //========== unassign ==========
+const unassignEmployee = async ({ counterId, employeeId }) => {
+  const { data } = await http.delete(`${API_ENDPOINTS.COUNTER}/${counterId}/unassign`, {
+    data: { employee_id: employeeId }
+  });
+  return data.data;
+};
+
+export const useUnassignEmployee = () => {
+  const queryClient = useQueryClient();
+  return useMutation(unassignEmployee, {
+    onSuccess: () => {
+      showSuccessMessage("Employee unassigned successfully!");
+      queryClient.invalidateQueries("counters");
+      queryClient.invalidateQueries("counter");
+    },
+    onError: () => {
+      showErrorMessage("Failed to unassign employee.");
+    },
+  });
+};
+

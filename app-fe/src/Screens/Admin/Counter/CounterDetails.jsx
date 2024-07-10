@@ -1,11 +1,11 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
-import { useDeleteCounter, useGetCounterById } from "../../../API/counter";
+import React from "react";
+import { useDeleteCounter, useGetCounterById, useUnassignEmployee } from "../../../API/counter";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { format } from "date-fns";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Ionicons from "react-native-vector-icons/Ionicons";
-
+import { showSuccessMessage, showErrorMessage } from "../../../Utils/notifications";
 
 export default function CounterDetails() {
   const navigation = useNavigation();
@@ -17,8 +17,7 @@ export default function CounterDetails() {
       navigation.navigate("Counter");
     },
   });
-
-
+  const { mutate: unassignEmployee } = useUnassignEmployee();
 
   if (isLoading) {
     return (
@@ -29,10 +28,10 @@ export default function CounterDetails() {
   }
 
   if (error) {
-    console.error("Error loading counters:", error);
+    console.error("Error loading counters:");
     return (
       <View>
-        <Text>Error loading data: {error.message}</Text>
+        <Text>Error loading data:</Text>
       </View>
     );
   }
@@ -41,7 +40,9 @@ export default function CounterDetails() {
     deleteCounter(counterId);
   };
 
-
+  const handleUnassignEmployee = (employeeId) => {
+    unassignEmployee({ counterId, employeeId });
+  };
 
   return (
     <View className="p-3 bg-white flex-1">
@@ -53,9 +54,14 @@ export default function CounterDetails() {
               {data?.counter_name}
             </Text>
           </Text>
-          <TouchableOpacity onPress={() =>
-                navigation.navigate("Cập nhật thông tin quầy hàng", { id: data?._id })
-              } className="flex flex-row">
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("Cập nhật thông tin quầy hàng", {
+                id: data?._id,
+              })
+            }
+            className="flex flex-row"
+          >
             <Text className="italic text-blue-700 text-base">Thay đổi</Text>
             <MaterialCommunityIcons
               name="chevron-right"
@@ -64,8 +70,6 @@ export default function CounterDetails() {
             />
           </TouchableOpacity>
         </View>
-
-        
       </View>
 
       <View className="px-4 mb-5 mt-4">
@@ -83,48 +87,50 @@ export default function CounterDetails() {
       </View>
 
       <View className="px-4 mt-4">
-        <Text className="uppercase font-medium text-lg mb-2">
-          Nhân viên phụ trách
-        </Text>
+        <View className="flex flex-row items-center justify-between my-6">
+          <Text className="uppercase font-medium text-lg mb-2">
+            Nhân viên phụ trách
+          </Text>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("Phân công nhân viên", { id: data?._id })
+            }
+            className="bg-[#ccac00] rounded-lg w-fit items-center px-2 py-2 "
+          >
+            <Text className="uppercase font-semibold text-sm">Phân công</Text>
+          </TouchableOpacity>
+        </View>
+
         {data?.assignedEmployees.length === 0 ? (
           <View className="items-center my-3">
             <Ionicons name="file-tray" size={50} color="#A6A5A5" />
             <Text className="text-base italic text-red-400 font-medium">
               Chưa có thông tin
             </Text>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate("Phân công nhân viên", { id: data?._id })
-              }
-              className="bg-slate-400 rounded-lg w-fit items-center mx-auto px-7 py-2 mt-4 mb-2"
-            >
-              <Text className="uppercase font-semibold text-base">
-                Phân công
-              </Text>
-            </TouchableOpacity>
           </View>
         ) : (
-          <View className="flex flex-row justify-between px-6 mb-2">
-            <Text>ID nhân viên:</Text>
-            <Text>{data?.assignedEmployees}</Text>
+          <View className="flex flex-col px-6 mb-2">
+            {data?.assignedEmployees?.map((employee, index) => (
+              <View key={index} className="flex flex-row justify-between mb-2 items-center">
+                <Text>ID nhân viên {index + 1}:</Text>
+                <Text>{employee}</Text>
+                <TouchableOpacity onPress={() => handleUnassignEmployee(employee)}>
+                  <MaterialCommunityIcons name="delete" size={20} color="red" />
+                </TouchableOpacity>
+              </View>
+            ))}
           </View>
         )}
       </View>
 
-      <View className=" absolute bottom-5 left-0 right-0 items-center">
+      <View className="absolute bottom-5 left-0 right-0 items-center">
         <TouchableOpacity
           onPress={handleDelete}
           className="flex flex-row bg-red-400 w-fit mx-auto px-8 py-3 rounded-lg"
         >
-          {/* <MaterialCommunityIcons
-            name="trash-can-outline"
-            size={25}
-            color="red"
-          /> */}
           <Text className="text-base font-semibold ">Xoá quầy hàng</Text>
         </TouchableOpacity>
       </View>
     </View>
-
   );
 }
