@@ -31,6 +31,7 @@ const ManageStaff = () => {
   const navigation = useNavigation(); // Initialize useNavigation hook
   const { mutate: activateStaffMutation } = useActivateStaff();
   const { mutate: inactivateStaffMutation } = useInactivateStaff();
+  const [visibleStaffs, setVisibleStaffs] = useState(3); // Số sản phẩm hiển thị ban đầu
 
   const [searchQuery, setSearchQuery] = useState("");
   const [userId, setuserId] = useState("");
@@ -214,6 +215,28 @@ const ManageStaff = () => {
   if (isLoading) return <Text>Loading...</Text>;
   if (error) return <Text>Có lỗi xảy ra khi tải dữ liệu nhân viên.</Text>;
 
+  const handleLoadMore = () => {
+    setVisibleStaffs(visibleStaffs + 3); // Tăng số lượng sản phẩm hiển thị khi nhấn nút "Xem thêm"
+  };
+
+  const renderFooter = () => {
+    // Kiểm tra nếu không còn sản phẩm để hiển thị thì không hiển thị nút "Xem thêm"
+    if (visibleStaffs >= filteredStaff.length) {
+      return null;
+    }
+
+    return (
+      <TouchableOpacity
+        className="bg-[#ccac00] rounded-md p-1 text-center w-[40%] mt-4 mx-auto"
+        onPress={handleLoadMore}
+      >
+        <Title className="text-white text-center text-sm text-semibold">
+          Xem thêm
+        </Title>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer} className="items-center">
@@ -233,7 +256,8 @@ const ManageStaff = () => {
         </TouchableOpacity>
       </View>
       <FlatList
-        data={filteredStaff}
+        data={filteredStaff.slice(0, visibleStaffs)}
+        ListFooterComponent={renderFooter} // Thêm footer cho FlatList
         renderItem={({ item, index }) => (
           <RenderStaffItem
             item={item}

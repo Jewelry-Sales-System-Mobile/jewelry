@@ -10,12 +10,13 @@ import {
 import { useGetCustomers } from "../../../API/customerApi";
 import moment from "moment";
 import { useNavigation } from "@react-navigation/native";
-import { Searchbar } from "react-native-paper";
+import { Searchbar, Title } from "react-native-paper";
 import { MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
 
 const ManageCustomer = () => {
   const { data: customers, isLoading, error } = useGetCustomers();
   const [searchQuery, setSearchQuery] = useState("");
+  const [visibleCus, setVisibleCus] = useState(3); // Số sản phẩm hiển thị ban đầu
 
   const navigation = useNavigation(); // Initialize useNavigation hook
 
@@ -57,6 +58,28 @@ const ManageCustomer = () => {
   if (isLoading) return <Text>Loading...</Text>;
   if (error) return <Text>Có lỗi xảy ra khi tải dữ liệu khách hàng.</Text>;
 
+  const handleLoadMore = () => {
+    setVisibleCus(visibleCus + 3); // Tăng số lượng sản phẩm hiển thị khi nhấn nút "Xem thêm"
+  };
+
+  const renderFooter = () => {
+    // Kiểm tra nếu không còn sản phẩm để hiển thị thì không hiển thị nút "Xem thêm"
+    if (visibleCus >= filteredSearch.length) {
+      return null;
+    }
+
+    return (
+      <TouchableOpacity
+        className="bg-[#ccac00] rounded-md p-1 text-center w-[40%] mt-4 mx-auto"
+        onPress={handleLoadMore}
+      >
+        <Title className="text-white text-center text-sm text-semibold">
+          Xem thêm
+        </Title>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer} className="items-center">
@@ -70,7 +93,8 @@ const ManageCustomer = () => {
       </View>
 
       <FlatList
-        data={filteredSearch}
+        data={filteredSearch.slice(0, visibleCus)}
+        ListFooterComponent={renderFooter} // Thêm footer cho FlatList
         renderItem={renderItem}
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.listContainer}

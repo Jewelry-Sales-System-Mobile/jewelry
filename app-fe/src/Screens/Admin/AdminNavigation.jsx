@@ -14,10 +14,11 @@ import CounterStackNavigator from "../../navigation/stack-navigators/CounterStac
 import Setttings from "./TabNavigation/Setttings";
 import AccountManagementStackNavigator from "./StackTab/AccountManagementStackNavigator";
 import SettingManagementStackNavigator from "./StackTab/SettingManagementStackNavigator";
+import DashboardStackNavigator from "./StackTab/DashboardStackNavigator";
 
 const Tab = createBottomTabNavigator();
 
-export default function AdminNavigation({ navigation }) {
+export default function AdminNavigation() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -40,7 +41,7 @@ export default function AdminNavigation({ navigation }) {
           }
           return <CustomTabIconV2 uri={iconUri} isFocused={focused} />;
         },
-        tabBarActiveTintColor: "tomato",
+        tabBarActiveTintColor: "#ccac00",
         tabBarInactiveTintColor: "gray",
         tabBarStyle: {
           height: 75, // Đổi chiều cao thành 70px
@@ -57,7 +58,7 @@ export default function AdminNavigation({ navigation }) {
     >
       <Tab.Screen
         name="Dashboard"
-        component={DashboardScreen}
+        component={DashboardStackNavigator}
         options={{ headerShown: false }}
       />
       <Tab.Screen
@@ -65,11 +66,7 @@ export default function AdminNavigation({ navigation }) {
         component={AccountManagementStackNavigator}
         options={{ headerShown: false }}
       />
-      {/* <Tab.Screen
-        name="Customer"
-        component={CustomerManagementScreen}
-        options={{ headerShown: false }}
-      /> */}
+
       <Tab.Screen
         name="Product"
         component={ProductManagementScreen}

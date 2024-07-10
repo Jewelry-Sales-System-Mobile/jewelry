@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import {
   useActivateProduct,
@@ -34,6 +35,8 @@ import * as ImagePicker from "react-native-image-picker";
 import Constants from "expo-constants";
 import ActionDropdown from "../Component/ActionSection";
 import FilterDropdown from "../Component/FilterDropdown";
+import ImageResizer from "../ResizeImage/resizeImage";
+import { showErrorMessage } from "../../../Utils/notifications";
 
 const MAX_NAME_LENGTH = 70;
 const MAX_WEIGHT = 1000; // in grams
@@ -378,40 +381,103 @@ const ProductManagementScreen = () => {
     deleteProductImage(product._id);
   };
 
-  const handleAddImage = (imageProduct) => {
-    // Define options for image picker
+  const handleAddImage = async (imageProduct) => {
     const options = {
-      title: "Select Image",
-      storageOptions: {
-        skipBackup: true,
-        path: "images",
-      },
+      mediaType: "photo",
+      includeBase64: true,
     };
 
-    // Launch image picker
-    ImagePicker.launchImageLibrary(options, (response) => {
+    ImagePicker.launchImageLibrary(options, async (response) => {
       if (response.didCancel) {
         console.log("User cancelled image picker");
-      } else if (response.error) {
-        console.log("ImagePicker Error: ", response.error);
-      } else {
-        console.log("Selected image: ", response.uri);
+      } else if (response.errorCode) {
+        console.log("ImagePicker Error: ", response.errorMessage);
+      } else if (response.assets && response.assets.length > 0) {
+        const selectedImage = response.assets[0];
+        console.log("Selected image: ", selectedImage.uri);
 
-        // Upload image using API
-        const formData = new FormData();
-        formData.append("image", {
-          uri: response.uri,
-          type: response.type,
-          name: response.fileName,
-        });
+        try {
+          // Convert Base64 to Blob
+          const base64Data = selectedImage.base64;
+          const byteCharacters = atob(base64Data);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: selectedImage.type });
 
-        console.log("FormData to be sent: ", formData);
+          // Compress Blob (if needed)
+          const compressedBlob = await compressBlob(blob);
 
-        addProductImage({
-          productId: imageProduct._id,
-          imageFile: formData,
-        });
+          // Create FormData and append Blob
+          const formData = new FormData();
+          formData.append("image", {
+            uri: selectedImage.uri,
+            type: selectedImage.type || "image/jpeg",
+            name: selectedImage.fileName || "photo.jpg",
+            data: compressedBlob,
+          });
+
+          // Call API to add image to product
+          await addProductImage({
+            productId: imageProduct._id,
+            imageFile: formData,
+          });
+        } catch (error) {
+          console.error("Error handling image: ", error);
+          showErrorMessage("Failed to handle image. Please try again.");
+        }
       }
+    });
+  };
+
+  const compressBlob = async (blob) => {
+    return new Promise((resolve, reject) => {
+      // Implement your image compression logic here
+      // Example: Use canvas to resize and compress image
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+
+          // Set the desired width and height (e.g., 800x800)
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob(
+            (compressedBlob) => {
+              resolve(compressedBlob);
+            },
+            "image/jpeg",
+            0.6
+          );
+        };
+        img.src = event.target.result;
+      };
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(blob);
     });
   };
 
@@ -491,10 +557,7 @@ const ProductManagementScreen = () => {
               name="camera"
               size={16}
               color="black"
-              onPress={() => {
-                setSelectedProduct(item);
-                handleAddImage(item);
-              }}
+              onPress={handleAddImage}
             />
           </View>
           <View style={styles.indexContainer}>

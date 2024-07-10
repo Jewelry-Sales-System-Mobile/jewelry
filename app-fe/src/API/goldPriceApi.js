@@ -4,8 +4,12 @@ import { showErrorMessage, showSuccessMessage } from "../Utils/notifications";
 import { API_ENDPOINTS } from "./api-endpoint";
 
 const getGoldPrices = async () => {
-  const { data } = await http.get(API_ENDPOINTS.GOLD_PRICES);
-  return data.data;
+  try {
+    const response = await http.get(API_ENDPOINTS.GOLD_PRICES);
+    return response.data.data; // Đảm bảo trả về dữ liệu như mong đợi từ API
+  } catch (error) {
+    throw new Error("Failed to fetch gold prices");
+  }
 };
 
 const updateGoldPrices = async (prices) => {
@@ -18,6 +22,12 @@ export const useGetGoldPrices = () => {
     "goldPrices",
     getGoldPrices
   );
+
+  // Xử lý trường hợp lỗi từ API
+  if (error) {
+    showErrorMessage("Failed to fetch gold prices"); // Hiển thị thông báo lỗi
+    console.error("Error fetching gold prices:", error); // Log lỗi ra console
+  }
 
   return { data, isLoading, error, isFetching };
 };
