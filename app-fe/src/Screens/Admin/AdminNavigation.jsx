@@ -15,6 +15,7 @@ import Setttings from "./TabNavigation/Setttings";
 import AccountManagementStackNavigator from "./StackTab/AccountManagementStackNavigator";
 import SettingManagementStackNavigator from "./StackTab/SettingManagementStackNavigator";
 import DashboardStackNavigator from "./StackTab/DashboardStackNavigator";
+import OrderManagementStackNavigator from "./StackTab/OrderManagementStackNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -74,7 +75,7 @@ export default function AdminNavigation() {
       />
       <Tab.Screen
         name="Order"
-        component={OrderManagementScreen}
+        component={OrderManagementStackNavigator}
         options={{ headerShown: false }}
       />
       <Tab.Screen

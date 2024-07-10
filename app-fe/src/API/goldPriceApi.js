@@ -38,6 +38,7 @@ export const useUpdateGoldPrices = () => {
     onSuccess: () => {
       showSuccessMessage("Giá vàng đã được cập nhật thành công!");
       queryClient.invalidateQueries("goldPrices");
+      queryClient.invalidateQueries("products");
     },
     onError: () => {
       showErrorMessage("Không thể cập nhật giá vàng.");
