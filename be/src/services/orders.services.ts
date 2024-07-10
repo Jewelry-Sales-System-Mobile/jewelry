@@ -78,16 +78,18 @@ class OrderServices {
     const { insertedId } = await databaseService.orders.insertOne(newBody);
 
     const order = await databaseService.orders.findOne({ _id: insertedId });
-    let addedPoints = Math.floor(body.total / 100000);
+    const addedPoints = Math.floor(body.total / 100000);
+    console.log(addedPoints);
+
     if (body.discount > 0) {
       const discountPoints = Math.floor(body.discount / 100000) * 100 * -1;
-      await databaseService.users.updateOne(
-        { _id: new ObjectId(user_id) },
+      await databaseService.customers.updateOne(
+        { _id: new ObjectId(body.customer_id) },
         { $inc: { points: discountPoints } }
       );
     }
-    await databaseService.users.updateOne(
-      { _id: new ObjectId(user_id) },
+    await databaseService.customers.updateOne(
+      { _id: new ObjectId(body.customer_id) },
       { $inc: { points: addedPoints } }
     );
     return { order, addedPoints };
