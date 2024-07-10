@@ -1,10 +1,11 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
-import { useDeleteCounter, useGetCounterById } from "../../../API/counter";
+import React from "react";
+import { useDeleteCounter, useGetCounterById, useUnassignEmployee } from "../../../API/counter";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { format } from "date-fns";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { Modal, Portal, Button, TextInput, Provider as PaperProvider } from 'react-native-paper';
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { showSuccessMessage, showErrorMessage } from "../../../Utils/notifications";
 
 export default function CounterDetails() {
   const navigation = useNavigation();
@@ -16,13 +17,7 @@ export default function CounterDetails() {
       navigation.navigate("Counter");
     },
   });
-  
-  const [visible, setVisible] = useState(false);
-  const [counterName, setCounterName] = useState(data?.counter_name || '');
-
-  const showModal = () => setVisible(true);
-  const hideModal = () => setVisible(false);
-  const containerStyle = { backgroundColor: 'white', padding: 20 };
+  const { mutate: unassignEmployee } = useUnassignEmployee();
 
   if (isLoading) {
     return (
@@ -33,10 +28,10 @@ export default function CounterDetails() {
   }
 
   if (error) {
-    console.error("Error loading counters:", error);
+    console.error("Error loading counters:");
     return (
       <View>
-        <Text>Error loading data: {error.message}</Text>
+        <Text>Error loading data:</Text>
       </View>
     );
   }
@@ -45,78 +40,97 @@ export default function CounterDetails() {
     deleteCounter(counterId);
   };
 
-  const handleUpdate = () => {
-    // Implement the update logic here
-    console.log("Updated counter name:", counterName);
-    hideModal();
+  const handleUnassignEmployee = (employeeId) => {
+    unassignEmployee({ counterId, employeeId });
   };
 
   return (
-    <PaperProvider>
-      <View>
-        <View className="bg-white flex border-t-2 border-neutral-200 px-6 pt-5 pb-3 rounded-lg shadow-lg shadow-black/25 mb-3">
-          <View className="flex flex-row justify-between">
-            <Text>
-              Tên quầy:{" "}
-              <Text className="font-semibold text-base">
-                {data?.counter_name}
-              </Text>
+    <View className="p-3 bg-white flex-1">
+      <View className="bg-red-100 indeterminate:flex border-t-2 border-neutral-200 px-6 pt-5 pb-3 rounded-lg shadow-lg shadow-black/25 mb-3">
+        <View className="flex flex-row justify-between">
+          <Text>
+            Tên quầy:{" "}
+            <Text className="font-semibold text-base">
+              {data?.counter_name}
             </Text>
-            <TouchableOpacity onPress={handleDelete}>
-              <Icon name="trash-can-outline" size={25} color="red" />
-            </TouchableOpacity>
-          </View>
-
-          <Text>
-            Ngày tạo: {format(new Date(data?.created_at), "dd-MM-yyyy")}
           </Text>
-          <Text className="italic">
-            Cập nhật lần cuối:{" "}
-            {format(new Date(data?.created_at), "dd-MM-yyyy HH:mm")}
-          </Text>
-
           <TouchableOpacity
-            onPress={showModal}
-            className="bg-slate-400 rounded-lg w-fit items-center mx-auto px-3 py-2 mt-4 mb-2"
+            onPress={() =>
+              navigation.navigate("Cập nhật thông tin quầy hàng", {
+                id: data?._id,
+              })
+            }
+            className="flex flex-row"
           >
-            <Text>Chỉnh sửa</Text>
+            <Text className="italic text-blue-700 text-base">Thay đổi</Text>
+            <MaterialCommunityIcons
+              name="chevron-right"
+              size={25}
+              color="#A6A5A5"
+            />
           </TouchableOpacity>
-        </View>
-
-        <View>
-          <Text>
-            Nhân viên phụ trách:{" "}
-            {data?.assignedEmployees.length === 0 ? (
-              <View>
-                <Text className="italic text-red-500">Chưa có thông tin</Text>
-                <TouchableOpacity
-                  onPress={showModal}
-                  className="bg-slate-400 rounded-lg w-fit items-center mx-auto px-3 py-2 mt-4 mb-2"
-                >
-                  <Text>Phân công</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              data?.assignedEmployees
-            )}
-          </Text>
         </View>
       </View>
 
-      <Portal>
-        <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>Cập nhật thông tin</Text>
-          <TextInput
-            label="Tên quầy"
-            value={counterName}
-            onChangeText={setCounterName}
-            style={{ marginBottom: 10 }}
-          />
-          <Button mode="contained" onPress={handleUpdate}>
-            Cập nhật
-          </Button>
-        </Modal>
-      </Portal>
-    </PaperProvider>
+      <View className="px-4 mb-5 mt-4">
+        <Text className="uppercase font-medium text-lg mb-2">
+          Thông tin quầy hàng
+        </Text>
+        <View className="flex flex-row justify-between px-6 mb-2">
+          <Text>Ngày tạo:</Text>
+          <Text>{format(new Date(data?.created_at), "dd-MM-yyyy HH:mm")}</Text>
+        </View>
+        <View className="flex flex-row justify-between px-6">
+          <Text>Cập nhật lần cuối:</Text>
+          <Text>{format(new Date(data?.updated_at), "dd-MM-yyyy HH:mm")}</Text>
+        </View>
+      </View>
+
+      <View className="px-4 mt-4">
+        <View className="flex flex-row items-center justify-between my-6">
+          <Text className="uppercase font-medium text-lg mb-2">
+            Nhân viên phụ trách
+          </Text>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("Phân công nhân viên", { id: data?._id })
+            }
+            className="bg-[#ccac00] rounded-lg w-fit items-center px-2 py-2 "
+          >
+            <Text className="uppercase font-semibold text-sm">Phân công</Text>
+          </TouchableOpacity>
+        </View>
+
+        {data?.assignedEmployees.length === 0 ? (
+          <View className="items-center my-3">
+            <Ionicons name="file-tray" size={50} color="#A6A5A5" />
+            <Text className="text-base italic text-red-400 font-medium">
+              Chưa có thông tin
+            </Text>
+          </View>
+        ) : (
+          <View className="flex flex-col px-6 mb-2">
+            {data?.assignedEmployees?.map((employee, index) => (
+              <View key={index} className="flex flex-row justify-between mb-2 items-center">
+                <Text>ID nhân viên {index + 1}:</Text>
+                <Text>{employee}</Text>
+                <TouchableOpacity onPress={() => handleUnassignEmployee(employee)}>
+                  <MaterialCommunityIcons name="delete" size={20} color="red" />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
+
+      <View className="absolute bottom-5 left-0 right-0 items-center">
+        <TouchableOpacity
+          onPress={handleDelete}
+          className="flex flex-row bg-red-400 w-fit mx-auto px-8 py-3 rounded-lg"
+        >
+          <Text className="text-base font-semibold ">Xoá quầy hàng</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }

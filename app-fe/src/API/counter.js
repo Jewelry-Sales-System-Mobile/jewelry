@@ -33,19 +33,64 @@ export const useGetCounterById = (counterId) => {
   return { data, isLoading, error, isFetching };
 };
 
-const deleteCounter = async (counterId) => {
-  const { data } = await http.delete(`${API_ENDPOINTS.COUNTER}/${counterId}`);
+  const deleteCounter = async (counterId) => {
+    const { data } = await http.delete(`${API_ENDPOINTS.COUNTER}/${counterId}`);
+    return data.data;
+  };
+  export const useDeleteCounter = () => {
+    const queryClient = useQueryClient();
+    return useMutation(deleteCounter, {
+      onSuccess: () => {
+        showSuccessMessage("Counter deleted successfully!");
+        queryClient.invalidateQueries("Counters");
+      },
+      onError: () => {
+        showErrorMessage("Failed to delete Counter.");
+      },
+    });
+  };
+  
+  //========== assign ==========
+  const assignEmployee = async ({ counterId, employeeId }) => {
+    const { data } = await http.post(`${API_ENDPOINTS.COUNTER}/${counterId}/assign`, {
+      employee_id: employeeId
+    });
+    return data.data;
+  };
+  
+  export const useAssignEmployee = () => {
+    const queryClient = useQueryClient();
+    return useMutation(assignEmployee, {
+      onSuccess: () => {
+        showSuccessMessage("Employee assigned successfully!");
+        queryClient.invalidateQueries("counters");
+        queryClient.invalidateQueries("counter");
+      },
+      onError: () => {
+        showErrorMessage("Failed to assign employee.");
+      },
+    });
+  };
+
+  //========== unassign ==========
+const unassignEmployee = async ({ counterId, employeeId }) => {
+  const { data } = await http.delete(`${API_ENDPOINTS.COUNTER}/${counterId}/unassign`, {
+    data: { employee_id: employeeId }
+  });
   return data.data;
 };
-export const useDeleteCounter = () => {
+
+export const useUnassignEmployee = () => {
   const queryClient = useQueryClient();
-  return useMutation(deleteCounter, {
+  return useMutation(unassignEmployee, {
     onSuccess: () => {
-      showSuccessMessage("Counter deleted successfully!");
-      queryClient.invalidateQueries("Counters");
+      showSuccessMessage("Employee unassigned successfully!");
+      queryClient.invalidateQueries("counters");
+      queryClient.invalidateQueries("counter");
     },
     onError: () => {
-      showErrorMessage("Failed to delete Counter.");
+      showErrorMessage("Failed to unassign employee.");
     },
   });
 };
+
