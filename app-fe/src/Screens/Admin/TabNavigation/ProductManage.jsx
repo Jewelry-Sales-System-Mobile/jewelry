@@ -42,7 +42,7 @@ const MAX_NAME_LENGTH = 70;
 const MAX_WEIGHT = 1000; // in grams
 const MAX_GEM_COST = 1000000000; // 1 billion VND
 const WEIGHT_DECIMAL_PLACES = 2;
-const MIN_WEIGHT = 5; // Minimum weight in grams
+const MIN_WEIGHT = 0.2; // Minimum weight in grams
 const MIN_GEM_COST = 50000; // Minimum gem cost in VND
 
 const ProductManagementScreen = () => {
@@ -555,7 +555,8 @@ const ProductManagementScreen = () => {
             source={{
               uri: item.image
                 ? item.image
-                : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s",
+                : // : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s",
+                  "https://cdn.pnj.io/images/detailed/136/gnxmxmy001678-nhan-vang-18k-dinh-da-cz-pnj-_1.png",
             }}
             style={styles.image}
           />
