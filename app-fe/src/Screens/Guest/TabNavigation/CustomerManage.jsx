@@ -1,25 +1,19 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useGetCustomers } from "../../../API/customer";
 import CustomerCard from "../../../components/Staff/CustomerManage/CustomerCard";
 import { Searchbar, Modal, Title } from "react-native-paper";
 import { useFocusEffect } from "@react-navigation/native";
-import {
-  View,
-  TextInput,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
+import { View, Text, TouchableOpacity } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 import AddCusModal from "../../../components/Staff/CustomerManage/AddCusModal";
+import { set } from "date-fns";
 
 export default function CustomerManagementScreen() {
   const [showAll, setShowAll] = useState(false);
-  const [displayedData, setDisplayedData] = useState([]);
   const { data: customers, isLoading, error } = useGetCustomers();
+  const [displayedData, setDisplayedData] = useState([]);
 
   const [search, setSearch] = useState("");
   const updateSearch = (search) => {
@@ -27,14 +21,14 @@ export default function CustomerManagementScreen() {
   };
   useFocusEffect(
     useCallback(() => {
-      if (customers) {
+      if (!isLoading && customers) {
         // Example filtering logic: filter customers based on a search term
         // This needs to be adjusted based on the actual structure of customer objects and how you want to filter them
         const filteredCustomers = customers.filter((customer) => {
           return (
-            customer.phone.toLowerCase().includes(search) ||
-            customer.name.toLowerCase().includes(search) ||
-            customer.email.toLowerCase().includes(search)
+            customer?.phone.includes(search) ||
+            customer?.name.toLowerCase().includes(search) ||
+            customer?.email.toLowerCase().includes(search)
           );
         });
 
@@ -44,28 +38,16 @@ export default function CustomerManagementScreen() {
             ? filteredCustomers
             : filteredCustomers.slice(0, 6)
         );
+
+        // setDisplayedData(customers);
+        console.log("displayedData", customers, filteredCustomers);
+      } else {
+        setDisplayedData([]);
       }
     }, [showAll, customers, search]) // Include search in the dependency array
   );
-  const [modalVisibleAdd, setModalVisibleAdd] = useState(false); // State để điều khiển hiển thị modal
-  const [newCustomerData, setNewCustomerData] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    dob: "",
-  }); // Step 1: State for managing new product data
-  const [date, setDate] = useState(new Date()); // Step 2: State for managing date
+  const [modalVisibleAdd, setModalVisibleAdd] = useState(false);
 
-  const handleChange = (key, value) => {
-    setNewCustomerData({
-      ...newCustomerData,
-      [key]: value,
-    });
-  };
-  const onDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setDate(currentDate);
-  };
   // Hàm mở modal
   const openModalAdd = () => {
     setModalVisibleAdd(true);

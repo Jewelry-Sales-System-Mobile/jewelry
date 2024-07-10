@@ -34,6 +34,7 @@ import * as ImagePicker from "react-native-image-picker";
 import Constants from "expo-constants";
 import ActionDropdown from "../Component/ActionSection";
 import FilterDropdown from "../Component/FilterDropdown";
+import { useCartStore } from "../../../Zustand/CartForStaff.js";
 
 const ProductManagementScreen = () => {
   const { data: products, isLoading, error, isFetching } = useGetProducts();
@@ -68,6 +69,7 @@ const ProductManagementScreen = () => {
   const [visible, setVisible] = useState(false);
   const [visibleProducts, setVisibleProducts] = useState(6); // Số sản phẩm hiển thị ban đầu
   const [sortBy, setSortBy] = useState(null);
+  const { addProductToCart } = useCartStore();
 
   const filteredProducts = products?.filter((product) =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -307,6 +309,14 @@ const ProductManagementScreen = () => {
               />
             </TouchableOpacity>
           </View>
+          <TouchableOpacity
+            className="bg-[#ccac00] rounded-md p-1 text-center mt-1 mx-auto"
+            onPress={() => addProductToCart(item)}
+          >
+            <Text className="px-2 py-1 text-sm text-white font-semibold">
+              Them vao gio
+            </Text>
+          </TouchableOpacity>
         </Card.Content>
       </Card>
     );

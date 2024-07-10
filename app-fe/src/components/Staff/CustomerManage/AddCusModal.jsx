@@ -20,9 +20,19 @@ import { yupResolver } from "@hookform/resolvers/yup";
 const schema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
-  phone: Yup.number().required("Phone is required"),
-  dob: Yup.date().required("Date of birth is required").nullable(),
-  // Add other fields validation as needed
+  phone: Yup.string()
+    .matches(
+      /^0[345789][0-9]{8}$/,
+      "Phone must have exact 10 digits and start with 03, 04, 05, 07, 08, or 09"
+    )
+    .required("Phone is required"),
+  dob: Yup.date()
+    .max(
+      new Date(new Date().setFullYear(new Date().getFullYear() - 16)),
+      "Must be at least 16 years old"
+    )
+    .required("Date of birth is required")
+    .nullable(), // Add other fields validation as needed
 });
 
 export default function AddCusModal({
