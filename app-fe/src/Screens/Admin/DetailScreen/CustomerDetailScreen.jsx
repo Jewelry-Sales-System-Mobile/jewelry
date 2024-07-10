@@ -234,43 +234,45 @@ const OrderItem = ({ item, index }) => {
               quantity={detail.quantity}
               index={index}
             />
-            <View className="w-full  flex-row justify-end items-center my-5 pr-5">
-              <View className="w-[60%]">
-                <View className="flex-row justify-between">
-                  <Text className="text-left">Tạm tổng:</Text>
-                  <Text className="text-right">
-                    {item.subtotal
-                      ? item.subtotal.toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        })
-                      : 0}{" "}
-                  </Text>
-                </View>
-                <View className="flex-row justify-between">
-                  <Text className="text-left">Sử dụng điểm:</Text>
-                  <Text className="text-right">
-                    {item.discount.toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })}
-                  </Text>
-                </View>
-                <View className="flex-row justify-between">
-                  <Text className="text-left">Tổng thành tiền:</Text>
-                  <Text className="text-right">
-                    {item.total
-                      ? item.total.toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        })
-                      : 0}{" "}
-                  </Text>
-                </View>
-              </View>
-            </View>
           </View>
         ))}
+      {expanded && (
+        <View className="w-full  flex-row justify-end items-center my-5 pr-5">
+          <View className="w-[60%]">
+            <View className="flex-row justify-between">
+              <Text className="text-left">Tạm tổng:</Text>
+              <Text className="text-right">
+                {item.subtotal
+                  ? item.subtotal.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
+                  : 0}{" "}
+              </Text>
+            </View>
+            <View className="flex-row justify-between">
+              <Text className="text-left">Sử dụng điểm:</Text>
+              <Text className="text-right">
+                {item.discount.toLocaleString("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                })}
+              </Text>
+            </View>
+            <View className="flex-row justify-between">
+              <Text className="text-left">Tổng thành tiền:</Text>
+              <Text className="text-right">
+                {item.total
+                  ? item.total.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
+                  : 0}{" "}
+              </Text>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   );
 };
