@@ -16,6 +16,7 @@ import {
 import moment from "moment";
 import { useGetProductById } from "../../../API/productApi";
 import { Title } from "react-native-paper";
+import { Tooltip, Icon } from "react-native-elements";
 
 const CustomerDetailScreen = () => {
   const route = useRoute();
@@ -31,6 +32,13 @@ const CustomerDetailScreen = () => {
     isLoading: ordersLoading,
     error: ordersError,
   } = useGetOrdersByCustomerId(customerId); // Use the new API hook
+
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+
+  console.log("tooltipVisible", tooltipVisible);
+  const toggleTooltip = () => {
+    setTooltipVisible(!tooltipVisible);
+  };
 
   console.log("orders", orders);
 
@@ -63,6 +71,18 @@ const CustomerDetailScreen = () => {
     );
   };
 
+  const formatCurrencyVND = (value) => {
+    if (value == null || isNaN(value)) return "0 VND";
+    const numValue = Number(value); // Convert value to a number
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(numValue.toFixed(2));
+  };
+
+  console.log("ordersTotal", orders);
+  const total = orders.reduce((acc, order) => acc + order.total, 0);
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -72,11 +92,29 @@ const CustomerDetailScreen = () => {
         style={styles.customerDetailCard}
         imageStyle={{ borderRadius: 8 }}
       >
-        <View className="flex-row justify-between">
+        <View className="flex-row justify-between items-center">
           <Text style={styles.detailTitle}>{customer.name}</Text>
-          <Text className="text-[#937C00] text-lg font-bold">
-            {customer.points} Điểm{" "}
-          </Text>
+          <View className="flex-row items-center">
+            <Text className="text-[#937C00] text-lg font-bold mr-3">
+              {customer.points} Điểm{" "}
+            </Text>
+            <Tooltip
+              className="rounded-md"
+              height={100}
+              width={250}
+              popover={
+                <View className="bg-[#FFFFF] p-2 rounded-md">
+                  <Text className="text-white font-semibold">
+                    Đơn hàng được quy đổi 100.000 đ = 1 Điểm. Được {">"} 100
+                    Điểm thì được Giảm giá cho đơn tiếp theo với 100 Điểm =
+                    100.000 đ
+                  </Text>
+                </View>
+              }
+            >
+              <Icon name="info" type="feather" color="#937C00" />
+            </Tooltip>
+          </View>
         </View>
 
         <View style={styles.detailText} className="flex-row">
@@ -94,6 +132,12 @@ const CustomerDetailScreen = () => {
           <Text className="text-base mr-2 font-semibold">Email:</Text>
           <Text className="text-base ">{customer.email}</Text>
         </View>
+        <View className="flex-row mb-4">
+          <Text className="text-base mr-2 font-semibold">Tổng chi tiêu: </Text>
+          <Text className="text-base font-semibold text-[#937C00]">
+            {formatCurrencyVND(total)}
+          </Text>
+        </View>
 
         <Text className="text-xs text-gray">
           Ngày tạo: {moment(customer.createdAt).format("DD/MM/YYYY, hh:mm A")}
@@ -105,7 +149,7 @@ const CustomerDetailScreen = () => {
       </ImageBackground>
 
       <Text className="uppercase font-semibold text-sm mb-5">
-        Danh sách đơn hàng của {customer.name}:
+        Danh sách đơn hàng của {customer.name} ({orders.length} đơn):
       </Text>
 
       <View
@@ -168,6 +212,8 @@ const OrderItem = ({ item, index }) => {
         return null;
     }
   };
+
+  const discountPrice = item?.discount * 1000;
 
   return (
     <View style={styles.orderRow}>
@@ -253,7 +299,8 @@ const OrderItem = ({ item, index }) => {
             <View className="flex-row justify-between">
               <Text className="text-left">Sử dụng điểm:</Text>
               <Text className="text-right">
-                {item.discount.toLocaleString("vi-VN", {
+                -{" "}
+                {discountPrice.toLocaleString("vi-VN", {
                   style: "currency",
                   currency: "VND",
                 })}
@@ -301,8 +348,8 @@ const ProductDetail = ({ productId, quantity, index }) => {
       <Text className="mr-2 font-semibold">{index + 1}.</Text>
       <Image
         source={{
-          uri: product.image
-            ? product.image
+          uri: product.image_url
+            ? product.image_url
             : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s",
         }}
         style={styles.productImage}

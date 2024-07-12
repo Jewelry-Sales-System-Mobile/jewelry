@@ -169,14 +169,7 @@ const StaffDetailScreen = () => {
             </View>
           ) : (
             <View style={styles.detailRow}>
-              <Text
-                style={styles.detailLabel}
-                onPress={() =>
-                  navigation.navigate("StaffDetail", { staffId: item._id })
-                }
-              >
-                Quầy quản lý:
-              </Text>
+              <Text style={styles.detailLabel}>Quầy quản lý:</Text>
               <Text style={styles.detailText}>Chưa được phân quyền</Text>
             </View>
           )}
@@ -258,7 +251,7 @@ const StaffDetailScreen = () => {
                 onPress={handleUpdate}
                 disabled={!isNameChanged}
               >
-                <Text style={styles.buttonText}>Thêm sản phẩm</Text>
+                <Text style={styles.buttonText}>Cập nhật</Text>
               </TouchableOpacity>
 
               <TouchableOpacity

@@ -16,6 +16,7 @@ import {
   useUpdateGoldPrices,
 } from "../../../API/goldPriceApi";
 import { MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
+import { format } from "date-fns";
 
 const GoldPriceManagement = () => {
   const { data: goldPrices, isLoading, error, isFetching } = useGetGoldPrices();
@@ -94,7 +95,8 @@ const GoldPriceManagement = () => {
       {goldPrices && (
         <View>
           <Text className="text-gray-600 text-xs ">
-            Ngày cập nhật giá vàng: {goldPrices.updated_at}
+            Ngày cập nhật giá vàng:{" "}
+            {format(new Date(goldPrices.updated_at), "p, dd/MM/yyyy")}
           </Text>
           <Text className="text-gray-600 text-xs mb-4">
             Đơn vị: 1 Lượng = 37.5 gram
@@ -222,6 +224,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
     backgroundColor: "#fff",
