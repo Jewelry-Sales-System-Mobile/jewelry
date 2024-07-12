@@ -7,8 +7,10 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  Platform,
 } from "react-native";
 import {
+  uploadImage,
   useActivateProduct,
   useAddProductImage,
   useCreateProduct,
@@ -28,15 +30,23 @@ import {
   Searchbar,
   Menu,
   Provider,
+  ActivityIndicator,
 } from "react-native-paper";
 import moment from "moment";
 import { MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
-import * as ImagePicker from "react-native-image-picker";
 import Constants from "expo-constants";
 import ActionDropdown from "../Component/ActionSection";
 import FilterDropdown from "../Component/FilterDropdown";
 import ImageResizer from "../ResizeImage/resizeImage";
-import { showErrorMessage } from "../../../Utils/notifications";
+import {
+  showErrorMessage,
+  showSuccessMessage,
+} from "../../../Utils/notifications";
+import ImagePicker from "../Component/ImagePicker";
+import { compressBlob } from "../../../Utils/compressBlob";
+import { useRoleStore } from "../../../Zustand/Role";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import http from "../../../Utils/http";
 
 const MAX_NAME_LENGTH = 70;
 const MAX_WEIGHT = 1000; // in grams
@@ -46,13 +56,22 @@ const MIN_WEIGHT = 0.2; // Minimum weight in grams
 const MIN_GEM_COST = 50000; // Minimum gem cost in VND
 
 const ProductManagementScreen = () => {
-  const { data: products, isLoading, error, isFetching } = useGetProducts();
+  const {
+    data: products,
+    isLoading,
+    error,
+    isFetching,
+    refetch,
+  } = useGetProducts();
   const { mutate: createProduct } = useCreateProduct();
   const { mutate: updateProduct } = useUpdateProduct();
   const { mutate: deleteProductImage } = useDeleteProductImage();
   const { mutate: addProductImage } = useAddProductImage();
+  const addProductImageMutation = useAddProductImage();
   const { mutate: inactivateProduct } = useInactivateProduct();
   const { mutate: activateProduct } = useActivateProduct();
+
+  const { token } = useRoleStore();
 
   const [selectedProduct, setSelectedProduct] = useState(null); // State to hold selected product
   const [modalVisible, setModalVisible] = useState(false); // State to control modal visibility
@@ -78,11 +97,12 @@ const ProductManagementScreen = () => {
   const [tooltipText, setTooltipText] = useState(""); // State to hold tooltip text
   const [searchQuery, setSearchQuery] = useState("");
   const [errors, setErrors] = useState({});
+
   // Dropdown menu actions
   const [visible, setVisible] = useState(false);
   const [visibleProducts, setVisibleProducts] = useState(6); // Số sản phẩm hiển thị ban đầu
   const [sortBy, setSortBy] = useState(null);
-
+  console.log("selectedProduct", selectedProduct);
   useEffect(() => {
     if (modalVisibleUpdate) {
       // Set the initial product data when the modal opens
@@ -381,110 +401,102 @@ const ProductManagementScreen = () => {
     setModalVisibleUpdate(false);
   };
 
-  const handleDeleteProductImage = (product) => {
-    // Delete product logic here
-    deleteProductImage(product._id);
+  const handleDeleteProductImage = (productId, imageUrl) => {
+    deleteProductImage({ productId, imageUrl });
   };
 
-  const handleAddImage = async (imageProduct) => {
+  const handleAddImage = (imageProduct) => {
+    // debugger;
     const options = {
-      mediaType: "photo",
-      includeBase64: true,
+      title: "Select Image",
+      storageOptions: {
+        skipBackup: true,
+        path: "images",
+      },
     };
 
     ImagePicker.launchImageLibrary(options, async (response) => {
       if (response.didCancel) {
         console.log("User cancelled image picker");
-      } else if (response.errorCode) {
-        console.log("ImagePicker Error: ", response.errorMessage);
-      } else if (response.assets && response.assets.length > 0) {
-        const selectedImage = response.assets[0];
-        console.log("Selected image: ", selectedImage.uri);
+        return;
+      }
+      if (response.error) {
+        console.log("ImagePicker Error: ", response.error);
+        return;
+      }
 
+      let uri, type, fileName;
+
+      if (Platform.OS === "web") {
+        uri = response.uri;
+        type = response.type || "image/jpeg"; // Fallback type
+        fileName = response.name || "image.jpg"; // Fallback filename
+
+        // Convert to Blob
+        const blob = await fetch(uri).then((res) => res.blob());
+        const compressedBlob = await compressBlob(blob);
+        // debugger;
+        // Create FormData
+        console.log("FormData entries for web:");
+        const formData = new FormData();
+        formData.append("image", compressedBlob, fileName);
+
+        // Check if FormData is populated
+        for (let [key, value] of formData.entries()) {
+          console.log("key&value", key, value); // Log entries
+        }
+
+        // Gửi dữ liệu
         try {
-          // Convert Base64 to Blob
-          const base64Data = selectedImage.base64;
-          const byteCharacters = atob(base64Data);
-          const byteNumbers = new Array(byteCharacters.length);
-          for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-          }
-          const byteArray = new Uint8Array(byteNumbers);
-          const blob = new Blob([byteArray], {
-            type: selectedImage.type || "image/jpeg",
-          });
+          const response = await http.post(
+            `/products/${imageProduct._id}/images`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data", // Để axios tự động thêm boundary
+              },
+            }
+          );
+          console.log("Upload thành công:", response);
+          showSuccessMessage("Upload thành công!");
+          await refetch(); // Refetch sản phẩm
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          showErrorMessage("Có lỗi xảy ra!");
+        }
+      } else {
+        const asset = response.assets[0];
+        uri = asset.uri;
+        type = asset.type;
+        fileName = asset.fileName || "image.jpg"; // Fallback filename
 
-          // Compress Blob (if needed)
-          const compressedBlob = await compressBlob(blob);
+        // Create FormData for mobile
+        const formData = new FormData();
+        formData.append("image", {
+          uri,
+          type,
+          name: fileName,
+        });
 
-          // Create FormData and append Blob
-          const formData = new FormData();
-          formData.append("image", {
-            uri: selectedImage.uri,
-            type: selectedImage.type || "image/jpeg",
-            name: selectedImage.fileName || "photo.jpg",
-            data: compressedBlob,
-          });
+        // Log FormData entries
+        for (let [key, value] of formData.entries()) {
+          console.log(key, value); // Log entries
+        }
 
-          // Call API to add image to product
-          await addProductImage({
+        // Upload image using API
+        try {
+          await addProductImageMutation.mutateAsync({
             productId: imageProduct._id,
             imageFile: formData,
           });
+          console.log("Upload thành công!"); // Debug
+          showSuccessMessage("Upload thành công!");
         } catch (error) {
-          console.error("Error handling image: ", error);
-          showErrorMessage("Failed to handle image. Please try again.");
+          console.error("Error uploading image:", error);
+          showErrorMessage("Có lỗi xảy ra!");
         }
       }
-    });
-  };
-
-  const compressBlob = async (blob) => {
-    return new Promise((resolve, reject) => {
-      // Implement your image compression logic here
-      // Example: Use canvas to resize and compress image
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-
-          // Set the desired width and height (e.g., 800x800)
-          const MAX_WIDTH = 800;
-          const MAX_HEIGHT = 800;
-
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          ctx.drawImage(img, 0, 0, width, height);
-
-          canvas.toBlob(
-            (compressedBlob) => {
-              resolve(compressedBlob);
-            },
-            "image/jpeg",
-            0.6
-          );
-        };
-        img.src = event.target.result;
-      };
-      reader.onerror = (error) => reject(error);
-      reader.readAsDataURL(blob);
     });
   };
 
@@ -545,7 +557,9 @@ const ProductManagementScreen = () => {
               handleUpdateProduct={handleUpdateProduct}
               setModalVisible={setModalVisible}
               setSelectedProduct={setSelectedProduct}
-              handleDeleteProductImage={handleDeleteProductImage}
+              handleDeleteProductImage={() =>
+                handleDeleteProductImage(item._id, item.image_url)
+              }
             />
           </View>
           <Title className="font-semibold  text-[14px] text-center ">
@@ -553,10 +567,10 @@ const ProductManagementScreen = () => {
           </Title>
           <Image
             source={{
-              uri: item.image
-                ? item.image
-                : // : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s",
-                  "https://cdn.pnj.io/images/detailed/136/gnxmxmy001678-nhan-vang-18k-dinh-da-cz-pnj-_1.png",
+              uri: item.image_url
+                ? item.image_url
+                : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s",
+              // "https://cdn.pnj.io/images/detailed/136/gnxmxmy001678-nhan-vang-18k-dinh-da-cz-pnj-_1.png",
             }}
             style={styles.image}
           />
@@ -564,8 +578,18 @@ const ProductManagementScreen = () => {
             <Feather
               name="camera"
               size={16}
-              color="black"
-              onPress={handleAddImage}
+              color={item.image_url ? "black" : "black"} // Nếu có image_url thì màu xám
+              onPress={() => {
+                if (item.image_url) {
+                  showErrorMessage(
+                    "Vui lòng xoá ảnh cũ thì mới tạo được ảnh mới"
+                  );
+                } else {
+                  setSelectedProduct(item);
+                  handleAddImage(item);
+                }
+              }}
+              style={{ opacity: item.image_url ? 0.5 : 1 }} // Giảm độ trong suốt nếu có image_url
             />
           </View>
           <View style={styles.indexContainer}>
@@ -698,10 +722,7 @@ const ProductManagementScreen = () => {
                       name="camera"
                       size={24}
                       color="black"
-                      onPress={() => {
-                        setSelectedProduct(selectedProduct);
-                        handleAddImage(selectedProduct);
-                      }}
+                      onPress={() => handleAddImage(item)}
                     />
                   </View>
                   <Title className="font-semibold text-lg ">

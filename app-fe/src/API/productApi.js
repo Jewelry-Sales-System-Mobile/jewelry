@@ -9,13 +9,12 @@ const getProducts = async () => {
 };
 
 export const useGetProducts = () => {
-  const { data, isLoading, isFetching, error } = useQuery(
+  const { data, isLoading, isFetching, error, refetch } = useQuery(
     "products",
     getProducts
   );
-  return { data, isLoading, error, isFetching };
+  return { data, isLoading, error, isFetching, refetch }; // Trả về refetch
 };
-
 // Create a new product
 const createProduct = async (newProduct) => {
   const { data } = await http.post(API_ENDPOINTS.PRODUCT, newProduct);
@@ -37,13 +36,12 @@ const deleteProduct = async (productId) => {
   return data.data;
 };
 
-// Add an image to a product
 const addProductImage = async ({ productId, imageFile }) => {
   const formData = new FormData();
   formData.append("image", imageFile);
 
-  const { data } = await http.post(
-    `${API_ENDPOINTS.PRODUCT}/${productId}/images`,
+  const response = await http.post(
+    `/products/${productId}/images`, // Sử dụng đường dẫn tương đối
     formData,
     {
       headers: {
@@ -51,11 +49,24 @@ const addProductImage = async ({ productId, imageFile }) => {
       },
     }
   );
-  return data.data;
+
+  return response.data; // Trả về dữ liệu
+};
+
+export const uploadImage = async (productId, formData, token) => {
+  const response = await http.post(`/products/${productId}/images`, formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
+    body: formData,
+  });
+  return response.data;
 };
 
 // Delete an image from a product
 const deleteProductImage = async ({ productId, imageUrl }) => {
+  // debugger;
   const { data } = await http.put(
     `${API_ENDPOINTS.PRODUCT}/${productId}/images/delete`,
     { url: imageUrl }
@@ -118,7 +129,8 @@ export const useAddProductImage = () => {
       showSuccessMessage("Ảnh đã được thêm vào thành công!");
       queryClient.invalidateQueries("products");
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Error:", error);
       showErrorMessage("Không thể thêm ảnh.");
     },
   });
