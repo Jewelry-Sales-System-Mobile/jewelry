@@ -1,8 +1,26 @@
 import { create } from "zustand";
 
 export const useCartStore = create((set) => ({
-  customer_id: "",
-  order_details: [], // Array to hold product details
+  customer: "",
+  order_details: [
+    {
+      _id: "66880c2fcb3ae588eee995b2",
+      name: "Lắc tay theo phong thuỷ",
+      barcode: "",
+      productCode: "PD224416",
+      weight: 100,
+      laborCost: 640000,
+      gemCost: 200000,
+      basePrice: 214173333.3333333,
+      image: "",
+      created_at: "2024-07-05T15:07:27.249Z",
+      updated_at: "2024-07-12T10:23:55.882Z",
+      status: 0,
+      productId: "66880c2fcb3ae588eee995b2",
+      unitPrice: 214173333.3333333,
+      quantity: 1,
+    },
+  ], // Array to hold product details
   subtotal: 0,
   discount: 0,
   total: 0,
@@ -74,10 +92,13 @@ export const useCartStore = create((set) => ({
       const newOrderDetails = state.order_details.filter(
         (item) => item.productId !== itemId
       ); // Remove the item
+      console.log(itemId, state.order_details, newOrderDetails);
+
       const newSubtotal = newOrderDetails.reduce(
         (acc, item) => acc + item.quantity * item.unitPrice,
         0
-      ); // Recalculate subtotal using quantity and unitPrice      const newTotal = newSubtotal - state.discount; // Recalculate total
+      ); // Recalculate subtotal using quantity and unitPrice
+      const newTotal = newSubtotal - state.discount; // Recalculate total
       return {
         ...state,
         order_details: newOrderDetails,
@@ -86,16 +107,20 @@ export const useCartStore = create((set) => ({
       };
     }),
 
-  // Method to update an item (assuming item updates are passed as an object with id and changes)
-  updateItem: (itemId, changes) =>
+  // Function to increase the quantity of an item in the cart
+  increaseQuantity: (itemId) =>
     set((state) => {
-      const newOrderDetails = state.order_details.map((item) =>
-        item.productId === itemId ? { ...item, ...changes } : item
-      ); // Update the item
+      const newOrderDetails = state.order_details.map((item) => {
+        if (item.productId === itemId) {
+          return { ...item, quantity: item.quantity + 1 };
+        }
+        return item;
+      });
       const newSubtotal = newOrderDetails.reduce(
         (acc, item) => acc + item.quantity * item.unitPrice,
         0
-      ); // Recalculate subtotal using quantity and unitPrice      const newTotal = newSubtotal - state.discount; // Recalculate total
+      );
+      const newTotal = newSubtotal - state.discount;
       return {
         ...state,
         order_details: newOrderDetails,
@@ -103,19 +128,49 @@ export const useCartStore = create((set) => ({
         total: newTotal,
       };
     }),
-  // Add a method to update discount and recalculate total
+
+  // Function to decrease the quantity of an item in the cart
+  decreaseQuantity: (itemId) =>
+    set((state) => {
+      // Filter out the item if its quantity is 1 (or somehow less than 1), otherwise decrease its quantity
+      const newOrderDetails = state.order_details.reduce((acc, item) => {
+        if (item.productId === itemId) {
+          if (item.quantity > 1) {
+            acc.push({ ...item, quantity: item.quantity - 1 }); // Decrease quantity
+          }
+          // If quantity is 1, do not push it back into the array, effectively deleting it
+        } else {
+          acc.push(item); // Keep all other items as is
+        }
+        return acc;
+      }, []);
+
+      // Recalculate subtotal and total
+      const newSubtotal = newOrderDetails.reduce(
+        (acc, item) => acc + item.quantity * item.unitPrice,
+        0
+      );
+      const newTotal = newSubtotal - state.discount;
+
+      return {
+        ...state,
+        order_details: newOrderDetails,
+        subtotal: newSubtotal,
+        total: newTotal,
+      };
+    }),
   applyDiscount: (discount) =>
     set((state) => {
       const newSubtotal = state.order_details.reduce(
         (acc, item) => acc + item.unitPrice * item.quantity,
         0
       );
-      const newTotal = newSubtotal - discount * 1000;
+      const newTotal = newSubtotal - discount;
 
       return { ...state, discount, total: newTotal };
     }),
-  setCustomerId: (customerId) => {
-    console.log("Setting customer ID to:", customerId);
-    set({ customer_id: customerId });
+  setCustomerId: (customer) => {
+    console.log("Setting customer ID to:", customer);
+    set({ customer: customer });
   },
 }));

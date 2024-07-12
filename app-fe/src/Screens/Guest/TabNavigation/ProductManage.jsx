@@ -313,6 +313,14 @@ const ProductManagementScreen = () => {
     setModalVisible(false);
     setSelectedProduct(null);
   };
+  const handleAddProductToCart = (item) => {
+    if (item.status === 0) {
+      addProductToCart(item);
+      showSuccessMessage("Sản phẩm đã được thêm vào giỏ hàng");
+    } else {
+      showErrorMessage("Sản phẩm đã bị ẩn");
+    }
+  };
 
   const renderItem = ({ item, index }) => {
     const formatCurrency = (value) => {
@@ -404,7 +412,7 @@ const ProductManagementScreen = () => {
           </View>
           <TouchableOpacity
             className="bg-[#ccac00] rounded-md p-1 text-center mt-1 mx-auto"
-            onPress={() => addProductToCart(item)}
+            onPress={() => handleAddProductToCart(item)}
           >
             <Text className="px-2 py-1 text-sm text-white font-semibold">
               Them vao gio
