@@ -492,8 +492,8 @@ const ProductManagementScreen = () => {
                 <Card.Content>
                   <Image
                     source={{
-                      uri: selectedProduct.image
-                        ? selectedProduct.image
+                      uri: selectedProduct.image_url
+                        ? selectedProduct.image_url
                         : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s",
                     }}
                     style={styles.modalImage}
