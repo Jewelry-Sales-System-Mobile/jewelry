@@ -22,7 +22,7 @@ const renderTable = (data, title, keyExtractor, renderItem) => (
 );
 
 // Component to display the VIP customer statistics
-const VIPCustomerStats = () => {
+const VIPCustomerStats = ({ info }) => {
   const navigation = useNavigation();
 
   const [topSpenders, setTopSpenders] = useState([]);
@@ -35,8 +35,8 @@ const VIPCustomerStats = () => {
     error: customersError,
   } = useGetCustomers();
 
- // console.log(topSpenders, "topSpenders");
-//  console.log(topPoints, "topPoints");
+  // console.log(topSpenders, "topSpenders");
+  //  console.log(topPoints, "topPoints");
 
   useEffect(() => {
     const fetchAllOrders = async () => {
@@ -76,9 +76,13 @@ const VIPCustomerStats = () => {
     return <Text>Error fetching data: {customersError.message}</Text>;
 
   const listOrder = () => {
-    navigation.navigate("Account", {
-      screen: "CustomerAccount", // Specify the screen inside the AccountManagementStackNavigator
-    });
+    if (info.role === 0) {
+      navigation.navigate("Account", {
+        screen: "CustomerAccount", // Specify the screen inside the AccountManagementStackNavigator
+      });
+    } else {
+      navigation.navigate("Customer");
+    }
   };
 
   return (

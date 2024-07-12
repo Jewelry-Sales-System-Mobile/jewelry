@@ -6,7 +6,7 @@ import { useGetAllOrders } from "../../../API/orderApi";
 import { format, startOfWeek } from "date-fns";
 import { useNavigation } from "@react-navigation/native";
 
-const RevenueChart = () => {
+const RevenueChart = ({ info }) => {
   const navigation = useNavigation();
 
   const [weeklyData, setWeeklyData] = useState([]);
@@ -138,7 +138,12 @@ const RevenueChart = () => {
   );
 
   const listOrder = () => {
-    navigation.navigate("Order"); // Navigate to CustomerDetail screen
+    if (info.role === 0) {
+      // debugger;
+      navigation.navigate("Order"); // Navigate to CustomerDetail screen
+    } else {
+      navigation.navigate("OrderList"); // Navigate to CustomerDetail screen
+    }
   };
 
   return (
