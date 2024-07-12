@@ -4,15 +4,18 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import moment from "moment";
 import ProductDetail from "./Pproductdetail";
 import { useGetCustomerById } from "../../../API/customerApi";
+import { useNavigation } from "@react-navigation/native";
 
 const OrderItem = ({ item, index }) => {
+  const navigation = useNavigation();
+
   const [expanded, setExpanded] = useState(false);
   const {
     data: customer,
     isLoading: customerLoading,
     error: customerError,
   } = useGetCustomerById(item?.customer_id);
-  console.log("customer order", customer);
+  // console.log("customer order", customer);
 
   const getStatusImage = (status) => {
     switch (status) {
@@ -53,23 +56,32 @@ const OrderItem = ({ item, index }) => {
     }
   };
 
+  const discountPrice = item?.discount * 1000;
+
   return (
     <View style={styles.orderRow}>
       <View className="flex-row items-start w-full">
         <Text className=" mr-4 font-semibold"> #{index + 1}</Text>
 
-        <View>
+        <View className="w-[85%]">
           {customer && (
-            <Text className="font-semibold text-sm">
+            <Text
+              className="font-semibold text-sm w-full "
+              onPress={() =>
+                navigation.navigate("CustomerDetail", {
+                  customerId: customer._id,
+                })
+              }
+            >
               Khách hàng:
-              <Text className="text-[#937C00] ml-3">
+              <Text className="text-[#937C00] ml-3 underline  ">
                 {customer.name} - {customer.email}
               </Text>
             </Text>
           )}
-          <View className="flex-row justify-between items-center">
+          <View className="flex-row justify-between items-center w-full">
             <View className="flex-row items-center">
-              {/* <Text className="font-semibold text-sm mr-2">#{index + 1}</Text> */}
+              {/* <Text className="font-  mibold text-sm mr-2">#{index + 1}</Text> */}
               <Image
                 source={{ uri: getStatusImage(item?.paymentStatus) }}
                 style={styles.image}
@@ -134,7 +146,7 @@ const OrderItem = ({ item, index }) => {
             ))}
           {expanded && (
             <View className="w-full  flex-row justify-end items-center my-5 pr-5">
-              <View className="w-[60%]">
+              <View className="w-[70%]">
                 <View className="flex-row justify-between">
                   <Text className="text-left">Tạm tổng:</Text>
                   <Text className="text-right">
@@ -148,12 +160,17 @@ const OrderItem = ({ item, index }) => {
                 </View>
                 <View className="flex-row justify-between">
                   <Text className="text-left">Sử dụng điểm:</Text>
-                  <Text className="text-right">
-                    {item?.discount.toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })}
-                  </Text>
+                  {discountPrice !== 0 ? (
+                    <Text className="text-right font-semibold text-red">
+                      -{" "}
+                      {discountPrice.toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                    </Text>
+                  ) : (
+                    <Text className="text-right ">{0}</Text>
+                  )}
                 </View>
                 <View className="flex-row justify-between">
                   <Text className="text-left">Tổng thành tiền:</Text>

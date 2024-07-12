@@ -11,8 +11,8 @@ const makerOrder = async (data) => {
 };
 
 const getAllOrders = async () => {
-  const { data } = await http.get("/");
-  debugger;
+  const { data } = await http.get(API_ENDPOINTS.ORDER);
+  // debugger;
   return data.data;
 };
 

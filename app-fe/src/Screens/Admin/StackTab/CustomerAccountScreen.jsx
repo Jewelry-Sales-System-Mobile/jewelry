@@ -29,6 +29,9 @@ const ManageCustomer = () => {
       item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Sắp xếp danh sách đơn hàng theo created_at từ mới nhất đến cũ nhất
+  filteredSearch?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
   const renderItem = ({ item, index }) => (
     <TouchableOpacity style={styles.customerCard}>
       <View className="flex-row ">
@@ -42,6 +45,9 @@ const ManageCustomer = () => {
           </View>
           <Text style={styles.customerPhone}>{item.phone}</Text>
           <Text style={styles.customerEmail}>{item.email}</Text>
+          <Text className="mb-2 text-xs text-right">
+            Ngày tạo: {moment(item.createdAt).format("DD/MM/YYYY, hh:mm A")}{" "}
+          </Text>
         </View>
       </View>
       <TouchableOpacity
@@ -93,7 +99,7 @@ const ManageCustomer = () => {
       </View>
       {customers && (
         <Text className="my-2 ml-2 font-semibold">
-          Tổng có: {customers.length} Nhân viên
+          Tổng có: {customers.length} Khách hàng
         </Text>
       )}
       <FlatList
