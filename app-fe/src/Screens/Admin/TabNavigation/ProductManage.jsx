@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Alert,
   Platform,
+  PermissionsAndroid,
 } from "react-native";
 import {
   uploadImage,
@@ -66,7 +67,6 @@ const ProductManagementScreen = () => {
   const { mutate: createProduct } = useCreateProduct();
   const { mutate: updateProduct } = useUpdateProduct();
   const { mutate: deleteProductImage } = useDeleteProductImage();
-  const { mutate: addProductImage } = useAddProductImage();
   const addProductImageMutation = useAddProductImage();
   const { mutate: inactivateProduct } = useInactivateProduct();
   const { mutate: activateProduct } = useActivateProduct();
@@ -405,9 +405,41 @@ const ProductManagementScreen = () => {
     deleteProductImage({ productId, imageUrl });
   };
 
-  const handleAddImage = (imageProduct) => {
-    // debugger;
+  const requestStoragePermission = async () => {
+    if (Platform.OS === "android") {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+          {
+            title: "Storage Permission",
+            message: "App needs access to your storage to select images.",
+            buttonNeutral: "Ask Me Later",
+            buttonNegative: "Cancel",
+            buttonPositive: "OK",
+          }
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      } catch (err) {
+        console.warn(err);
+        return false;
+      }
+    } else {
+      // Đối với iOS, có thể không cần yêu cầu quyền
+      return true;
+    }
+  };
+
+  const handleAddImage = async (imageProduct) => {
+    const hasPermission = await requestStoragePermission();
+    if (!hasPermission) {
+      console.log("Permission denied");
+      return;
+    }
+
     const options = {
+      mediaType: "photo", // Chọn loại media
+      quality: 1, // Chất lượng hình ảnh (0-1)
+      includeBase64: false, // Chọn có bao gồm Base64 hay không
       title: "Select Image",
       storageOptions: {
         skipBackup: true,
@@ -416,6 +448,7 @@ const ProductManagementScreen = () => {
     };
 
     ImagePicker.launchImageLibrary(options, async (response) => {
+      console.log("response", response);
       if (response.didCancel) {
         console.log("User cancelled image picker");
         return;
@@ -427,71 +460,94 @@ const ProductManagementScreen = () => {
 
       let uri, type, fileName;
 
-      if (Platform.OS === "web") {
-        uri = response.uri;
-        type = response.type || "image/jpeg"; // Fallback type
-        fileName = response.name || "image.jpg"; // Fallback filename
+      // if (Platform.OS === "web") {
+      //   uri = response.uri;
+      //   type = response.type || "image/jpeg"; // Fallback type
+      //   fileName = response.name || "image.jpg"; // Fallback filename
 
-        // Convert to Blob
-        const blob = await fetch(uri).then((res) => res.blob());
-        const compressedBlob = await compressBlob(blob);
-        // debugger;
-        // Create FormData
-        console.log("FormData entries for web:");
-        const formData = new FormData();
-        formData.append("image", compressedBlob, fileName);
+      //   // Convert to Blob
+      //   const blob = await fetch(uri).then((res) => res.blob());
+      //   const compressedBlob = await compressBlob(blob);
+      //   // debugger;
+      //   // Create FormData
+      //   console.log("FormData entries for web:");
+      //   const formData = new FormData();
+      //   formData.append("image", compressedBlob, fileName);
 
-        // Check if FormData is populated
-        for (let [key, value] of formData.entries()) {
-          console.log("key&value", key, value); // Log entries
-        }
+      //   // Check if FormData is populated
+      //   for (let [key, value] of formData.entries()) {
+      //     console.log("key&value", key, value); // Log entries
+      //   }
 
-        // Gửi dữ liệu
+      //   // Gửi dữ liệu
+      //   try {
+      //     const response = await http.post(
+      //       `/products/${imageProduct._id}/images`,
+      //       formData,
+      //       {
+      //         headers: {
+      //           Authorization: `Bearer ${token}`,
+      //           "Content-Type": "multipart/form-data", // Để axios tự động thêm boundary
+      //         },
+      //       }
+      //     );
+      //     console.log("Upload thành công:", response);
+      //     showSuccessMessage("Upload thành công!");
+      //     await refetch(); // Refetch sản phẩm
+      //   } catch (error) {
+      //     console.error("Error uploading image:", error);
+      //     showErrorMessage("Có lỗi xảy ra!");
+      //   }
+      // } else
+
+      console.log(Platform.OS, "Platform.OS");
+
+      if (Platform.OS === "android") {
+        debugger;
+        uri = response.uri; // Đường dẫn đến hình ảnh
+        type = response.type || "image/jpeg"; // Loại hình ảnh
+        fileName = response.fileName || "image.jpg"; // Tên tệp tin
+
+        // uri = asset.uri;
+        // type = asset.type || "image/jpeg"; // Fallback type
+        // fileName = asset.name || "image.jpg"; // Fallback filename
+
         try {
-          const response = await http.post(
+          // Fetch the image as a blob
+          const blob = await fetch(uri).then((res) => {
+            if (!res.ok) {
+              throw new Error("Failed to fetch the image.");
+            }
+            return res.blob();
+          });
+
+          // Compress the blob
+          const compressedBlob = await compressBlob(blob);
+
+          // Create FormData
+          const formData = new FormData();
+          formData.append("image", {
+            uri: uri,
+            type: type,
+            name: fileName,
+          });
+          console.log("formDataAnd", formData);
+
+          // Gửi dữ liệu
+          const uploadResponse = await http.post(
             `/products/${imageProduct._id}/images`,
             formData,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
-                "Content-Type": "multipart/form-data", // Để axios tự động thêm boundary
+                "Content-Type": "multipart/form-data",
               },
             }
           );
-          console.log("Upload thành công:", response);
+
+          console.log("Upload thành công:", uploadResponse);
           showSuccessMessage("Upload thành công!");
           await refetch(); // Refetch sản phẩm
-        } catch (error) {
-          console.error("Error uploading image:", error);
-          showErrorMessage("Có lỗi xảy ra!");
-        }
-      } else {
-        const asset = response.assets[0];
-        uri = asset.uri;
-        type = asset.type;
-        fileName = asset.fileName || "image.jpg"; // Fallback filename
-
-        // Create FormData for mobile
-        const formData = new FormData();
-        formData.append("image", {
-          uri,
-          type,
-          name: fileName,
-        });
-
-        // Log FormData entries
-        for (let [key, value] of formData.entries()) {
-          console.log(key, value); // Log entries
-        }
-
-        // Upload image using API
-        try {
-          await addProductImageMutation.mutateAsync({
-            productId: imageProduct._id,
-            imageFile: formData,
-          });
-          console.log("Upload thành công!"); // Debug
-          showSuccessMessage("Upload thành công!");
         } catch (error) {
           console.error("Error uploading image:", error);
           showErrorMessage("Có lỗi xảy ra!");
@@ -595,6 +651,8 @@ const ProductManagementScreen = () => {
               setSelectedProduct(item);
               setModalVisible(true);
             }}
+            numberOfLines={2} // Giới hạn số dòng hiển thị
+            ellipsizeMode="tail" // Thêm dấu "..." ở cuối nếu văn bản quá dài
           >
             {item.name}
           </Title>
@@ -632,14 +690,16 @@ const ProductManagementScreen = () => {
     }
 
     return (
-      <TouchableOpacity
-        className="bg-[#ccac00] rounded-md p-1 text-center w-[40%] mt-4 mx-auto"
-        onPress={handleLoadMore}
-      >
-        <Title className="text-white text-center text-sm text-semibold">
-          Xem thêm
-        </Title>
-      </TouchableOpacity>
+      <View>
+        <TouchableOpacity
+          className="bg-[#ccac00] rounded-md p-1 text-center w-[40%] mt-4 mx-auto"
+          onPress={handleLoadMore}
+        >
+          <Title className="text-white text-center text-sm text-semibold">
+            Xem thêm
+          </Title>
+        </TouchableOpacity>
+      </View>
     );
   };
 
@@ -653,7 +713,6 @@ const ProductManagementScreen = () => {
             onPress={openModalAdd}
           >
             <FontAwesome name="plus" size={20} color="white" />
-            {/* <Text style={{ color: "white", marginLeft: 10 }}>Tạo Sản Phẩm</Text> */}
           </TouchableOpacity>
         </View>
       </View>
@@ -671,7 +730,10 @@ const ProductManagementScreen = () => {
           Tổng có: {products.length} Sản phẩm
         </Text>
       )}
-      <View style={styles.separator}></View> {/* Separator View */}
+      <View style={styles.separator}>
+        <Text> </Text>
+      </View>
+      {/* Separator View */}
       {isLoading ? (
         <Text>Loading...</Text>
       ) : error ? (
@@ -698,7 +760,7 @@ const ProductManagementScreen = () => {
         <View style={styles.modalContainer}>
           <Card style={styles.modalCard}>
             {selectedProduct && (
-              <>
+              <View>
                 <Card.Content>
                   <Image
                     source={{
@@ -815,7 +877,7 @@ const ProductManagementScreen = () => {
                   </View>
                 </Card.Content>
                 <Button onPress={closeModal}>Close</Button>
-              </>
+              </View>
             )}
           </Card>
         </View>
@@ -853,7 +915,7 @@ const ProductManagementScreen = () => {
               <TextInput
                 style={styles.input}
                 placeholder="Trọng lượng (Gram)"
-                value={updatedProductData.weight}
+                value={updatedProductData.weight.toString()}
                 onChangeText={(text) => handleUpdateChange("weight", text)}
                 keyboardType="numeric"
                 mode="outlined"
@@ -870,7 +932,7 @@ const ProductManagementScreen = () => {
               <TextInput
                 style={styles.input}
                 placeholder="Giá đá quý (VND)"
-                value={updatedProductData.gemCost}
+                value={updatedProductData.gemCost.toString()}
                 onChangeText={(text) => handleUpdateChange("gemCost", text)}
                 keyboardType="numeric"
                 mode="outlined"
@@ -936,7 +998,7 @@ const ProductManagementScreen = () => {
               <TextInput
                 style={styles.input}
                 placeholder="Khối lượng (gram)"
-                value={newProductData.weight}
+                value={newProductData.weight.toString()}
                 onChangeText={(text) => handleChange("weight", text)}
                 keyboardType="numeric"
                 mode="outlined"
@@ -952,7 +1014,7 @@ const ProductManagementScreen = () => {
               <TextInput
                 style={styles.input}
                 placeholder="Chi phí đá (VND)"
-                value={newProductData.gemCost}
+                value={newProductData.gemCost.toString()}
                 onChangeText={(text) => handleChange("gemCost", text)}
                 keyboardType="numeric"
                 mode="outlined"

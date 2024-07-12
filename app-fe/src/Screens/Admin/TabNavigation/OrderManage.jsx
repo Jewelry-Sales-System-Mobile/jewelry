@@ -26,7 +26,9 @@ const OrderManagementScreen = () => {
   );
 
   // Sắp xếp danh sách đơn hàng theo created_at từ mới nhất đến cũ nhất
-  filteredOrder.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  filteredOrder?.sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+  );
 
   const handleLoadMore = () => {
     setVisibleOrders(visibleOrders + 5); // Tăng số lượng sản phẩm hiển thị khi nhấn nút "Xem thêm"
@@ -83,7 +85,7 @@ const OrderManagementScreen = () => {
         </Text>
       )}
       <FlatList
-        data={filteredOrder.slice(0, visibleOrders)} // Hiển thị số sản phẩm tối đa
+        data={filteredOrder?.slice(0, visibleOrders)} // Hiển thị số sản phẩm tối đa
         ListFooterComponent={renderFooter} // Thêm footer cho FlatList
         renderItem={({ item, index }) => (
           <OrderItem item={item} index={index} />
