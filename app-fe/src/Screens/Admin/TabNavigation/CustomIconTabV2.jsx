@@ -1,7 +1,6 @@
 // CustomTabIconV2.jsx
 import React, { useState } from "react";
 import { View, Image, Dimensions } from "react-native";
-import { Svg, Path } from "react-native-svg";
 import { scale } from "react-native-size-scaling";
 import { getPathDown } from "./cure";
 

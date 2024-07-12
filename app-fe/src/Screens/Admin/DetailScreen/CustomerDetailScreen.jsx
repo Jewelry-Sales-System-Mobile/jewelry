@@ -426,6 +426,7 @@ const styles = StyleSheet.create({
     height: 50,
     marginBottom: 10,
     marginRight: 5,
+    backgroundColor: "#ffffff",
   },
 
   statusIcon: {

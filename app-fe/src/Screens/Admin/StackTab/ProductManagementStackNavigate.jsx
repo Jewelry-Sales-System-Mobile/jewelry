@@ -1,23 +1,23 @@
 // OrderManagementStackNavigator.js
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import OrderManagementScreen from "../TabNavigation/OrderManage";
 import { Text } from "react-native-paper";
+import ProductManagementScreen from "../TabNavigation/ProductManage";
 
 const Stack = createStackNavigator();
 
-const OrderManagementStackNavigator = () => {
+const ProductManagementStackNavigator = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="OrderManagement"
-        component={OrderManagementScreen}
+        name="ProductManagement"
+        component={ProductManagementScreen}
         options={{
           headerTitleAlign: "center",
           headerShown: true,
           headerTitle: () => (
             <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-              Quản lý đơn hàng
+              Quản lý sản phẩm Trang Sức
             </Text>
           ),
         }}
@@ -28,4 +28,4 @@ const OrderManagementStackNavigator = () => {
   );
 };
 
-export default OrderManagementStackNavigator;
+export default ProductManagementStackNavigator;

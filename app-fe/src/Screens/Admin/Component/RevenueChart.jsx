@@ -6,18 +6,16 @@ import { useGetAllOrders } from "../../../API/orderApi";
 import { format, startOfWeek } from "date-fns";
 import { useNavigation } from "@react-navigation/native";
 
-const screenWidth = Dimensions.get("window").width;
-
 const RevenueChart = () => {
   const navigation = useNavigation();
 
   const [weeklyData, setWeeklyData] = useState([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [totalOrder, setTotalOrder] = useState(0);
- // console.log("weeklyData", weeklyData);
+  // console.log("weeklyData", weeklyData);
 
   const { orders: allOrders, isLoading, error } = useGetAllOrders();
-//  console.log("allOrders", allOrders);
+  //  console.log("allOrders", allOrders);
 
   useEffect(() => {
     if (allOrders && allOrders.length > 0) {
@@ -93,7 +91,8 @@ const RevenueChart = () => {
     return weeklyRevenueData;
   };
 
-  // Chart configuration
+  const screenWidth = Dimensions.get("window").width;
+
   const chartConfig = {
     backgroundGradientFrom: "#ffffff",
     backgroundGradientFromOpacity: 0,
@@ -129,8 +128,8 @@ const RevenueChart = () => {
     (data) => !isNaN(data.revenue)
   );
 
- // console.log("weeklyRevenueData", weeklyRevenueData);
- // console.log("chartConfig", chartConfig);
+  // console.log("weeklyRevenueData", weeklyRevenueData);
+  // console.log("chartConfig", chartConfig);
 
   // Calculate total revenue for the week
   const totalWeeklyRevenue = weeklyData.reduce(
@@ -144,52 +143,62 @@ const RevenueChart = () => {
 
   return (
     <View className="w-[90%]">
-      <View className="my-2 p-4 bg-white rounded-md w-full font-bold ">
-        {" "}
-        <View className="  flex-row items-center">
-          <Text className="text-sm font-bold">Tổng doanh thu :</Text>
+      {totalRevenue && totalOrder && (
+        <View className="my-2 p-4 bg-white rounded-md w-full font-bold ">
+          <View className="  flex-row items-center">
+            <Text className="text-sm font-bold">Tổng doanh thu :</Text>
+            <Text
+              className="text-base text-[#ccac00] ml-3 font-bold "
+              onPress={() => navigation.navigate("CustomerAccount")}
+            >
+              {formatCurrencyVND(totalRevenue)} / {totalOrder} đơn
+            </Text>
+          </View>
           <Text
-            className="text-base text-[#ccac00] ml-3 font-bold "
-            onPress={() => navigation.navigate("CustomerAccount")}
+            className="text-sm underline font-medium mrs-4 text-right"
+            onPress={listOrder}
           >
-            {formatCurrencyVND(totalRevenue)} / {totalOrder} đơn
+            Tất cả
           </Text>
         </View>
-        <Text
-          className="text-sm underline font-medium mrs-4 text-right"
-          onPress={listOrder}
-        >
-          {" "}
-          Tất cả
+      )}
+      <View>
+        <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 10 }}>
+          Doanh thu tổng quan theo tuần
         </Text>
+        {weeklyData.length !== 0 && (
+          <LineChart
+            data={{
+              labels: weeklyData.map((data) =>
+                format(new Date(data.date), "dd/MM/yyyy")
+              ),
+              datasets: [
+                {
+                  data: weeklyData.map((data) => data.revenue),
+                  color: (opacity = 1) => `rgba(204, 172, 0, ${opacity})`, // optional
+                  strokeWidth: 2, // optional
+                },
+              ],
+              legend: ["Doanh thu ngày"], // optional
+            }}
+            width={screenWidth - 30}
+            height={220}
+            chartConfig={chartConfig}
+            bezier
+          />
+        )}
       </View>
 
-      <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 10 }}>
-        Doanh thu tổng quan theo tuần
-      </Text>
-      <LineChart
-        data={{
-          labels: weeklyData.map((data) =>
-            format(new Date(data.date), "dd/MM/yyyy")
-          ),
-          datasets: [
-            {
-              data: weeklyData.map((data) => data.revenue),
-            },
-          ],
-        }}
-        width={screenWidth - 30}
-        fontSize={10}
-        height={220}
-        chartConfig={chartConfig}
-        bezier
-      />
-      <Text className="font-semibold txxt-sm ">
-        Tổng doanh thu trong 1 tuần:
-        <Text className="text-[#937C00] ml-3">
-          {formatCurrencyVND(totalWeeklyRevenue)}
-        </Text>
-      </Text>
+      {totalWeeklyRevenue && (
+        <View className=" flex-row ">
+          <Text className="font-semibold text-sm mr-2">
+            Tổng doanh thu trong 1 tuần:
+          </Text>
+          <Text className="text-[#937C00] ml-2 font-semibold">
+            {formatCurrencyVND(totalWeeklyRevenue)}
+          </Text>
+        </View>
+      )}
     </View>
   );
 };

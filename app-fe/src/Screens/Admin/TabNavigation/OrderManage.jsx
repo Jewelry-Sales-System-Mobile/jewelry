@@ -11,15 +11,23 @@ import {
 import OrderItem from "../Component/orderItem";
 import { useGetAllOrders } from "../../../API/order";
 import { Searchbar, Title } from "react-native-paper";
+import useResetScreen from "../Component/useResetScreen";
 
 const OrderManagementScreen = () => {
   const { data: orders, isLoading, error } = useGetAllOrders();
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleOrders, setVisibleOrders] = useState(5); // Số sản phẩm hiển thị ban đầu
 
- // console.log("ordersMana", orders);
+  // console.log("ordersMana", orders);
 
   const onChangeSearch = (query) => setSearchQuery(query);
+
+  const resetScreen = () => {
+    setSearchQuery("");
+    setVisibleOrders(5);
+  };
+
+  useResetScreen(resetScreen);
 
   const filteredOrder = orders?.filter((item) =>
     item.order_code.toLowerCase().includes(searchQuery.toLowerCase())
@@ -33,10 +41,8 @@ const OrderManagementScreen = () => {
   const handleLoadMore = () => {
     setVisibleOrders(visibleOrders + 5); // Tăng số lượng sản phẩm hiển thị khi nhấn nút "Xem thêm"
   };
-
   const renderFooter = () => {
-    // Kiểm tra nếu không còn sản phẩm để hiển thị thì không hiển thị nút "Xem thêm"
-    if (visibleOrders >= filteredOrder.length) {
+    if (!filteredOrder || visibleOrders >= filteredOrder.length) {
       return null;
     }
 
@@ -61,6 +67,7 @@ const OrderManagementScreen = () => {
   }
 
   if (error) {
+    console.error("Error loading orders:", error.message);
     return (
       <View style={styles.container}>
         <Text>Error loading orders: {error.message}</Text>
@@ -76,7 +83,6 @@ const OrderManagementScreen = () => {
           onChangeText={onChangeSearch}
           value={searchQuery}
           style={styles.searchBar}
-          // className="shadow-md"
         />
       </View>
       {orders && (
@@ -84,15 +90,17 @@ const OrderManagementScreen = () => {
           Tổng có: {orders.length} đơn hàng
         </Text>
       )}
-      <FlatList
-        data={filteredOrder?.slice(0, visibleOrders)} // Hiển thị số sản phẩm tối đa
-        ListFooterComponent={renderFooter} // Thêm footer cho FlatList
-        renderItem={({ item, index }) => (
-          <OrderItem item={item} index={index} />
-        )}
-        keyExtractor={(item) => item._id}
-        contentContainerStyle={styles.listContainer}
-      />
+      {filteredOrder.length !== 0 && (
+        <FlatList
+          data={filteredOrder?.slice(0, visibleOrders)} // Hiển thị số sản phẩm tối đa
+          ListFooterComponent={renderFooter} // Thêm footer cho FlatList
+          renderItem={({ item, index }) => (
+            <OrderItem item={item} index={index} />
+          )}
+          keyExtractor={(item) => item._id}
+          contentContainerStyle={styles.listContainer}
+        />
+      )}
     </View>
   );
 };

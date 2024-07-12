@@ -15,7 +15,7 @@ const DashboardStackNavigator = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Dashboard"
+        name="AdminDashboard"
         component={DashboardScreen}
         options={{
           headerTitleAlign: "center",

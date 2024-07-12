@@ -12,6 +12,7 @@ import {
 import { useGetStaffById } from "../../../API/staffApi";
 import EmployeeDetails from "../../../components/Counter/EmployeeDetails";
 import { Dialog, Portal, Button, Paragraph } from "react-native-paper";
+import { showErrorMessage } from "../../../Utils/notifications";
 
 export default function CounterDetails({ navigation }) {
   const route = useRoute();
@@ -34,7 +35,15 @@ export default function CounterDetails({ navigation }) {
   }, [employeeData]);
 
   const handleDelete = () => {
-    setDeleteDialogVisible(true);
+    if (data.assignedEmployees.length === 0) {
+      // Thực hiện xóa quầy hàng
+      setDeleteDialogVisible(true);
+    } else {
+      // Hiển thị thông báo lỗi
+      showErrorMessage(
+        "Vui lòng kick tất cả nhân viên khỏi quầy rồi mới xoá quầy!"
+      );
+    }
   };
 
   const confirmDeleteCounter = () => {
@@ -76,7 +85,12 @@ export default function CounterDetails({ navigation }) {
         </Text>
       </View>
       <View className="flex flex-row items-center justify-evenly gap-5 mb-6">
-        <TouchableOpacity onPress={handleDelete} className="flex flex-row">
+        <TouchableOpacity
+          onPress={handleDelete}
+          className={`flex flex-row ${
+            data.assignedEmployees.length === 0 ? "opacity-100" : "opacity-50"
+          }`}
+        >
           <Ionicons name="trash-outline" size={20} color="red" />
           <Text className="italic text-red-600 text-base">Xoá quầy hàng</Text>
         </TouchableOpacity>
@@ -178,7 +192,7 @@ export default function CounterDetails({ navigation }) {
             onPress={() =>
               navigation.navigate("Phân công nhân viên", { id: data?._id })
             }
-           className=" flex items-center justify-end px-1 "
+            className=" flex items-center justify-end px-1 "
           >
             <Ionicons name="add-circle-sharp" size={35} color="#ccac00" />
             {/* <Text className=" font-semibold text-sm text-white">Phân công</Text> */}
@@ -197,7 +211,6 @@ export default function CounterDetails({ navigation }) {
               </Text>
             </TouchableOpacity>
           )} */}
-          
         </View>
 
         {data?.assignedEmployees.length === 0 ? (
@@ -215,6 +228,7 @@ export default function CounterDetails({ navigation }) {
                 employeeId={employeeId}
                 onUnassign={handleUnassignEmployee}
                 index={index}
+                navigation={navigation}
               />
             ))}
           </View>

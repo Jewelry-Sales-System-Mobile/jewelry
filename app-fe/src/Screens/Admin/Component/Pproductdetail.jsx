@@ -95,12 +95,14 @@ const styles = StyleSheet.create({
     height: 20,
     marginBottom: 10,
     marginRight: 3,
+    borderRadius: 8,
   },
   productImage: {
     width: 50,
     height: 50,
     marginBottom: 10,
     marginRight: 5,
+    backgroundColor: "#ffffff",
   },
 
   statusIcon: {
