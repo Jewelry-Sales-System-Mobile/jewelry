@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Platform,
 } from "react-native";
 import {
   useActivateProduct,
@@ -30,18 +31,34 @@ import {
 } from "react-native-paper";
 import moment from "moment";
 import { MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
-import * as ImagePicker from "react-native-image-picker";
+// import * as ImagePicker from "react-native-image-picker";
 import Constants from "expo-constants";
 import ActionDropdown from "../Component/ActionSection";
 import FilterDropdown from "../Component/FilterDropdown";
 import { useCartStore } from "../../../Zustand/CartForStaff.js";
+import {
+  showErrorMessage,
+  showSuccessMessage,
+} from "../../../Utils/notifications";
+import { compressBlob } from "../../../Utils/compressBlob";
+import ImagePicker from "../../../Screens/Admin/Component/ImagePicker";
+import http from "../../../Utils/http";
+import { useRoleStore } from "../../../Zustand/Role";
 
 const ProductManagementScreen = () => {
-  const { data: products, isLoading, error, isFetching } = useGetProducts();
+  const {
+    data: products,
+    isLoading,
+    error,
+    isFetching,
+    refetch,
+  } = useGetProducts();
   const { mutate: createProduct } = useCreateProduct();
   const { mutate: updateProduct } = useUpdateProduct();
   const { mutate: deleteProductImage } = useDeleteProductImage();
-  const { mutate: addProductImage } = useAddProductImage();
+  // const { mutate: addProductImage } = useAddProductImage();
+  const addProductImageMutation = useAddProductImage();
+
   const { mutate: inactivateProduct } = useInactivateProduct();
   const { mutate: activateProduct } = useActivateProduct();
   console.log(products, "products");
@@ -71,8 +88,17 @@ const ProductManagementScreen = () => {
   const [sortBy, setSortBy] = useState(null);
   const { addProductToCart } = useCartStore();
 
-  const filteredProducts = products?.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const { token } = useRoleStore();
+
+  const filteredProducts = products?.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.productCode.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Sắp xếp danh sách đơn hàng theo created_at từ mới nhất đến cũ nhất
+  filteredProducts?.sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
   );
 
   const filteredProductsSort = filteredProducts?.sort((a, b) => {
@@ -162,13 +188,12 @@ const ProductManagementScreen = () => {
     setModalVisibleUpdate(false);
   };
 
-  const handleDeleteProductImage = (product) => {
-    // Delete product logic here
-    deleteProductImage(product._id);
+  const handleDeleteProductImage = (productId, imageUrl) => {
+    deleteProductImage({ productId, imageUrl });
   };
 
   const handleAddImage = (imageProduct) => {
-    // Define options for image picker
+    // debugger;
     const options = {
       title: "Select Image",
       storageOptions: {
@@ -177,29 +202,88 @@ const ProductManagementScreen = () => {
       },
     };
 
-    // Launch image picker
-    ImagePicker.launchImageLibrary(options, (response) => {
+    ImagePicker.launchImageLibrary(options, async (response) => {
       if (response.didCancel) {
         console.log("User cancelled image picker");
-      } else if (response.error) {
+        return;
+      }
+      if (response.error) {
         console.log("ImagePicker Error: ", response.error);
-      } else {
-        console.log("Selected image: ", response.uri);
+        return;
+      }
 
-        // Upload image using API
+      let uri, type, fileName;
+
+      if (Platform.OS === "web") {
+        uri = response.uri;
+        type = response.type || "image/jpeg"; // Fallback type
+        fileName = response.name || "image.jpg"; // Fallback filename
+
+        // Convert to Blob
+        const blob = await fetch(uri).then((res) => res.blob());
+        const compressedBlob = await compressBlob(blob);
+        // debugger;
+        // Create FormData
+        console.log("FormData entries for web:");
+        const formData = new FormData();
+        formData.append("image", compressedBlob, fileName);
+
+        // Check if FormData is populated
+        for (let [key, value] of formData.entries()) {
+          console.log("key&value", key, value); // Log entries
+        }
+
+        // Gửi dữ liệu
+        try {
+          const response = await http.post(
+            `/products/${imageProduct._id}/images`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data", // Để axios tự động thêm boundary
+              },
+            }
+          );
+          console.log("Upload thành công:", response);
+          showSuccessMessage("Upload thành công!");
+          await refetch(); // Refetch sản phẩm
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          debugger;
+          showErrorMessage("Có lỗi xảy ra!");
+        }
+      } else {
+        const asset = response.assets[0];
+        uri = asset.uri;
+        type = asset.type;
+        fileName = asset.fileName || "image.jpg"; // Fallback filename
+
+        // Create FormData for mobile
         const formData = new FormData();
         formData.append("image", {
-          uri: response.uri,
-          type: response.type,
-          name: response.fileName,
+          uri,
+          type,
+          name: fileName,
         });
 
-        console.log("FormData to be sent: ", formData);
+        // Log FormData entries
+        for (let [key, value] of formData.entries()) {
+          console.log(key, value); // Log entries
+        }
 
-        addProductImage({
-          productId: imageProduct._id,
-          imageFile: formData,
-        });
+        // Upload image using API
+        try {
+          await addProductImageMutation.mutateAsync({
+            productId: imageProduct._id,
+            imageFile: formData,
+          });
+          console.log("Upload thành công!"); // Debug
+          showSuccessMessage("Upload thành công!");
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          showErrorMessage("Có lỗi xảy ra!");
+        }
       }
     });
   };
@@ -233,12 +317,12 @@ const ProductManagementScreen = () => {
 
   const renderItem = ({ item, index }) => {
     const formatCurrency = (value) => {
-      // debugger;
       if (value == null || isNaN(value)) return "0 VND";
+      const numValue = Number(value); // Convert value to a number
       return new Intl.NumberFormat("vi-VN", {
         style: "currency",
         currency: "VND",
-      }).format(Number(value?.toFixed(2)));
+      }).format(numValue.toFixed(2));
     };
 
     const formattedPrice = formatCurrency(item?.basePrice);
@@ -252,7 +336,9 @@ const ProductManagementScreen = () => {
               handleUpdateProduct={handleUpdateProduct}
               setModalVisible={setModalVisible}
               setSelectedProduct={setSelectedProduct}
-              handleDeleteProductImage={handleDeleteProductImage}
+              handleDeleteProductImage={() =>
+                handleDeleteProductImage(item._id, item.image_url)
+              }
             />
           </View>
           <Title className="font-semibold  text-[14px] text-center ">
@@ -260,9 +346,10 @@ const ProductManagementScreen = () => {
           </Title>
           <Image
             source={{
-              uri: item.image
-                ? item.image
+              uri: item.image_url
+                ? item.image_url
                 : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s",
+              // "https://cdn.pnj.io/images/detailed/136/gnxmxmy001678-nhan-vang-18k-dinh-da-cz-pnj-_1.png",
             }}
             style={styles.image}
           />
@@ -270,11 +357,18 @@ const ProductManagementScreen = () => {
             <Feather
               name="camera"
               size={16}
-              color="black"
+              color={item.c ? "black" : "black"} // Nếu có image_url thì màu xám
               onPress={() => {
-                setSelectedProduct(item);
-                handleAddImage(item);
+                if (item.image_url) {
+                  showErrorMessage(
+                    "Vui lòng xoá ảnh cũ thì mới tạo được ảnh mới"
+                  );
+                } else {
+                  setSelectedProduct(item);
+                  handleAddImage(item);
+                }
               }}
+              style={{ opacity: item.image_url ? 0.5 : 1 }} // Giảm độ trong suốt nếu có image_url
             />
           </View>
           <View style={styles.indexContainer}>
