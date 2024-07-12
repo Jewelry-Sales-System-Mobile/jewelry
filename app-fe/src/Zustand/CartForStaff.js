@@ -3,23 +3,23 @@ import { create } from "zustand";
 export const useCartStore = create((set) => ({
   customer: "",
   order_details: [
-    {
-      _id: "66880c2fcb3ae588eee995b2",
-      name: "Lắc tay theo phong thuỷ",
-      barcode: "",
-      productCode: "PD224416",
-      weight: 100,
-      laborCost: 640000,
-      gemCost: 200000,
-      basePrice: 214173333.3333333,
-      image: "",
-      created_at: "2024-07-05T15:07:27.249Z",
-      updated_at: "2024-07-12T10:23:55.882Z",
-      status: 0,
-      productId: "66880c2fcb3ae588eee995b2",
-      unitPrice: 214173333.3333333,
-      quantity: 1,
-    },
+    // {
+    //   _id: "66880c2fcb3ae588eee995b2",
+    //   name: "Lắc tay theo phong thuỷ",
+    //   barcode: "",
+    //   productCode: "PD224416",
+    //   weight: 100,
+    //   laborCost: 640000,
+    //   gemCost: 200000,
+    //   basePrice: 214173333.3333333,
+    //   image: "",
+    //   created_at: "2024-07-05T15:07:27.249Z",
+    //   updated_at: "2024-07-12T10:23:55.882Z",
+    //   status: 0,
+    //   productId: "66880c2fcb3ae588eee995b2",
+    //   unitPrice: 214173333.3333333,
+    //   quantity: 1,
+    // },
   ], // Array to hold product details
   subtotal: 0,
   discount: 0,
@@ -173,4 +173,13 @@ export const useCartStore = create((set) => ({
     console.log("Setting customer ID to:", customer);
     set({ customer: customer });
   },
+  // Function to reset all the state of cartStore
+  resetCart: () =>
+    set(() => ({
+      customer: "", // Reset customer to an empty string
+      order_details: [], // Reset order details to an empty array
+      discount: 0, // Reset discount to 0
+      subtotal: 0, // Reset subtotal to 0
+      total: 0, // Reset total to 0
+    })),
 }));

@@ -19,7 +19,7 @@ const OrderManagementScreen = () => {
     const checkOut = {
       customer_id: customer._id,
       order_details: order_details,
-      discount: discount * 1000,
+      discount: applyDiscount,
       subtotal: subtotal,
       total: total,
     };

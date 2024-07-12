@@ -2,7 +2,8 @@ import { showSuccessMessage } from "../Utils/notifications";
 import http, { setToken } from "../Utils/http";
 import { API_ENDPOINTS } from "./api-endpoint";
 import { useMutation, useQuery } from "react-query";
-import { useRoleStore } from "../Zustand/Role";
+import { useCartStore } from "../Zustand/CartForStaff";
+import { useNavigation } from "@react-navigation/native";
 
 // Sign In function
 const makerOrder = async (data) => {
@@ -24,8 +25,13 @@ export const useGetAllOrders = () => {
 };
 
 export const useMakerOrder = () => {
+  const navigate = useNavigation();
+  const { resetCart } = useCartStore();
   return useMutation(makerOrder, {
     onSuccess: (data) => {
+      console.log("data", data);
+      resetCart();
+      navigate.navigate("OrderSuccess", { orderData: data });
       showSuccessMessage("Make Order Successfully!");
     },
     onError: () => {
