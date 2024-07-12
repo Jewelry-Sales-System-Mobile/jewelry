@@ -7,7 +7,7 @@ import DashboardScreen from "../TabNavigation/DashBoard";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import ManageCustomer from "./CustomerAccountScreen";
-import OrderManagementScreen from "../TabNavigation/OrderManage";
+import OrderManagementScreenAdmin from "../TabNavigation/OrderManage";
 
 const Stack = createStackNavigator();
 

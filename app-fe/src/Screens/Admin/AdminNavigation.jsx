@@ -4,12 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import ManageCounter from "./Counter/ManageCounter";
 import { Text } from "react-native";
 import CustomTabIconV2 from "./CustomIconTabV2";
-import ProductManagementScreen from "./TabNavigation/ProductManage";
-import DashboardScreen from "./TabNavigation/DashBoard";
-import OrderManagementScreen from "./TabNavigation/OrderManage";
-import CustomerManagementScreen from "./TabNavigation/CustomerManage";
-import AccountManagementScreen from "./TabNavigation/AccountManage";
-import CounterManagementScreen from "./TabNavigation/CounterManage";
+
 import CounterStackNavigator from "../../navigation/stack-navigators/CounterStackNavigator";
 import Setttings from "./TabNavigation/Setttings";
 import AccountManagementStackNavigator from "./StackTab/AccountManagementStackNavigator";
@@ -31,7 +26,7 @@ export default function AdminNavigation() {
             iconUri =
               "https://www.iconpacks.net/icons/2/free-settings-icon-3110-thumb.png";
           } else if (route.name === "Product") {
-            iconUri = "https://img.icons8.com/small/64/null/gear.png";
+            iconUri = "https://cdn-icons-png.freepik.com/512/332/332938.png";
           } else if (route.name === "Account") {
             iconUri = "https://static.thenounproject.com/png/4181324-200.png";
           } else if (route.name === "Order") {

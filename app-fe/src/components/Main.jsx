@@ -178,13 +178,7 @@ export default function Main() {
                 tabBarVisible: false, // Ẩn bottom navigation bar khi vào CustomerDetail
               })}
             />
-            {/* <Stack.Screen
-      name="Chi tiết quầy hàng"
-      component={CounterDetails}
-      options={{
-        headerShown: true,
-      }}
-    /> */}
+
             <Stack.Screen
               name="Tạo quầy hàng mới"
               component={CreateCounter}
@@ -204,27 +198,32 @@ export default function Main() {
                 tabBarVisible: false, // Ẩn bottom navigation bar khi vào CustomerDetail
               })}
             />
-            {/* <Stack.Screen
-      name="Cập nhật thông tin quầy hàng"
-      component={UpdateCounter}
-      options={{
-        headerShown: true,
-      }}
-    /> */}
-            {/* <Stack.Screen
-      name="Phân công nhân viên"
-      component={AssignEmployee}
-      options={{
-        headerShown: true,
-      }}
-    /> */}
           </>
         );
       case 1:
         return (
           <>
             <Stack.Screen name="Staff" component={GuestNavigation} />
-            <Stack.Screen name="CustomerDetails" component={CustomerDetail} />
+            {/* <Stack.Screen name="CustomerDetails" component={CustomerDetail} /> */}
+            <Stack.Screen
+              name="CustomerDetail"
+              component={CustomerDetailScreen}
+              options={({ navigation }) => ({
+                headerShown: true,
+                headerTitle: "Thông tin chi tiết Khách Hàng",
+                headerLeft: () => (
+                  // Sử dụng headerLeft để đặt nút back
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <FontAwesomeIcon
+                      icon={faArrowLeft}
+                      size={20}
+                      style={{ marginLeft: 16 }}
+                    />
+                  </TouchableOpacity>
+                ),
+                tabBarVisible: false, // Ẩn bottom navigation bar khi vào CustomerDetail
+              })}
+            />
           </>
         );
       default:
