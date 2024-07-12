@@ -398,7 +398,7 @@ const RenderStaffItem = ({ item, index, handleToggle, navigation, userId }) => {
           <View className=" flex-row items-center">
             <Text className="text-sm font-semibold mr-3">Vị trí:</Text>
             <Text className="uppercase font-bold text-gray-600">
-              {item.role === 0 ? "Quản lý" : "Nhân viên"}
+              {item && item.role === 0 ? "Quản lý" : "Nhân viên"}
             </Text>
           </View>
 

@@ -69,9 +69,9 @@ export default function Setttings() {
 
               <Text style={styles.userInfo}>{staff.email}</Text>
               <Text className="uppercase mt-3 font-bold tẽtx-lg">
-                {staff.role === 0 ? "Quản lý" : "Nhân viên"}{" "}
+                {staff && staff.role === 0 ? "Quản lý" : "Nhân viên"}{" "}
               </Text>
-              {staff.role !== 0 && (
+              {staff && staff.role !== 0 && (
                 <View>
                   {counterDetail ? (
                     <View className="flex-row mt-4">

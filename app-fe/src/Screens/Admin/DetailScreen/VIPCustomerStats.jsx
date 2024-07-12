@@ -76,7 +76,7 @@ const VIPCustomerStats = ({ info }) => {
     return <Text>Error fetching data: {customersError.message}</Text>;
 
   const listOrder = () => {
-    if (info.role === 0) {
+    if (info && info.role === 0) {
       navigation.navigate("Account", {
         screen: "CustomerAccount", // Specify the screen inside the AccountManagementStackNavigator
       });

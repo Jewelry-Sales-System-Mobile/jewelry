@@ -138,7 +138,7 @@ const RevenueChart = ({ info }) => {
   );
 
   const listOrder = () => {
-    if (info.role === 0) {
+    if (info && info?.role === 0) {
       // debugger;
       navigation.navigate("Order"); // Navigate to CustomerDetail screen
     } else {
