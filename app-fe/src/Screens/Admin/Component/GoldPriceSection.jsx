@@ -1,9 +1,7 @@
-// GoldPriceManagement.js
 import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  Button,
   Modal,
   TextInput,
   StyleSheet,
@@ -22,32 +20,22 @@ const GoldPriceManagement = () => {
   const { data: goldPrices, isLoading, error, isFetching } = useGetGoldPrices();
   const updateGoldPricesMutation = useUpdateGoldPrices();
 
-  console.log("goldPrices", goldPrices);
-
   const [modalVisible, setModalVisible] = useState(false);
   const [newPrices, setNewPrices] = useState({});
-  const [isValid, setIsValid] = useState(false); // State để xác định nút "Lưu" có được kích hoạt hay không
-  const [errorText, setErrorText] = useState(""); // State để lưu trữ thông báo lỗi
+  const [isValid, setIsValid] = useState(false);
+  const [errorText, setErrorText] = useState("");
   const [errorTimeout, setErrorTimeout] = useState(null);
-  const [inputValue, setInputValue] = useState(""); // State để lưu trữ giá trị nhập vào từ TextInput
-  const [initialPrices, setInitialPrices] = useState({}); // Giá trị khởi tạo ban đầu
 
   useEffect(() => {
     if (goldPrices) {
-      setInitialPrices(goldPrices);
+      console.log("Gold Prices: ", goldPrices);
     }
   }, [goldPrices]);
 
-  console.log("errorText", errorText);
   const handleUpdatePrices = () => {
     updateGoldPricesMutation.mutate(newPrices);
     setModalVisible(false);
   };
-
-  //   const handleOpenModal = () => {
-  //     setNewPrices(goldPrices); // Khởi tạo giá trị ban đầu với giá vàng hiện tại
-  //     setModalVisible(true);
-  //   };
 
   const handleOpenModal = () => {
     setNewPrices({
@@ -89,8 +77,16 @@ const GoldPriceManagement = () => {
     }
   };
 
+  if (isLoading) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (error) {
+    return <Text>Error loading gold prices: {error.message}</Text>;
+  }
+
   return (
-    <View className="w-[90%]">
+    <View style={styles.container}>
       <Text style={styles.title}>Quản lý Giá vàng (Vàng 24K)</Text>
       {goldPrices && (
         <View>
@@ -98,89 +94,66 @@ const GoldPriceManagement = () => {
             Ngày cập nhật giá vàng:{" "}
             {format(new Date(goldPrices.updated_at), "p, dd/MM/yyyy")}
           </Text>
-          <Text className="text-gray-600 text-xs mb-4">
-            Đơn vị: 1 Lượng = 37.5 gram
-          </Text>
-          <View className="flex-row justify-between items-center">
+          <Text style={styles.unitText}>Đơn vị: 1 Lượng = 37.5 gram</Text>
+          <View style={styles.priceContainer}>
             <View>
-              <View className="flex-row ">
-                <Text className="mr-4 font-semibold text-sm">Giá mua:</Text>
-                <Text className="text-[#ccac00] font-semibold text-lg">
-                  {" "}
-                  {goldPrices.buy_price.toLocaleString("vi-VN", {
+              <View style={styles.priceRow}>
+                <Text style={styles.priceLabel}>Giá mua:</Text>
+                <Text style={styles.priceValue}>
+                  {goldPrices.buy_price?.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
-                  })}{" "}
+                  })}
                 </Text>
               </View>
-
-              <View className="flex-row ">
-                <Text className="mr-4 text-left font-semibold text-sm mb-4">
-                  {" "}
-                  Giá bán:{" "}
-                </Text>
-                <Text className="text-[#ccac00] font-semibold text-lg">
-                  {" "}
-                  {goldPrices.sell_price.toLocaleString("vi-VN", {
+              <View style={styles.priceRow}>
+                <Text style={styles.priceLabel}>Giá bán:</Text>
+                <Text style={styles.priceValue}>
+                  {goldPrices.sell_price?.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })}
                 </Text>
               </View>
             </View>
-            <TouchableOpacity className="bg-[#ccac00] p-2 rounded-md">
-              <MaterialIcons
-                name="edit"
-                size={20}
-                color="white"
-                onPress={handleOpenModal}
-              />
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={handleOpenModal}
+            >
+              <MaterialIcons name="edit" size={20} color="white" />
             </TouchableOpacity>
           </View>
         </View>
       )}
-      {/* Nút để mở modal chỉnh sửa */}
 
-      {/* Modal chỉnh sửa Giá vàng */}
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text className="font-semibold text-xl mb-5 text-[#ccac00]">
-              Chỉnh sửa Giá vàng
-            </Text>
-
-            <View className="w-full">
-              <Text className="text-[12px] font-semibold mb-2">Giá mua:</Text>
+            <Text style={styles.modalTitle}>Chỉnh sửa Giá vàng</Text>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Giá mua:</Text>
               <TextInput
                 style={[styles.input, errorText ? styles.inputError : null]}
                 placeholder="Nhập giá mua mới"
                 keyboardType="numeric"
-                value={
-                  newPrices.buy_price ? newPrices.buy_price.toString() : ""
-                }
+                value={newPrices.buy_price ? newPrices.buy_price.toString() : ""}
                 onChangeText={(text) => handleChangePrice(text, "buy_price")}
               />
             </View>
-
-            <View className="w-full">
-              <Text className="text-[12px] font-semibold mb-2">Giá bán:</Text>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Giá bán:</Text>
               <TextInput
                 style={[styles.input, errorText ? styles.inputError : null]}
                 placeholder="Nhập giá bán mới"
                 keyboardType="numeric"
-                value={
-                  newPrices.sell_price ? newPrices.sell_price.toString() : ""
-                }
+                value={newPrices.sell_price ? newPrices.sell_price.toString() : ""}
                 onChangeText={(text) => handleChangePrice(text, "sell_price")}
               />
             </View>
-
-            {errorText ? (
-              <Text style={styles.errorText}>{errorText}</Text>
-            ) : null}
+            {errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
             <TouchableOpacity
               style={[
-                styles.addButton2,
+                styles.saveButton,
                 {
                   backgroundColor: isValid ? "#ccac00" : "#ccc",
                 },
@@ -190,10 +163,7 @@ const GoldPriceManagement = () => {
             >
               <Text style={styles.buttonText}>Lưu</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={handleCloseModal}
-            >
+            <TouchableOpacity style={styles.cancelButton} onPress={handleCloseModal}>
               <Text style={styles.buttonText}>Hủy</Text>
             </TouchableOpacity>
           </View>
@@ -204,21 +174,47 @@ const GoldPriceManagement = () => {
 };
 
 const styles = StyleSheet.create({
-  inputError: {
-    borderColor: "red",
-  },
-  errorText: {
-    color: "red",
-    marginBottom: 10,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+  container: {
+    width: "90%",
   },
   title: {
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
+  },
+  dateText: {
+    color: "gray",
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  unitText: {
+    color: "gray",
+    fontSize: 12,
+    marginBottom: 10,
+  },
+  priceContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  priceLabel: {
+    marginRight: 4,
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+  priceValue: {
+    color: "#ccac00",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  editButton: {
+    backgroundColor: "#ccac00",
+    padding: 8,
+    borderRadius: 5,
   },
   modalContainer: {
     flex: 1,
@@ -234,29 +230,47 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalTitle: {
-    fontSize: 18,
     fontWeight: "bold",
+    fontSize: 20,
+    marginBottom: 20,
+    color: "#ccac00",
+  },
+  inputContainer: {
+    width: "100%",
     marginBottom: 10,
+  },
+  inputLabel: {
+    fontSize: 12,
+    fontWeight: "bold",
+    marginBottom: 5,
   },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     padding: 10,
-    marginBottom: 10,
     borderRadius: 5,
     width: "100%",
   },
-
-  cancelButton: {
-    backgroundColor: "#8B0000",
+  inputError: {
+    borderColor: "red",
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  saveButton: {
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
     width: "100%",
     alignItems: "center",
   },
-  addButton2: {
-    backgroundColor: "#ccac00",
+  cancelButton: {
+    backgroundColor: "#8B0000",
     padding: 10,
     borderRadius: 5,
     marginTop: 10,

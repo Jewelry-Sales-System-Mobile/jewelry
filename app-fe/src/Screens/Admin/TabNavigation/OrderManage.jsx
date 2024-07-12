@@ -17,7 +17,7 @@ const OrderManagementScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleOrders, setVisibleOrders] = useState(5); // Số sản phẩm hiển thị ban đầu
 
-  console.log("ordersMana", orders);
+ // console.log("ordersMana", orders);
 
   const onChangeSearch = (query) => setSearchQuery(query);
 

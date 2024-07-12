@@ -14,10 +14,10 @@ const RevenueChart = () => {
   const [weeklyData, setWeeklyData] = useState([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [totalOrder, setTotalOrder] = useState(0);
-  console.log("weeklyData", weeklyData);
+ // console.log("weeklyData", weeklyData);
 
   const { orders: allOrders, isLoading, error } = useGetAllOrders();
-  console.log("allOrders", allOrders);
+//  console.log("allOrders", allOrders);
 
   useEffect(() => {
     if (allOrders && allOrders.length > 0) {
@@ -129,8 +129,8 @@ const RevenueChart = () => {
     (data) => !isNaN(data.revenue)
   );
 
-  console.log("weeklyRevenueData", weeklyRevenueData);
-  console.log("chartConfig", chartConfig);
+ // console.log("weeklyRevenueData", weeklyRevenueData);
+ // console.log("chartConfig", chartConfig);
 
   // Calculate total revenue for the week
   const totalWeeklyRevenue = weeklyData.reduce(

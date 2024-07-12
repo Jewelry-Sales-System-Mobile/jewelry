@@ -6,7 +6,7 @@ import { API_ENDPOINTS } from "./api-endpoint";
 const getAllOrders = async () => {
   try {
     const response = await http.get(API_ENDPOINTS.ORDER);
-    console.log("API response:", response); // Log the entire response object
+ //   console.log("API response:", response); // Log the entire response object
     return response.data.data; // Assuming the API response structure has a `data` field containing orders
   } catch (error) {
     throw new Error("Failed to fetch orders");
@@ -16,7 +16,7 @@ const getAllOrders = async () => {
 export const useGetAllOrders = () => {
   const { data, isLoading, error } = useQuery("orders", getAllOrders);
 
-  console.log("Data:", data); // Log the `data` received from React Query
+//  console.log("Data:", data); // Log the `data` received from React Query
 
   // Handling API errors
   if (error) {

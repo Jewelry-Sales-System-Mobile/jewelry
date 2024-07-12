@@ -5,7 +5,6 @@ import { Ionicons } from "@expo/vector-icons";
 
 import CustomTabIconV2 from "./CustomIconTabV2";
 import ProductManagementScreen from "../Screens/Guest/TabNavigation/ProductManage";
-import DashboardScreen from "../Screens/Guest/TabNavigation/DashBoard";
 import OrderManagementScreen from "../Screens/Guest/TabNavigation/OrderManage";
 import CustomerManagementScreen from "../Screens/Guest/TabNavigation/CustomerManage";
 import CounterStackNavigator from "./stack-navigators/CounterStackNavigator";
@@ -52,11 +51,7 @@ export default function GuestNavigation({ navigation }) {
         },
       })}
     >
-      <Tab.Screen
-        name="Dashboard"
-        component={DashboardScreen}
-        options={{ headerShown: false }}
-      />
+     
       <Tab.Screen
         name="Customer"
         component={CustomerManagementScreen}
