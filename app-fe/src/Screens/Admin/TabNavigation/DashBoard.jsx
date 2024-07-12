@@ -16,7 +16,7 @@ const DashboardScreen = () => {
     >
       {/* <Text style={{ fontSize: 24, marginBottom: 20 }}>Dashboard</Text> */}
       <GoldPriceManagement />
-      <RevenueChart />
+      {/* <RevenueChart /> */}
       <VIPCustomerStats />
       {/* Các thành phần khác của dashboard */}
     </ScrollView>

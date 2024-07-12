@@ -46,6 +46,7 @@ export default function ManageCounter({ navigation }) {
             value={searchQuery}
           />
         </View>
+        
         <CounterCard counters={filteredCounters} />
 
         <FAB.Group
@@ -62,7 +63,7 @@ export default function ManageCounter({ navigation }) {
           onStateChange={({ open }) => setIsFABOpen(open)}
           style={{
             position: 'absolute',
-            margin: 35,
+            margin: 30,
             right: 0,
             bottom: 0,
           }}
