@@ -28,7 +28,7 @@ const DashboardScreen = () => {
   const renderItem = () => (
     <View className="mt-5 items-center">
       <GoldPriceManagement />
-      <RevenueChart />
+      {/* <RevenueChart /> */}
       <VIPCustomerStats />
     </View>
   );
