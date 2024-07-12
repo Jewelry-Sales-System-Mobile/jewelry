@@ -348,8 +348,8 @@ const ProductDetail = ({ productId, quantity, index }) => {
       <Text className="mr-2 font-semibold">{index + 1}.</Text>
       <Image
         source={{
-          uri: product.image
-            ? product.image
+          uri: product.image_url
+            ? product.image_url
             : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s",
         }}
         style={styles.productImage}

@@ -15,7 +15,7 @@ const OrderItem = ({ item, index }) => {
     isLoading: customerLoading,
     error: customerError,
   } = useGetCustomerById(item?.customer_id);
-  console.log("customer order", customer);
+  // console.log("customer order", customer);
 
   const getStatusImage = (status) => {
     switch (status) {
