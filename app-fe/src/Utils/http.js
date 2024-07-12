@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode";
 
 
 const http = axios.create({
- //  baseURL: "http://192.168.56.2:4000",
+  // baseURL: "http://192.168.1.6:4000",
   baseURL: "http://localhost:4000",
   //http://192.168.1.12:4000/
   // baseURL: "https://nghich.id.vn",

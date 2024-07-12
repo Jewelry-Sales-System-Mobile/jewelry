@@ -1,18 +1,23 @@
 import { View, Text } from "react-native";
-import React, { useState } from "react";
+import React, { useState , useMemo } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FAB, Searchbar } from "react-native-paper";
 
 import CounterCard from "../../../components/Counter/CounterCard";
 import { useGetCounters } from "../../../API/counter";
-import { Searchbar } from "react-native-paper";
 
-export default function ManageCounter() {
+export default function ManageCounter({ navigation }) {
   const { data, isLoading, error } = useGetCounters();
-
   const [searchQuery, setSearchQuery] = useState("");
-  const updateSearch = (search) => {
-    setSearch(search);
-  };
+  const [isFABOpen, setIsFABOpen] = useState(false);
+
+  const filteredCounters = useMemo(() => {
+    if (!data) return [];
+    return data.filter(counter =>
+      counter.counter_name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [data, searchQuery]);
+
 
   if (isLoading) {
     return (
@@ -41,7 +46,30 @@ export default function ManageCounter() {
             value={searchQuery}
           />
         </View>
-        <CounterCard counters={data} />
+        <CounterCard counters={filteredCounters} />
+
+        <FAB.Group
+          open={isFABOpen}
+          icon={isFABOpen ? 'close' : 'plus'}
+          actions={[
+            {
+              icon: 'plus',
+              label: 'Thêm quầy hàng',
+              onPress: () => navigation.navigate("Tạo quầy hàng mới"),
+              small: false,
+            },
+          ]}
+          onStateChange={({ open }) => setIsFABOpen(open)}
+          style={{
+            position: 'absolute',
+            margin: 35,
+            right: 0,
+            bottom: 0,
+          }}
+          fabStyle={{
+            backgroundColor: "#ccac00",
+          }}
+        />
       </View>
     </SafeAreaView>
   );

@@ -33,6 +33,52 @@ export const useGetCounterById = (counterId) => {
   return { data, isLoading, error, isFetching };
 };
 
+//========== create ==========
+const createCounter = async ({ name }) => {
+  const { data } = await http.post(API_ENDPOINTS.COUNTER, {
+    name,
+  });
+  return data.data;
+};
+
+export const useCreateCounter = () => {
+  const queryClient = useQueryClient();
+  return useMutation(createCounter, {
+    onSuccess: () => {
+      showSuccessMessage("Tạo quầy hàng mới thành công!");
+      queryClient.invalidateQueries("counters");
+    },
+    onError: () => {
+      showErrorMessage("Failed to create counter.");
+    },
+  });
+};
+
+// === update
+
+const updateCounter = async ({ counterId, counterName }) => {
+  const { data } = await http.put(`${API_ENDPOINTS.COUNTER}/${counterId}`, {
+    counter_name: counterName
+  });
+  return data.data;
+};
+
+export const useUpdateCounter = () => {
+  const queryClient = useQueryClient();
+  return useMutation(updateCounter, {
+    onSuccess: () => {
+      showSuccessMessage("Cập nhật thông tin quầy hàng thành công!");
+      queryClient.invalidateQueries("counters");
+      queryClient.invalidateQueries("counter");
+    },
+    onError: () => {
+      showErrorMessage("Failed to update counter.");
+    },
+  });
+};
+
+//==== delete ===
+
   const deleteCounter = async (counterId) => {
     const { data } = await http.delete(`${API_ENDPOINTS.COUNTER}/${counterId}`);
     return data.data;
@@ -41,7 +87,7 @@ export const useGetCounterById = (counterId) => {
     const queryClient = useQueryClient();
     return useMutation(deleteCounter, {
       onSuccess: () => {
-        showSuccessMessage("Counter deleted successfully!");
+        showSuccessMessage("Xoá quầy hàng thành công!");
         queryClient.invalidateQueries("counters");
       },
       onError: () => {
@@ -62,9 +108,10 @@ export const useGetCounterById = (counterId) => {
     const queryClient = useQueryClient();
     return useMutation(assignEmployee, {
       onSuccess: () => {
-        showSuccessMessage("Employee assigned successfully!");
+        showSuccessMessage("Đã thêm nhân viên vào quầy!");
         queryClient.invalidateQueries("counters");
         queryClient.invalidateQueries("counter");
+        queryClient.invalidateQueries("freeStaffs");
       },
       onError: () => {
         showErrorMessage("Failed to assign employee.");
@@ -84,9 +131,11 @@ export const useUnassignEmployee = () => {
   const queryClient = useQueryClient();
   return useMutation(unassignEmployee, {
     onSuccess: () => {
-      showSuccessMessage("Employee unassigned successfully!");
+      showSuccessMessage("Xoá nhân viên khỏi quầy thành công!");
       queryClient.invalidateQueries("counters");
       queryClient.invalidateQueries("counter");
+      queryClient.invalidateQueries("staff");
+      queryClient.invalidateQueries("freeStaffs");
     },
     onError: () => {
       showErrorMessage("Failed to unassign employee.");

@@ -48,6 +48,12 @@ const inactivateStaff = async (staffId) => {
   return data.data;
 };
 
+// get free staff
+const getAllFreeStaff = async () => {
+  const { data } = await http.get(`${API_ENDPOINTS.USERS}/get-all`);
+  return data.data.filter((staff) => staff.role === 1 && staff.assigned_counter === "");
+};
+
 // Custom hooks for using these APIs
 export const useRegisterStaff = () => {
   const queryClient = useQueryClient();
@@ -211,4 +217,14 @@ export const useSetToStaff = () => {
       showErrorMessage("Có lỗi xảy ra khi chuyển quyền nhân viên");
     },
   });
+};
+
+
+// free staff
+export const useGetAllFreeStaff = () => {
+  const { data, isLoading, isFetching, error } = useQuery(
+    "freeStaffs",
+    getAllFreeStaff
+  );
+  return { data, isLoading, error, isFetching };
 };

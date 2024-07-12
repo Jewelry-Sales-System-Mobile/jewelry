@@ -35,8 +35,8 @@ const VIPCustomerStats = () => {
     error: customersError,
   } = useGetCustomers();
 
-  console.log(topSpenders, "topSpenders");
-  console.log(topPoints, "topPoints");
+ // console.log(topSpenders, "topSpenders");
+//  console.log(topPoints, "topPoints");
 
   useEffect(() => {
     const fetchAllOrders = async () => {

@@ -5,6 +5,7 @@ import ManageCounter from '../../Screens/Admin/Counter/ManageCounter';
 import CounterDetails from '../../Screens/Admin/Counter/CounterDetails';
 import AssignEmployee from '../../Screens/Admin/Counter/AssignEmployee';
 import UpdateCounter from '../../Screens/Admin/Counter/UpdateCounter';
+import CreateCounter from '../../Screens/Admin/Counter/CreateCounter';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +24,13 @@ export default function CounterStackNavigator() {
     <Stack.Screen
       name="Chi tiết quầy hàng"
       component={CounterDetails}
+      options={{
+        headerShown: true,
+      }}
+    />
+     <Stack.Screen
+      name="Tạo quầy hàng mới"
+      component={CreateCounter}
       options={{
         headerShown: true,
       }}
