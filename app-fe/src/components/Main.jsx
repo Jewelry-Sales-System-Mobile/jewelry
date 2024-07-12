@@ -19,6 +19,7 @@ import StaffDetailScreen from "../Screens/Admin/DetailScreen/StaffDetailScreen";
 import CounterDetails from "../Screens/Admin/Counter/CounterDetails";
 import AssignEmployee from "../Screens/Admin/Counter/AssignEmployee";
 import UpdateCounter from "../Screens/Admin/Counter/UpdateCounter";
+import CreateCounter from "../Screens/Admin/Counter/CreateCounter";
 
 const Stack = createNativeStackNavigator();
 NativeWindStyleSheet.setOutput({
@@ -40,12 +41,22 @@ export default function Main() {
     })();
   }, []);
 
+  const decodeTokenJwt = (token) => {
+    try {
+      const decodedToken = jwtDecode(token);
+      return decodedToken;
+    } catch (error) {
+      console.error("Invalid token specified:", error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     console.log("check role", role, isSignedIn);
     const fetchToken = async () => {
       const token = await getToken();
       if (token) {
-        const decodeToken = jwtDecode(token); // Corrected variable declaration
+        const decodeToken = decodeTokenJwt(token); // Corrected variable declaration
         const currentTime = Math.floor(Date.now() / 1000);
         // console.log("check exp", decodeToken);
         // console.log("check exp", decodeToken.exp, currentTime);
@@ -167,6 +178,46 @@ export default function Main() {
                 tabBarVisible: false, // Ẩn bottom navigation bar khi vào CustomerDetail
               })}
             />
+            {/* <Stack.Screen
+      name="Chi tiết quầy hàng"
+      component={CounterDetails}
+      options={{
+        headerShown: true,
+      }}
+    /> */}
+            <Stack.Screen
+              name="Tạo quầy hàng mới"
+              component={CreateCounter}
+              options={({ navigation }) => ({
+                headerShown: true,
+                headerTitle: "Tạo quầy hàng mới",
+                headerLeft: () => (
+                  // Sử dụng headerLeft để đặt nút back
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <FontAwesomeIcon
+                      icon={faArrowLeft}
+                      size={20}
+                      style={{ marginLeft: 16 }}
+                    />
+                  </TouchableOpacity>
+                ),
+                tabBarVisible: false, // Ẩn bottom navigation bar khi vào CustomerDetail
+              })}
+            />
+            {/* <Stack.Screen
+      name="Cập nhật thông tin quầy hàng"
+      component={UpdateCounter}
+      options={{
+        headerShown: true,
+      }}
+    /> */}
+            {/* <Stack.Screen
+      name="Phân công nhân viên"
+      component={AssignEmployee}
+      options={{
+        headerShown: true,
+      }}
+    /> */}
           </>
         );
       case 1:

@@ -3,7 +3,12 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { useGetStaffById } from "../../API/staffApi";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-export default function EmployeeDetails({ employeeId, onUnassign, index }) {
+export default function EmployeeDetails({
+  employeeId,
+  onUnassign,
+  index,
+  navigation,
+}) {
   const { data: employeeData, isLoading, error } = useGetStaffById(employeeId);
 
   if (isLoading) {
@@ -20,16 +25,23 @@ export default function EmployeeDetails({ employeeId, onUnassign, index }) {
       <View className="flex flex-row items-center gap-3">
         <Text className="bg-amber-200 py-4 px-2 rounded-lg">{index + 1}</Text>
         <View className="flex flex-col">
-          <Text className="text-base font-semibold">{employeeData?.name}</Text>
+          <Text
+            className="text-base font-semibold underline"
+            onPress={() =>
+              navigation.navigate("StaffDetail", {
+                staffId: employeeData._id,
+              })
+            }
+          >
+            {employeeData?.name}
+          </Text>
           <Text>{employeeData?.email}</Text>
         </View>
       </View>
-     
+
       <TouchableOpacity onPress={() => onUnassign(employeeId)}>
-      <Ionicons name="trash-outline" size={20} color="red" />
+        <Ionicons name="trash-outline" size={20} color="red" />
       </TouchableOpacity>
-    
-      
     </View>
   );
 }

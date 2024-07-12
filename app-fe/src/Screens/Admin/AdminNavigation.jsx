@@ -17,12 +17,12 @@ import SettingManagementStackNavigator from "./StackTab/SettingManagementStackNa
 import DashboardStackNavigator from "./StackTab/DashboardStackNavigator";
 import OrderManagementStackNavigator from "./StackTab/OrderManagementStackNavigator";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ProductManagementStackNavigator from "./StackTab/ProductManagementStackNavigate";
 
 const Tab = createBottomTabNavigator();
 
 export default function AdminNavigation() {
   return (
-
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused }) => {
@@ -38,8 +38,7 @@ export default function AdminNavigation() {
             iconUri = "https://cdn-icons-png.flaticon.com/512/2977/2977924.png";
           } else if (route.name === "Quầy hàng") {
             iconUri = "https://img.icons8.com/small/64/null/switch.png";
-          } 
-          else {
+          } else {
             // Default case
             iconUri = "https://img.icons8.com/small/64/null/home-page.png";
           }
@@ -73,7 +72,7 @@ export default function AdminNavigation() {
 
       <Tab.Screen
         name="Product"
-        component={ProductManagementScreen}
+        component={ProductManagementStackNavigator}
         options={{ headerShown: false }}
       />
       <Tab.Screen

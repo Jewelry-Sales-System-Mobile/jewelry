@@ -32,7 +32,6 @@ import {
 import moment from "moment";
 import { MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
 // import * as ImagePicker from "react-native-image-picker";
-import Constants from "expo-constants";
 import ActionDropdown from "../Component/ActionSection";
 import FilterDropdown from "../Component/FilterDropdown";
 import { useCartStore } from "../../../Zustand/CartForStaff.js";
@@ -752,6 +751,7 @@ const styles = StyleSheet.create({
     height: 150, // Adjust height as needed
     resizeMode: "cover", // or 'contain' as per your preference
     marginBottom: 10,
+    backgroundColor: "#ffffff",
   },
   separator: {
     height: 1,
@@ -815,6 +815,7 @@ const styles = StyleSheet.create({
     height: 300,
     marginBottom: 10,
     resizeMode: "cover",
+    backgroundColor: "#ffffff",
   },
   cameraIconContainer: {
     position: "absolute",

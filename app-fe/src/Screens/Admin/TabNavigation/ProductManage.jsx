@@ -402,7 +402,9 @@ const ProductManagementScreen = () => {
   };
 
   const handleDeleteProductImage = (productId, imageUrl) => {
+    // debugger;
     deleteProductImage({ productId, imageUrl });
+    setModalVisible(false);
   };
 
   const requestStoragePermission = async () => {
@@ -439,7 +441,7 @@ const ProductManagementScreen = () => {
     const options = {
       mediaType: "photo", // Chọn loại media
       quality: 1, // Chất lượng hình ảnh (0-1)
-      includeBase64: false, // Chọn có bao gồm Base64 hay không
+      // includeBase64: false, // Chọn có bao gồm Base64 hay không
       title: "Select Image",
       storageOptions: {
         skipBackup: true,
@@ -460,47 +462,46 @@ const ProductManagementScreen = () => {
 
       let uri, type, fileName;
 
-      // if (Platform.OS === "web") {
-      //   uri = response.uri;
-      //   type = response.type || "image/jpeg"; // Fallback type
-      //   fileName = response.name || "image.jpg"; // Fallback filename
+      if (Platform.OS === "web") {
+        uri = response.uri;
+        type = response.type || "image/jpeg"; // Fallback type
+        fileName = response.name || "image.jpg"; // Fallback filename
 
-      //   // Convert to Blob
-      //   const blob = await fetch(uri).then((res) => res.blob());
-      //   const compressedBlob = await compressBlob(blob);
-      //   // debugger;
-      //   // Create FormData
-      //   console.log("FormData entries for web:");
-      //   const formData = new FormData();
-      //   formData.append("image", compressedBlob, fileName);
+        // Convert to Blob
+        const blob = await fetch(uri).then((res) => res.blob());
+        const compressedBlob = await compressBlob(blob);
+        // debugger;
+        // Create FormData
+        console.log("FormData entries for web:");
+        const formData = new FormData();
+        formData.append("image", compressedBlob, fileName);
 
-      //   // Check if FormData is populated
-      //   for (let [key, value] of formData.entries()) {
-      //     console.log("key&value", key, value); // Log entries
-      //   }
+        // Check if FormData is populated
+        for (let [key, value] of formData.entries()) {
+          console.log("key&value", key, value); // Log entries
+        }
 
-      //   // Gửi dữ liệu
-      //   try {
-      //     const response = await http.post(
-      //       `/products/${imageProduct._id}/images`,
-      //       formData,
-      //       {
-      //         headers: {
-      //           Authorization: `Bearer ${token}`,
-      //           "Content-Type": "multipart/form-data", // Để axios tự động thêm boundary
-      //         },
-      //       }
-      //     );
-      //     console.log("Upload thành công:", response);
-      //     showSuccessMessage("Upload thành công!");
-      //     await refetch(); // Refetch sản phẩm
-      //   } catch (error) {
-      //     console.error("Error uploading image:", error);
-      //     showErrorMessage("Có lỗi xảy ra!");
-      //   }
-      // } else
-
-      console.log(Platform.OS, "Platform.OS");
+        // Gửi dữ liệu
+        try {
+          const response = await http.post(
+            `/products/${imageProduct._id}/images`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data", // Để axios tự động thêm boundary
+              },
+            }
+          );
+          console.log("Upload thành công:", response);
+          showSuccessMessage("Upload thành công!");
+          setModalVisible(false);
+          await refetch(); // Refetch sản phẩm
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          showErrorMessage("Có lỗi xảy ra!");
+        }
+      } else console.log(Platform.OS, "Platform.OS");
 
       if (Platform.OS === "android") {
         debugger;
@@ -613,6 +614,7 @@ const ProductManagementScreen = () => {
             #{item.productCode}
           </Title>
           <Image
+            className="bg-white"
             source={{
               uri: item.image_url
                 ? item.image_url
@@ -705,9 +707,14 @@ const ProductManagementScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View className="flex-row p-2 justify-between">
-        <Text style={styles.title}>Quản lý sản phẩm Trang Sức</Text>
-        <View style={styles.buttonContainer2} onPress={openModalAdd}>
+      {/* <View className="flex-row p-2 justify-between">
+      </View> */}
+      <View style={styles.searchContainer}>
+        <View
+          style={styles.buttonContainer2}
+          className="mr-3"
+          onPress={openModalAdd}
+        >
           <TouchableOpacity
             className="flex-row  bg-[#ccac00] p-2 rounded-md mb-4 "
             onPress={openModalAdd}
@@ -715,8 +722,6 @@ const ProductManagementScreen = () => {
             <FontAwesome name="plus" size={20} color="white" />
           </TouchableOpacity>
         </View>
-      </View>
-      <View style={styles.searchContainer}>
         <Searchbar
           placeholder="Tìm tên hoặc mã sản phẩm..."
           onChangeText={setSearchQuery}
@@ -773,9 +778,19 @@ const ProductManagementScreen = () => {
                   <View style={styles.cameraIconContainer}>
                     <Feather
                       name="camera"
-                      size={24}
-                      color="black"
-                      onPress={() => handleAddImage(item)}
+                      size={16}
+                      color={selectedProduct.image_url ? "black" : "black"} // Nếu có image_url thì màu xám
+                      onPress={() => {
+                        if (selectedProduct.image_url) {
+                          showErrorMessage(
+                            "Vui lòng xoá ảnh cũ thì mới tạo được ảnh mới"
+                          );
+                        } else {
+                          setSelectedProduct(selectedProduct);
+                          handleAddImage(selectedProduct);
+                        }
+                      }}
+                      style={{ opacity: selectedProduct.image_url ? 0.5 : 1 }} // Giảm độ trong suốt nếu có image_url
                     />
                   </View>
                   <Title className="font-semibold text-lg ">
@@ -867,10 +882,12 @@ const ProductManagementScreen = () => {
                           name="trash"
                           size={20}
                           color="#8B0000"
-                          onPress={() => {
-                            setSelectedProduct(selectedProduct);
-                            handleDeleteProductImage(selectedProduct);
-                          }}
+                          onPress={() =>
+                            handleDeleteProductImage(
+                              selectedProduct._id,
+                              selectedProduct.image_url
+                            )
+                          }
                         />
                       </TouchableOpacity>
                     </View>
@@ -1068,7 +1085,7 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#f9f8e6",
   },
   filterButton: {
     marginLeft: 10,
@@ -1076,6 +1093,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
+    backgroundColor: "#ffffff",
   },
   card: {
     margin: 5,
@@ -1093,6 +1111,7 @@ const styles = StyleSheet.create({
     height: 150, // Adjust height as needed
     resizeMode: "cover", // or 'contain' as per your preference
     marginBottom: 10,
+    backgroundColor: "#ffffff",
   },
   separator: {
     height: 1,
@@ -1156,6 +1175,7 @@ const styles = StyleSheet.create({
     height: 300,
     marginBottom: 10,
     resizeMode: "cover",
+    backgroundColor: "#ffffff",
   },
   cameraIconContainer: {
     position: "absolute",

@@ -65,59 +65,61 @@ const OrderItem = ({ item, index }) => {
 
         <View className="w-[85%]">
           {customer && (
-            <Text
-              className="font-semibold text-sm w-full "
-              onPress={() =>
-                navigation.navigate("CustomerDetail", {
-                  customerId: customer._id,
-                })
-              }
-            >
-              Khách hàng:
-              <Text className="text-[#937C00] ml-3 underline  ">
+            <View className="flex-row w-full ">
+              <Text className="font-semibold text-sm">Khách hàng:</Text>
+              <Text
+                className="text-[#937C00] ml-3 underline font-semibold  "
+                onPress={() =>
+                  navigation.navigate("CustomerDetail", {
+                    customerId: customer._id,
+                  })
+                }
+              >
                 {customer.name} - {customer.email}
               </Text>
-            </Text>
+            </View>
           )}
-          <View className="flex-row justify-between items-center w-full">
-            <View className="flex-row items-center">
-              {/* <Text className="font-  mibold text-sm mr-2">#{index + 1}</Text> */}
-              <Image
-                source={{ uri: getStatusImage(item?.paymentStatus) }}
-                style={styles.image}
-              />
-              <Text
-                className=" ml-2 font-semibold text-lg self-start "
-                style={[getStatusTextStyle(item?.paymentStatus)]}
-              >
-                {getStatusText(item?.paymentStatus)}
+          {item && (
+            <View className="flex-row justify-between items-center w-full">
+              <View className="flex-row items-center">
+                {/* <Text className="font-  mibold text-sm mr-2">#{index + 1}</Text> */}
+                <Image
+                  source={{ uri: getStatusImage(item?.paymentStatus) }}
+                  style={styles.image}
+                />
+                <Text
+                  className=" ml-2 font-semibold text-lg self-start "
+                  style={[getStatusTextStyle(item?.paymentStatus)]}
+                >
+                  {getStatusText(item?.paymentStatus)}
+                </Text>
+              </View>
+              <Text className="ml-2 font-semibold text-base  self-start">
+                #{item?.order_code}
               </Text>
             </View>
-            <Text className="ml-2 font-semibold text-base  self-start">
-              #{item?.order_code}
+          )}
+
+          <View className="w-full">
+            <Text className="text-xs text-gray  ml-8">
+              {moment(item?.created_at).format("DD/MM/YYYY, hh:mm A")}
+            </Text>
+            <Text className="text-base font-semibold text-[#937C00] my-2 ml-8">
+              {item?.total
+                ? item?.total.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })
+                : 0}{" "}
             </Text>
           </View>
-          <Text className="text-xs text-gray  ml-8">
-            {moment(item?.created_at).format("DD/MM/YYYY, hh:mm A")}
-          </Text>
-          <Text className="text-base font-semibold text-[#937C00] my-2 ml-8">
-            {item?.total
-              ? item?.total.toLocaleString("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                })
-              : 0}{" "}
-          </Text>
 
           <TouchableOpacity
             onPress={() => setExpanded(!expanded)}
             className="flex-row justify-end mb-4"
           >
-            <Text
-              style={styles.orderText}
-              className="font-medium text-sm underline "
-            >
-              Sản phẩm{" "}
+            <View style={styles.orderText} className="flex-row ">
+              <Text className="font-medium text-sm underline">Sản phẩm </Text>
               {expanded ? (
                 <View className="w-3 ml-3">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -131,7 +133,7 @@ const OrderItem = ({ item, index }) => {
                   </svg>
                 </View>
               )}
-            </Text>
+            </View>
           </TouchableOpacity>
           {expanded &&
             item?.order_details?.map((detail, index) => (
