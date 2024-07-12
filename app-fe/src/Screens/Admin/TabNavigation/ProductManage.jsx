@@ -35,7 +35,6 @@ import {
 } from "react-native-paper";
 import moment from "moment";
 import { MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
-import Constants from "expo-constants";
 import ActionDropdown from "../Component/ActionSection";
 import FilterDropdown from "../Component/FilterDropdown";
 import ImageResizer from "../ResizeImage/resizeImage";
@@ -805,7 +804,7 @@ const ProductManagementScreen = () => {
                   </Paragraph>
                   <Paragraph className="text-xs">
                     {" "}
-                    Lần sửa cuối:{" "}
+                    Lần cập nhật cuối:{" "}
                     {moment(selectedProduct?.updated_at).format(
                       "DD/MM/YYYY, hh:mm A"
                     )}

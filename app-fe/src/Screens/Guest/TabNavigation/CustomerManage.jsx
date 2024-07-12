@@ -32,6 +32,11 @@ export default function CustomerManagementScreen() {
           );
         });
 
+        // Sắp xếp danh sách đơn hàng theo created_at từ mới nhất đến cũ nhất
+        filteredCustomers?.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
         // Set displayed data based on showAll flag and search filter
         setDisplayedData(
           showAll || !Array.isArray(customers)

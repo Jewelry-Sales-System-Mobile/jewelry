@@ -11,9 +11,9 @@ import {
 import OrderItem from "../Component/orderItem";
 import { useGetAllOrders } from "../../../API/order";
 import { Searchbar, Title } from "react-native-paper";
-import useResetScreen from "../Component/useResetScreen";
+// import useResetScreen from "../Component/useResetScreen";
 
-const OrderManagementScreen = () => {
+const OrderManagementScreenAdmin = () => {
   const { data: orders, isLoading, error } = useGetAllOrders();
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleOrders, setVisibleOrders] = useState(5); // Số sản phẩm hiển thị ban đầu
@@ -22,12 +22,12 @@ const OrderManagementScreen = () => {
 
   const onChangeSearch = (query) => setSearchQuery(query);
 
-  const resetScreen = () => {
-    setSearchQuery("");
-    setVisibleOrders(5);
-  };
+  // const resetScreen = () => {
+  //   setSearchQuery("");
+  //   setVisibleOrders(5);
+  // };
 
-  useResetScreen(resetScreen);
+  // useResetScreen(resetScreen);
 
   const filteredOrder = orders?.filter((item) =>
     item.order_code.toLowerCase().includes(searchQuery.toLowerCase())
@@ -125,4 +125,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OrderManagementScreen;
+export default OrderManagementScreenAdmin;
