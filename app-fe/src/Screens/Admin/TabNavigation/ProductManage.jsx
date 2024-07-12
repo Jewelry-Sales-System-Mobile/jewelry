@@ -539,15 +539,6 @@ const ProductManagementScreen = () => {
 
     const formattedPrice = formatCurrency(item?.basePrice);
 
-    // const clearErrorAfterTimeout = (key) => {
-    //   setTimeout(() => {
-    //     setErrors((prevErrors) => ({
-    //       ...prevErrors,
-    //       [key]: null,
-    //     }));
-    //   }, 3000); // 3 seconds timeout
-    // };
-
     return (
       <Card style={styles.card}>
         <Card.Content>
@@ -711,8 +702,8 @@ const ProductManagementScreen = () => {
                 <Card.Content>
                   <Image
                     source={{
-                      uri: selectedProduct.image
-                        ? selectedProduct.image
+                      uri: selectedProduct.image_url
+                        ? selectedProduct.image_url
                         : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s",
                     }}
                     style={styles.modalImage}
