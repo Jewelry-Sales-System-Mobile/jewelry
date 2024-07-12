@@ -5,9 +5,17 @@ import moment from "moment";
 import ProductDetail from "./Pproductdetail";
 import { useGetCustomerById } from "../../../API/customerApi";
 import { useNavigation } from "@react-navigation/native";
+import { useCancelOrder, useConfirmOrder } from "../../../API/order";
+import { FontAwesome } from "@expo/vector-icons";
+import { Button, Modal, Portal, Title } from "react-native-paper";
 
-const OrderItem = ({ item, index }) => {
+const OrderItem = ({ item, index, info }) => {
   const navigation = useNavigation();
+  const { mutate: confirmOrder } = useConfirmOrder();
+  const { mutate: cancelOrder } = useCancelOrder();
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   const [expanded, setExpanded] = useState(false);
   const {
@@ -16,6 +24,15 @@ const OrderItem = ({ item, index }) => {
     error: customerError,
   } = useGetCustomerById(item?.customer_id);
   // console.log("customer order", customer);
+  const handleConfirmOrder = () => {
+    confirmOrder(item._id);
+    setShowConfirmModal(false);
+  };
+
+  const handleCancelOrder = () => {
+    cancelOrder(item._id);
+    setShowCancelModal(false);
+  };
 
   const getStatusImage = (status) => {
     switch (status) {
@@ -80,39 +97,60 @@ const OrderItem = ({ item, index }) => {
             </View>
           )}
           {item && (
-            <View className="flex-row justify-between items-center w-full">
-              <View className="flex-row items-center">
-                {/* <Text className="font-  mibold text-sm mr-2">#{index + 1}</Text> */}
-                <Image
-                  source={{ uri: getStatusImage(item?.paymentStatus) }}
-                  style={styles.image}
-                />
-                <Text
-                  className=" ml-2 font-semibold text-lg self-start "
-                  style={[getStatusTextStyle(item?.paymentStatus)]}
-                >
-                  {getStatusText(item?.paymentStatus)}
+            <View>
+              <View className="flex-row justify-between items-center w-full">
+                <View className="flex-row items-center">
+                  {/* <Text className="font-  mibold text-sm mr-2">#{index + 1}</Text> */}
+                  <Image
+                    source={{ uri: getStatusImage(item?.paymentStatus) }}
+                    style={styles.image}
+                  />
+                  <Text
+                    className=" ml-2 font-semibold text-lg self-start "
+                    style={[getStatusTextStyle(item?.paymentStatus)]}
+                  >
+                    {getStatusText(item?.paymentStatus)}
+                  </Text>
+                </View>
+                <Text className="ml-2 font-semibold text-base  self-start">
+                  #{item?.order_code}
                 </Text>
               </View>
-              <Text className="ml-2 font-semibold text-base  self-start">
-                #{item?.order_code}
-              </Text>
+              <View className="w-full flex-row justify-between">
+                <Text className="text-xs text-gray  ml-8">
+                  {moment(item?.created_at).format("DD/MM/YYYY, hh:mm A")}
+                </Text>
+                <Text className="text-base font-semibold text-[#937C00] my-2 ml-8">
+                  {item?.total
+                    ? item?.total.toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })
+                    : 0}{" "}
+                </Text>
+              </View>
+              {info && info.role === 1 && (
+                <View>
+                  {item.paymentStatus === 0 && (
+                    <View className="flex-row ml-8">
+                      <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => setShowConfirmModal(true)}
+                      >
+                        <Text className="text-white">Đã thanh toán</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => setShowCancelModal(true)}
+                        style={[styles.button, styles.cancelButton]}
+                      >
+                        <Text className="text-white">Huỷ đơn</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              )}
             </View>
           )}
-
-          <View className="w-full">
-            <Text className="text-xs text-gray  ml-8">
-              {moment(item?.created_at).format("DD/MM/YYYY, hh:mm A")}
-            </Text>
-            <Text className="text-base font-semibold text-[#937C00] my-2 ml-8">
-              {item?.total
-                ? item?.total.toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  })
-                : 0}{" "}
-            </Text>
-          </View>
 
           <TouchableOpacity
             onPress={() => setExpanded(!expanded)}
@@ -190,11 +228,103 @@ const OrderItem = ({ item, index }) => {
           )}
         </View>
       </View>
+      <Portal>
+        <Modal
+          visible={showConfirmModal}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowConfirmModal(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Title className="text-sm text-center my-3 font-semibold">
+                Xác nhận đã thanh toán đơn hàng
+              </Title>
+              <Title className="text-sm text-center my-2">
+                Bạn có chắc chắn khách hàng đã thanh toán đơn hàng?
+              </Title>
+              <View className="flex-row justify-around w-full">
+                <TouchableOpacity
+                  style={styles.addButton3}
+                  onPress={() => handleConfirmOrder()}
+                  className="w-1/3"
+                >
+                  <Text style={styles.buttonText}>Xác nhận</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.cancelButton1}
+                  onPress={() => setShowConfirmModal(false)}
+                  className="w-1/3"
+                >
+                  <Text style={styles.buttonText}>Hủy</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </Portal>
+      <Portal>
+        <Modal
+          visible={showCancelModal}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowCancelModal(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Title className="text-sm text-center my-3 font-semibold">
+                Xác nhận huỷ đơn hàng?
+              </Title>
+              <Title className="text-sm text-center my-2">
+                Bạn có chắc chắn muốn huỷ đơn này?
+              </Title>
+              <View className="flex-row justify-around w-full">
+                <TouchableOpacity
+                  style={styles.addButton3}
+                  onPress={handleCancelOrder}
+                  className="w-1/3"
+                >
+                  <Text style={styles.buttonText}>Xác nhận</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.cancelButton1}
+                  onPress={() => setShowCancelModal(false)}
+                  className="w-1/3"
+                >
+                  <Text style={styles.buttonText}>Hủy</Text>
+                </TouchableOpacity>
+              </View>
+              {/* <Button title="Xác nhận" onPress={handleCancelOrder} />
+              <Button title="Hủy" onPress={() => setShowCancelModal(false)} /> */}
+            </View>
+          </View>
+        </Modal>
+      </Portal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  button: {
+    backgroundColor: "green",
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  cancelButton: {
+    backgroundColor: "red",
+  },
+  statusWait: {
+    color: "orange",
+  },
+  statusPaid: {
+    color: "green",
+  },
+  statusReturn: {
+    color: "red",
+  },
   container: {
     flex: 1,
     paddingHorizontal: 20,
@@ -288,6 +418,43 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     color: "#ffffff",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    marginBottom: 10,
+    fontWeight: "bold",
+  },
+  addButton3: {
+    backgroundColor: "#ccac00",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    width: "30%",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  cancelButton1: {
+    backgroundColor: "#8B0000",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    width: "30%",
+    alignItems: "center",
   },
 });
 

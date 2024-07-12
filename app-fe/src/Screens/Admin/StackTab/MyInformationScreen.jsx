@@ -86,7 +86,7 @@ const MyInformationScreen = () => {
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Vị trí:</Text>
             <Text style={styles.detailText}>
-              {myInfo.role === 0 ? "Quản lý" : "Nhân viên"}
+              {myInfo && myInfo.role === 0 ? "Quản lý" : "Nhân viên"}
             </Text>
           </View>
           <View style={styles.detailRow}>

@@ -116,7 +116,7 @@ const GoldPriceManagement = ({ info }) => {
                 </Text>
               </View>
             </View>
-            {info.role === 0 && (
+            {info && info.role === 0 && (
               <TouchableOpacity
                 style={styles.editButton}
                 onPress={handleOpenModal}

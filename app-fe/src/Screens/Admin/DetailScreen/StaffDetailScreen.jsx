@@ -50,7 +50,7 @@ const StaffDetailScreen = () => {
   }, [modalVisible, staff]);
 
   const handleRoleChange = () => {
-    if (staff.role === 1) {
+    if (staff && staff.role === 1) {
       setToManager(staffId, {
         onSuccess: () => {
           refetch();
@@ -131,7 +131,7 @@ const StaffDetailScreen = () => {
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Vị trí:</Text>
               <Text style={styles.detailText}>
-                {staff.role === 0 ? "Quản lý" : "Nhân viên"}
+                {staff && staff.role === 0 ? "Quản lý" : "Nhân viên"}
               </Text>
             </View>
             <View style={styles.detailRow}>

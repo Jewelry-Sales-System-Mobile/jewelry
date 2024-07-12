@@ -9,25 +9,22 @@ import {
 } from "react-native";
 // import { useGetAllOrders } from "../../../API/orderApi";
 import OrderItem from "../Component/orderItem";
-import { useGetAllOrders } from "../../../API/order";
-import { Searchbar, Title } from "react-native-paper";
+import {
+  useCancelOrder,
+  useConfirmOrder,
+  useGetAllOrders,
+} from "../../../API/order";
+import { Button, Modal, Portal, Searchbar, Title } from "react-native-paper";
+import { useGetMyProfile } from "../../../API/staffApi";
 // import useResetScreen from "../Component/useResetScreen";
 
 const OrderManagementScreenAdmin = () => {
   const { data: orders, isLoading, error } = useGetAllOrders();
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleOrders, setVisibleOrders] = useState(5); // Số sản phẩm hiển thị ban đầu
-
-  // console.log("ordersMana", orders);
+  const { data: info } = useGetMyProfile();
 
   const onChangeSearch = (query) => setSearchQuery(query);
-
-  // const resetScreen = () => {
-  //   setSearchQuery("");
-  //   setVisibleOrders(5);
-  // };
-
-  // useResetScreen(resetScreen);
 
   const filteredOrder = orders?.filter((item) =>
     item.order_code.toLowerCase().includes(searchQuery.toLowerCase())
@@ -41,6 +38,24 @@ const OrderManagementScreenAdmin = () => {
   const handleLoadMore = () => {
     setVisibleOrders(visibleOrders + 5); // Tăng số lượng sản phẩm hiển thị khi nhấn nút "Xem thêm"
   };
+
+  const { mutate: confirmOrder } = useConfirmOrder();
+  const { mutate: cancelOrder } = useCancelOrder();
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [orderToProcess, setOrderToProcess] = useState(null);
+
+  const handleConfirmOrder = () => {
+    confirmOrder(orderToProcess);
+    setShowConfirmModal(false);
+  };
+
+  const handleCancelOrder = () => {
+    cancelOrder(orderToProcess);
+    setShowCancelModal(false);
+  };
+
   const renderFooter = () => {
     if (!filteredOrder || visibleOrders >= filteredOrder.length) {
       return null;
@@ -95,7 +110,7 @@ const OrderManagementScreenAdmin = () => {
           data={filteredOrder?.slice(0, visibleOrders)} // Hiển thị số sản phẩm tối đa
           ListFooterComponent={renderFooter} // Thêm footer cho FlatList
           renderItem={({ item, index }) => (
-            <OrderItem item={item} index={index} />
+            <OrderItem item={item} index={index} info={info} />
           )}
           keyExtractor={(item) => item._id}
           contentContainerStyle={styles.listContainer}
@@ -122,6 +137,43 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingBottom: 20,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    marginBottom: 10,
+    fontWeight: "bold",
+  },
+  addButton3: {
+    backgroundColor: "#ccac00",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    width: "30%",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  cancelButton1: {
+    backgroundColor: "#8B0000",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    width: "30%",
+    alignItems: "center",
   },
 });
 
