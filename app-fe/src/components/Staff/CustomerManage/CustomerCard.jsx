@@ -14,8 +14,8 @@ export default function CustomerCard({ item }) {
   const navigation = useNavigation();
   const { setCustomerId } = useCartStore();
   const selectCustomer = () => {
-    console.log("selectCustomer", item._id);
-    setCustomerId(item._id); // Assuming item._id is the customer ID you want to set
+    console.log("selectCustomer", item);
+    setCustomerId(item); // Assuming item._id is the customer ID you want to set
     navigation.navigate("Order"); // Navigate to CustomerDetail screen
   };
   return (

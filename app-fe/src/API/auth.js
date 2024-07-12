@@ -1,4 +1,4 @@
-import { showSuccessMessage } from "../Utils/notifications";
+import { showErrorMessage, showSuccessMessage } from "../Utils/notifications";
 import http, { setToken } from "../Utils/http";
 import { API_ENDPOINTS } from "./api-endpoint";
 import { useMutation } from "react-query";
@@ -17,10 +17,12 @@ export const useSignIn = () => {
       setIsSignedIn(true);
       setToken(data.data.access_token);
       console.log("data", data.data.access_token);
-      showSuccessMessage("Sign In successfully!");
+      showSuccessMessage("Đăng nhập thành công.");
     },
     onError: () => {
-      showErrorMessage("Failed to Sign In.");
+      showErrorMessage(
+        "Đăng nhập thất bại.\nVui lòng kiểm tra lại thông tin đăng nhập."
+      );
     },
   });
 };

@@ -47,10 +47,10 @@ export default function SignIn() {
     <View className="flex mx-auto my-auto bg-white w-full h-full">
       <View className="mx-auto my-auto w-full">
         <Text className="text-center text-2xl font-bold text-slate-700">
-          Xin Chao
+          Xin Chào
         </Text>
         <Text className="w-full text-center my-2 text-slate-700">
-          Chao mung ban tro lai, vui long dang nhap
+          Chào mừng bạn trở lại, xin vui lòng đăng nhập
         </Text>
         <Text className="m-3 text-lg text-slate-700 font-semibold">Email</Text>
         <TextInput
@@ -88,7 +88,7 @@ export default function SignIn() {
           className="mx-auto mt-8 bg-amber-700 rounded-3xl"
           onPress={() => handleSignIn()}
         >
-          <Text className=" text-xl text-white px-11 py-2">Dang Nhap</Text>
+          <Text className=" text-xl text-white px-11 py-2">Đăng Nhập</Text>
         </TouchableOpacity>
         {/* <TouchableOpacity style={styles.cancelButton} onPress={closeModalAdd}>
           <Text style={styles.buttonText}>Hủy</Text>
