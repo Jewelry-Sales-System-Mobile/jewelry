@@ -4,7 +4,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  StyleSheet,
+  StyleSheet, Image,
 } from "react-native";
 import { useSignIn } from "../../API/auth";
 import { Feather } from "@expo/vector-icons";
@@ -46,13 +46,18 @@ export default function SignIn() {
   return (
     <View className="flex mx-auto my-auto bg-white w-full h-full">
       <View className="mx-auto my-auto w-full">
-        <Text className="text-center text-2xl font-bold text-slate-700">
+      <Image 
+          source={require("../../../assets/jewelryLogo.png")} 
+          className="w-[160px] h-[120px] items-center mx-auto mb-2"
+        />
+        {/* <Text className="text-center text-2xl font-bold text-amber-700">
           Xin Chào
+        </Text> */}
+        <Text className="w-full text-center mt- mb-7 text-slate-700 text-base italic">
+          Chào mừng bạn trở lại, vui lòng đăng nhập
         </Text>
-        <Text className="w-full text-center my-2 text-slate-700">
-          Chào mừng bạn trở lại, xin vui lòng đăng nhập
-        </Text>
-        <Text className="m-3 text-lg text-slate-700 font-semibold">Email</Text>
+        <View className="px-3">
+        <Text className="mx-3 my-2 text-lg text-slate-700 font-medium">Email</Text>
         <TextInput
           placeholder="Email"
           // value={loginData.email}
@@ -60,8 +65,10 @@ export default function SignIn() {
           style={styles.input}
           // className=" border-[1px] border-slate-300 p-2 rounded-3xl text-lg mx-7"
         />
-        <View className="my-3">
-          <Text className="m-3 text-lg text-slate-700 font-semibold">
+        </View>
+       
+        <View className="my-3 px-3">
+          <Text className="my-2 mx-3 text-lg text-slate-700 font-medium">
             Password
           </Text>
           <View className="flex flex-row mx-7  border-[1px] border-slate-300 p-2 rounded-3xl">
@@ -88,7 +95,7 @@ export default function SignIn() {
           className="mx-auto mt-8 bg-amber-700 rounded-3xl"
           onPress={() => handleSignIn()}
         >
-          <Text className=" text-xl text-white px-11 py-2">Đăng Nhập</Text>
+          <Text className=" text-xl text-white px-11 py-2 font-semibold">ĐĂNG NHẬP</Text>
         </TouchableOpacity>
         {/* <TouchableOpacity style={styles.cancelButton} onPress={closeModalAdd}>
           <Text style={styles.buttonText}>Hủy</Text>

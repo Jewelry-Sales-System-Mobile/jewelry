@@ -8,12 +8,18 @@ import { StyleSheet, Text, View, Image } from "react-native";
 import { jwtDecode } from "jwt-decode";
 import { useGetMyProfile, useGetStaffById } from "../../../API/staffApi";
 import { useNavigation } from "@react-navigation/native";
+import { useGetCounterById } from "../../../API/counter";
 
 export default function Setttings() {
   const { setIsSignedIn } = useRoleStore();
   const [userId, setuserId] = useState("");
   // const { data: staff, isLoading, error } = useGetStaffById(userId);
   const { data: staff, isLoading, error } = useGetMyProfile();
+  const {
+    data: counterDetail,
+    isLoading: counterLoading,
+    error: counterError,
+  } = useGetCounterById(staff?.assigned_counter);
   const navigation = useNavigation();
 
   console.log("staff", staff);
@@ -60,10 +66,51 @@ export default function Setttings() {
                 }}
               />
               <Text style={styles.name}>{staff.name}</Text>
+
               <Text style={styles.userInfo}>{staff.email}</Text>
               <Text className="uppercase mt-3 font-bold tẽtx-lg">
-                {staff.role === 0 ? "Quản lý" : "Nhân viên"}{" "}
+                {staff && staff.role === 0 ? "Quản lý" : "Nhân viên"}{" "}
               </Text>
+              {staff && staff.role !== 0 && (
+                <View>
+                  {counterDetail ? (
+                    <View className="flex-row mt-4">
+                      <View className="flex-row">
+                        <Text className="mr-3 text-lg font-bold text-gray-700">
+                          Quầy quản lý:
+                        </Text>
+                        <Text
+                          style={styles.detailText}
+                          className="text-gray-700 text-lg  font-semibold mr-2"
+                          onPress={() =>
+                            navigation.navigate("Chi tiết quầy hàng", {
+                              id: counterDetail._id,
+                            })
+                          }
+                        >
+                          {counterDetail?.counter_name}
+                        </Text>
+                      </View>
+                      <FontAwesome
+                        name="hand-o-right"
+                        size={16}
+                        color="#ccac0"
+                        className="self-end"
+                        style={styles.icon}
+                      />
+                    </View>
+                  ) : (
+                    <View className="flex-row mt-4">
+                      <Text className="mr-3 font-semibold text-lg font-bold text-gray-700">
+                        Quầy quản lý:
+                      </Text>
+                      <Text className="text-gray-700 text-lg  font-semibold mr-2">
+                        Chưa được phân quyền
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              )}
             </View>
           </View>
 

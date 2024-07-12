@@ -10,7 +10,8 @@ import CounterStackNavigator from "./stack-navigators/CounterStackNavigator";
 import Setttings from "../Screens/Guest/TabNavigation/Settings";
 import OrderManagementStackNavigator from "../Screens/Admin/StackTab/OrderManagementStackNavigator";
 import ProductManagementStackNavigator from "../Screens/Guest/StackNavigateTab/ProductManagementStackNavigator";
-import OrderSuccess from "../components/Staff/CustomerManage/OrderSuccess";
+import SettingManagementStackNavigator from "../Screens/Admin/StackTab/SettingManagementStackNavigator";
+import DashboardStackNavigator from "../Screens/Admin/StackTab/DashboardStackNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -54,6 +55,11 @@ export default function GuestNavigation({ navigation }) {
       })}
     >
       <Tab.Screen
+        name="Dashboard"
+        component={DashboardStackNavigator}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
         name="Customer"
         component={CustomerManagementScreen}
         // component={OrderSuccess}
@@ -76,7 +82,7 @@ export default function GuestNavigation({ navigation }) {
       />
       <Tab.Screen
         name="Setting"
-        component={Setttings}
+        component={SettingManagementStackNavigator}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>

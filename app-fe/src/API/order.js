@@ -1,7 +1,7 @@
 import { showSuccessMessage } from "../Utils/notifications";
 import http, { setToken } from "../Utils/http";
 import { API_ENDPOINTS } from "./api-endpoint";
-import { useMutation, useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useCartStore } from "../Zustand/CartForStaff";
 import { useNavigation } from "@react-navigation/native";
 
@@ -18,6 +18,43 @@ const getAllOrders = async () => {
 };
 
 export { getAllOrders };
+
+// API functions for order
+const confirmOrder = async (orderId) => {
+  const { data } = await http.put(`${API_ENDPOINTS.ORDER}/${orderId}/confirm`);
+  return data.data;
+};
+
+const cancelOrder = async (orderId) => {
+  const { data } = await http.put(`${API_ENDPOINTS.ORDER}/${orderId}/cancel`);
+  return data.data;
+};
+
+export const useConfirmOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation(confirmOrder, {
+    onSuccess: () => {
+      showSuccessMessage("Đơn hàng đã được xác nhận!");
+      queryClient.invalidateQueries("orders");
+    },
+    onError: () => {
+      showErrorMessage("Không thể xác nhận đơn hàng.");
+    },
+  });
+};
+
+export const useCancelOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation(cancelOrder, {
+    onSuccess: () => {
+      showSuccessMessage("Đơn hàng đã được hủy!");
+      queryClient.invalidateQueries("orders");
+    },
+    onError: () => {
+      showErrorMessage("Không thể hủy đơn hàng.");
+    },
+  });
+};
 
 export const useGetAllOrders = () => {
   const { data, isLoading, error } = useQuery("orders", getAllOrders);
