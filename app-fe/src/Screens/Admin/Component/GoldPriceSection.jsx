@@ -16,7 +16,7 @@ import {
 import { MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
 import { format } from "date-fns";
 
-const GoldPriceManagement = () => {
+const GoldPriceManagement = ({ info }) => {
   const { data: goldPrices, isLoading, error, isFetching } = useGetGoldPrices();
   const updateGoldPricesMutation = useUpdateGoldPrices();
 
@@ -116,12 +116,14 @@ const GoldPriceManagement = () => {
                 </Text>
               </View>
             </View>
-            <TouchableOpacity
-              style={styles.editButton}
-              onPress={handleOpenModal}
-            >
-              <MaterialIcons name="edit" size={20} color="white" />
-            </TouchableOpacity>
+            {info.role === 0 && (
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={handleOpenModal}
+              >
+                <MaterialIcons name="edit" size={20} color="white" />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       )}
@@ -136,7 +138,9 @@ const GoldPriceManagement = () => {
                 style={[styles.input, errorText ? styles.inputError : null]}
                 placeholder="Nhập giá mua mới"
                 keyboardType="numeric"
-                value={newPrices.buy_price ? newPrices.buy_price.toString() : ""}
+                value={
+                  newPrices.buy_price ? newPrices.buy_price.toString() : ""
+                }
                 onChangeText={(text) => handleChangePrice(text, "buy_price")}
               />
             </View>
@@ -146,11 +150,15 @@ const GoldPriceManagement = () => {
                 style={[styles.input, errorText ? styles.inputError : null]}
                 placeholder="Nhập giá bán mới"
                 keyboardType="numeric"
-                value={newPrices.sell_price ? newPrices.sell_price.toString() : ""}
+                value={
+                  newPrices.sell_price ? newPrices.sell_price.toString() : ""
+                }
                 onChangeText={(text) => handleChangePrice(text, "sell_price")}
               />
             </View>
-            {errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
+            {errorText ? (
+              <Text style={styles.errorText}>{errorText}</Text>
+            ) : null}
             <TouchableOpacity
               style={[
                 styles.saveButton,
@@ -163,7 +171,10 @@ const GoldPriceManagement = () => {
             >
               <Text style={styles.buttonText}>Lưu</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.cancelButton} onPress={handleCloseModal}>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={handleCloseModal}
+            >
               <Text style={styles.buttonText}>Hủy</Text>
             </TouchableOpacity>
           </View>

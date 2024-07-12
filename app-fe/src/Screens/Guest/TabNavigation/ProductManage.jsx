@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   FlatList,
   StyleSheet,
-  TouchableOpacity,
   TextInput,
+  TouchableOpacity,
+  Alert,
   Platform,
+  PermissionsAndroid,
 } from "react-native";
 import {
+  uploadImage,
   useActivateProduct,
   useAddProductImage,
   useCreateProduct,
@@ -31,7 +34,6 @@ import {
 } from "react-native-paper";
 import moment from "moment";
 import { MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
-// import * as ImagePicker from "react-native-image-picker";
 import ActionDropdown from "../Component/ActionSection";
 import FilterDropdown from "../Component/FilterDropdown";
 import { useCartStore } from "../../../Zustand/CartForStaff.js";
@@ -39,10 +41,19 @@ import {
   showErrorMessage,
   showSuccessMessage,
 } from "../../../Utils/notifications";
-import { compressBlob } from "../../../Utils/compressBlob";
-import ImagePicker from "../../../Screens/Admin/Component/ImagePicker";
+
+// import ImagePicker from "../../../Screens/Admin/Component/ImagePicker";
 import http from "../../../Utils/http";
+import ImagePicker from "../../../Screens/Admin/Component/ImagePicker";
+import { compressBlob } from "../../../Utils/compressBlob";
 import { useRoleStore } from "../../../Zustand/Role";
+
+const MAX_NAME_LENGTH = 70;
+const MAX_WEIGHT = 1000; // in grams
+const MAX_GEM_COST = 1000000000; // 1 billion VND
+const WEIGHT_DECIMAL_PLACES = 2;
+const MIN_WEIGHT = 0.2; // Minimum weight in grams
+const MIN_GEM_COST = 50000; // Minimum gem cost in VND
 
 const ProductManagementScreenStaff = () => {
   const {
@@ -55,12 +66,9 @@ const ProductManagementScreenStaff = () => {
   const { mutate: createProduct } = useCreateProduct();
   const { mutate: updateProduct } = useUpdateProduct();
   const { mutate: deleteProductImage } = useDeleteProductImage();
-  // const { mutate: addProductImage } = useAddProductImage();
-  const addProductImageMutation = useAddProductImage();
 
   const { mutate: inactivateProduct } = useInactivateProduct();
   const { mutate: activateProduct } = useActivateProduct();
-  console.log(products, "products");
 
   const [selectedProduct, setSelectedProduct] = useState(null); // State to hold selected product
   const [modalVisible, setModalVisible] = useState(false); // State to control modal visibility
@@ -74,13 +82,18 @@ const ProductManagementScreenStaff = () => {
   }); // State để lưu thông tin mới của sản phẩm
   const [updatedProductData, setUpdatedProductData] = useState({
     name: "",
-    weight: 0,
-    gemCost: 0,
+    weight: "",
+    gemCost: "",
+  });
+  const [initialProductData, setInitialProductData] = useState({
+    name: "",
+    weight: "",
+    gemCost: "",
   });
   const [tooltipVisible, setTooltipVisible] = useState(false); // State to control tooltip visibility
   const [tooltipText, setTooltipText] = useState(""); // State to hold tooltip text
-  const [searchText, setSearchText] = useState(""); // State to hold search text
   const [searchQuery, setSearchQuery] = useState("");
+
   // Dropdown menu actions
   const [visible, setVisible] = useState(false);
   const [visibleProducts, setVisibleProducts] = useState(6); // Số sản phẩm hiển thị ban đầu
@@ -89,6 +102,13 @@ const ProductManagementScreenStaff = () => {
   const [errors, setErrors] = useState({});
 
   const { token } = useRoleStore();
+
+  useEffect(() => {
+    if (modalVisibleUpdate) {
+      // Set the initial product data when the modal opens
+      setInitialProductData(updatedProductData);
+    }
+  }, [modalVisibleUpdate]);
 
   const filteredProducts = products?.filter(
     (product) =>
@@ -122,6 +142,10 @@ const ProductManagementScreenStaff = () => {
     }
     return 0;
   });
+
+  const filteredProductsActive = filteredProductsSort?.filter(
+    (item) => item.status === 0
+  );
 
   const handleFilterChange = (filter) => {
     setSortBy(filter);
@@ -288,6 +312,8 @@ const ProductManagementScreenStaff = () => {
     !errors.name &&
     !errors.weight &&
     !errors.gemCost;
+
+  console.log(isFormValidUpdate, "isFormValidUpdate");
 
   const handleUpdateChange = (key, value) => {
     if (key === "weight" || key === "gemCost") {
@@ -652,7 +678,7 @@ const ProductManagementScreenStaff = () => {
             <Paragraph className="text-right text-base font-semibold text-[#ccac00]">
               {formattedPrice}
             </Paragraph>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={styles.button}
               onPress={() => handleToggleActive(item)}
             >
@@ -661,10 +687,10 @@ const ProductManagementScreenStaff = () => {
                 size={20}
                 color={item.status === 0 ? "green" : "gray"}
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           <TouchableOpacity
-            className="bg-[#ccac00] rounded-md p-1 text-center mt-1 mx-auto"
+            className="bg-[#ccac00] rounded-md p-1 text-center mt-4 mx-auto"
             onPress={() => handleAddProductToCart(item)}
           >
             <Text className="px-2 py-1 text-sm text-white font-semibold">
@@ -712,9 +738,9 @@ const ProductManagementScreenStaff = () => {
         />
         <FilterDropdown onFilterChange={handleFilterChange} />
       </View>
-      {products && (
+      {filteredProductsActive && (
         <Text className="my-2 ml-2 font-semibold">
-          Tổng có: {products.length} Sản phẩm
+          Tổng có: {filteredProductsActive.length} Sản phẩm
         </Text>
       )}
       <View style={styles.separator}>
@@ -728,7 +754,7 @@ const ProductManagementScreenStaff = () => {
       ) : (
         <View style={styles.container}>
           <FlatList
-            data={filteredProductsSort.slice(0, visibleProducts)}
+            data={filteredProductsActive.slice(0, visibleProducts)}
             renderItem={({ item, index }) => renderItem({ item, index })}
             keyExtractor={(item) => item._id}
             numColumns={2} // Adjust as needed for your grid layout
@@ -889,80 +915,79 @@ const ProductManagementScreenStaff = () => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Title className="font-semibold text-xl mb-10 text-[#ccac00]">
+            <Title className="font-semibold text-xl mb-5 text-[#ccac00]">
               Cập Nhật Sản Phẩm
             </Title>
-            <TextInput
-              style={styles.input}
-              placeholder="Tên sản phẩm"
-              value={updatedProductData.name}
-              onChangeText={(text) => handleUpdateChange("name", text)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Trọng lượng (Gram)"
-              value={updatedProductData.weight}
-              onChangeText={(text) => handleUpdateChange("weight", text)}
-              keyboardType="numeric"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Giá đá quý (VND)"
-              value={updatedProductData.gemCost}
-              onChangeText={(text) => handleUpdateChange("gemCost", text)}
-              keyboardType="numeric"
-            />
+            <View className="w-full">
+              <Text className="text-[12px] font-semibold mb-2">
+                Tên sản phẩm
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Tên sản phẩm"
+                value={updatedProductData.name}
+                onChangeText={(text) => handleUpdateChange("name", text)}
+                mode="outlined"
+              />
+              <Text className=" text-right text-[12px]">
+                {updatedProductData.name.length}/{MAX_NAME_LENGTH}
+              </Text>
+            </View>
+            <View className="w-full ">
+              <Text className="text-[12px] font-semibold mb-2">
+                Trọng lượng (Gram)
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Trọng lượng (Gram)"
+                value={updatedProductData.weight.toString()}
+                onChangeText={(text) => handleUpdateChange("weight", text)}
+                keyboardType="numeric"
+                mode="outlined"
+              />
+              {errors.weight && (
+                <Text style={styles.errorText}>{errors.weight}</Text>
+              )}
+            </View>
+
+            <View className="w-full ">
+              <Text className="text-[12px] font-semibold mb-2">
+                Giá đá quý (VND)
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Giá đá quý (VND)"
+                value={updatedProductData.gemCost.toString()}
+                onChangeText={(text) => handleUpdateChange("gemCost", text)}
+                keyboardType="numeric"
+                mode="outlined"
+              />
+              {errors.gemCost && (
+                <Text style={styles.errorText}>{errors.gemCost}</Text>
+              )}
+            </View>
             <TouchableOpacity
-              style={styles.addButton2}
+              style={[
+                styles.addButton2,
+                (!isFormValidUpdate ||
+                  errors.name ||
+                  errors.weight ||
+                  errors.gemCost) &&
+                  styles.disabledButton,
+              ]}
               onPress={handleSaveUpdate}
+              disabled={
+                !isFormValidUpdate ||
+                errors.name ||
+                errors.weight ||
+                errors.gemCost
+              }
             >
               <Text style={styles.buttonText}>Lưu</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.cancelButton}
               onPress={closeModalUpdate}
-            >
-              <Text style={styles.buttonText}>Hủy</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-      {/* Modal để nhập thông tin sản phẩm mới */}
-      <Modal visible={modalVisibleAdd} animationType="slide" transparent={true}>
-        <View style={[styles.modalContainer]}>
-          <View style={styles.modalContent}>
-            <Title className="font-semibold text-xl mb-10 text-[#ccac00]">
-              Tạo Sản Phẩm Mới
-            </Title>
-            <TextInput
-              style={styles.input}
-              placeholder="Tên sản phẩm"
-              value={newProductData.name}
-              onChangeText={(text) => handleChange("name", text)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Khối lượng (gram)"
-              value={newProductData.weight}
-              onChangeText={(text) => handleChange("weight", text)}
-              keyboardType="numeric"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Chi phí đá (VND)"
-              value={newProductData.gemCost}
-              onChangeText={(text) => handleChange("gemCost", text)}
-              keyboardType="numeric"
-            />
-            <TouchableOpacity
-              style={styles.addButton2}
-              onPress={handleCreateProduct}
-            >
-              <Text style={styles.buttonText}>Thêm sản phẩm</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={closeModalAdd}
             >
               <Text style={styles.buttonText}>Hủy</Text>
             </TouchableOpacity>

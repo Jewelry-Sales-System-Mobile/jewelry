@@ -101,7 +101,9 @@ const ProductManagementScreen = () => {
   const [visible, setVisible] = useState(false);
   const [visibleProducts, setVisibleProducts] = useState(6); // Số sản phẩm hiển thị ban đầu
   const [sortBy, setSortBy] = useState(null);
+
   console.log("selectedProduct", selectedProduct);
+
   useEffect(() => {
     if (modalVisibleUpdate) {
       // Set the initial product data when the modal opens
@@ -145,7 +147,6 @@ const ProductManagementScreen = () => {
   const handleFilterChange = (filter) => {
     setSortBy(filter);
   };
-
   const handleLoadMore = () => {
     setVisibleProducts(visibleProducts + 6); // Tăng số lượng sản phẩm hiển thị khi nhấn nút "Xem thêm"
   };
