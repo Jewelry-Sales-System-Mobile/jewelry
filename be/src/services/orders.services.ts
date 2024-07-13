@@ -147,6 +147,7 @@ class OrderServices {
           returnDocument: "after",
         }
       );
+      return updatedOrder;
     }
 
     const updatedOrder = await databaseService.orders.findOneAndUpdate(
