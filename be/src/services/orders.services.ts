@@ -114,7 +114,7 @@ class OrderServices {
       {
         $set: {
           paymentStatus: PaymentStatus.Paid,
-          total: order.total * -1,
+          total: order.total,
         },
         $currentDate: { updated_at: true },
       },
@@ -134,9 +134,18 @@ class OrderServices {
     }
 
     if (order.paymentStatus === PaymentStatus.Paid) {
-      throw new ErrorWithStatus(
-        "Cannot cancel paid order",
-        HTTP_STATUS.BAD_REQUEST
+      const updatedOrder = await databaseService.orders.findOneAndUpdate(
+        { _id: new ObjectId(order_id) },
+        {
+          $set: {
+            paymentStatus: PaymentStatus.Cancelled,
+            total: order.total * -1,
+          },
+          $currentDate: { updated_at: true },
+        },
+        {
+          returnDocument: "after",
+        }
       );
     }
 
@@ -145,6 +154,7 @@ class OrderServices {
       {
         $set: {
           paymentStatus: PaymentStatus.Cancelled,
+          total: 0,
         },
         $currentDate: { updated_at: true },
       },
