@@ -233,7 +233,7 @@ export default function Main() {
                 headerTitle: "Tạo đơn hàng thành công",
                 headerLeft: () => (
                   // Sử dụng headerLeft để đặt nút back
-                  <TouchableOpacity onPress={() => navigation.goBack()}>
+                  <TouchableOpacity y onPress={() => navigation.goBack()}>
                     <FontAwesomeIcon
                       icon={faArrowLeft}
                       size={20}

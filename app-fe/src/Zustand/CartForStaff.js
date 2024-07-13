@@ -169,7 +169,26 @@ export const useCartStore = create((set) => ({
 
       return { ...state, discount, total: newTotal };
     }),
-  setCustomerId: (customer) => {
+  // Action to increase discount by 100000
+  increaseDiscount: () =>
+    set((state) => {
+      console.log("increaseDiscountInCartStore");
+      const newDiscount = state.discount + 100000;
+      const newTotal =
+        state.subtotal - newDiscount >= 0 ? state.subtotal - newDiscount : 0;
+      return { ...state, discount: newDiscount, total: newTotal };
+    }),
+
+  // Action to decrease discount by 100000, ensuring discount doesn't go below 0
+  decreaseDiscount: () =>
+    set((state) => {
+      console.log("decreaseDiscountInCartStore");
+
+      const newDiscount = Math.max(0, state.discount - 100000); // Prevent discount from going below 0
+      const newTotal = state.subtotal - newDiscount;
+      return { ...state, discount: newDiscount, total: newTotal };
+    }),
+  setCustomer: (customer) => {
     console.log("Setting customer ID to:", customer);
     set({ customer: customer });
   },

@@ -134,7 +134,7 @@ export default function OrderSuccess({ route }) {
         <Text className="text-center text-xl font-bold mb-4">
           Thông tin đơn hàng
         </Text>
-        {/* <View className="flex-row justify-between items-center">
+        <View className="flex-row justify-between items-center">
           <View className="flex-row items-center">
             <Image
               source={{ uri: getStatusImage(item.paymentStatus) }}
@@ -162,9 +162,9 @@ export default function OrderSuccess({ route }) {
                 currency: "VND",
               })
             : 0}{" "}
-        </Text> */}
+        </Text>
 
-        {/* {item.order_details.map((detail, index) => (
+        {item.order_details.map((detail, index) => (
           <View
             key={index}
             className="bg-white rounded-md p-2 shadow-lg shadow-black/25"
@@ -193,7 +193,7 @@ export default function OrderSuccess({ route }) {
               </View>
             </View>
           </View>
-        ))} */}
+        ))}
         <TouchableOpacity onPress={() => navigate.navigate("OrderList")}>
           <Text className="text-center text-blue-500 my-4">
             Xem danh sách đơn hàng

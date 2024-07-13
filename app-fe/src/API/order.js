@@ -62,12 +62,15 @@ export const useGetAllOrders = () => {
 };
 
 export const useMakerOrder = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigation();
   const { resetCart } = useCartStore();
   return useMutation(makerOrder, {
     onSuccess: (data) => {
       console.log("data", data);
       resetCart();
+      queryClient.invalidateQueries("orders");
+
       navigate.navigate("OrderSuccess", { orderData: data });
       showSuccessMessage("Make Order Successfully!");
     },
