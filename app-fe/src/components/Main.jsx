@@ -20,6 +20,7 @@ import CounterDetails from "../Screens/Admin/Counter/CounterDetails";
 import AssignEmployee from "../Screens/Admin/Counter/AssignEmployee";
 import UpdateCounter from "../Screens/Admin/Counter/UpdateCounter";
 import CreateCounter from "../Screens/Admin/Counter/CreateCounter";
+import OrderSuccess from "./Staff/CustomerManage/OrderSuccess";
 
 const Stack = createNativeStackNavigator();
 NativeWindStyleSheet.setOutput({
@@ -214,6 +215,25 @@ export default function Main() {
                 headerLeft: () => (
                   // Sử dụng headerLeft để đặt nút back
                   <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <FontAwesomeIcon
+                      icon={faArrowLeft}
+                      size={20}
+                      style={{ marginLeft: 16 }}
+                    />
+                  </TouchableOpacity>
+                ),
+                tabBarVisible: false, // Ẩn bottom navigation bar khi vào CustomerDetail
+              })}
+            />
+            <Stack.Screen
+              name="OrderSuccess"
+              component={OrderSuccess}
+              options={({ navigation }) => ({
+                headerShown: true,
+                headerTitle: "Tạo đơn hàng thành công",
+                headerLeft: () => (
+                  // Sử dụng headerLeft để đặt nút back
+                  <TouchableOpacity y onPress={() => navigation.goBack()}>
                     <FontAwesomeIcon
                       icon={faArrowLeft}
                       size={20}

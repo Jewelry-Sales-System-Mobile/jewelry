@@ -62,6 +62,7 @@ export default function GuestNavigation({ navigation }) {
       <Tab.Screen
         name="Customer"
         component={CustomerManagementScreen}
+        // component={OrderSuccess}
         options={{ headerShown: false }}
       />
       <Tab.Screen

@@ -12,11 +12,11 @@ import { useCartStore } from "../../../Zustand/CartForStaff";
 
 export default function CustomerCard({ item }) {
   const navigation = useNavigation();
-  const { setCustomerId } = useCartStore();
+  const { setCustomer } = useCartStore();
 
   const selectCustomer = () => {
     console.log("selectCustomer", item);
-    setCustomerId(item); // Assuming item._id is the customer ID you want to set
+    setCustomer(item); // Assuming item._id is the customer ID you want to set
     navigation.navigate("Order"); // Navigate to CustomerDetail screen
   };
 
