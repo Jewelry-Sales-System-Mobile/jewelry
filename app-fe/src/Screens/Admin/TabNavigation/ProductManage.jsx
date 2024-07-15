@@ -6,8 +6,12 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Alert,
+  Platform,
+  PermissionsAndroid,
 } from "react-native";
 import {
+  uploadImage,
   useActivateProduct,
   useAddProductImage,
   useCreateProduct,
@@ -27,29 +31,46 @@ import {
   Searchbar,
   Menu,
   Provider,
+  ActivityIndicator,
 } from "react-native-paper";
 import moment from "moment";
 import { MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
-import * as ImagePicker from "react-native-image-picker";
-import Constants from "expo-constants";
 import ActionDropdown from "../Component/ActionSection";
 import FilterDropdown from "../Component/FilterDropdown";
+import ImageResizer from "../ResizeImage/resizeImage";
+import {
+  showErrorMessage,
+  showSuccessMessage,
+} from "../../../Utils/notifications";
+import ImagePicker from "../Component/ImagePicker";
+import { compressBlob } from "../../../Utils/compressBlob";
+import { useRoleStore } from "../../../Zustand/Role";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import http from "../../../Utils/http";
 
 const MAX_NAME_LENGTH = 70;
 const MAX_WEIGHT = 1000; // in grams
 const MAX_GEM_COST = 1000000000; // 1 billion VND
 const WEIGHT_DECIMAL_PLACES = 2;
-const MIN_WEIGHT = 5; // Minimum weight in grams
+const MIN_WEIGHT = 0.2; // Minimum weight in grams
 const MIN_GEM_COST = 50000; // Minimum gem cost in VND
 
 const ProductManagementScreen = () => {
-  const { data: products, isLoading, error, isFetching } = useGetProducts();
+  const {
+    data: products,
+    isLoading,
+    error,
+    isFetching,
+    refetch,
+  } = useGetProducts();
   const { mutate: createProduct } = useCreateProduct();
   const { mutate: updateProduct } = useUpdateProduct();
   const { mutate: deleteProductImage } = useDeleteProductImage();
-  const { mutate: addProductImage } = useAddProductImage();
+  const addProductImageMutation = useAddProductImage();
   const { mutate: inactivateProduct } = useInactivateProduct();
   const { mutate: activateProduct } = useActivateProduct();
+
+  const { token } = useRoleStore();
 
   const [selectedProduct, setSelectedProduct] = useState(null); // State to hold selected product
   const [modalVisible, setModalVisible] = useState(false); // State to control modal visibility
@@ -75,10 +96,13 @@ const ProductManagementScreen = () => {
   const [tooltipText, setTooltipText] = useState(""); // State to hold tooltip text
   const [searchQuery, setSearchQuery] = useState("");
   const [errors, setErrors] = useState({});
+
   // Dropdown menu actions
   const [visible, setVisible] = useState(false);
   const [visibleProducts, setVisibleProducts] = useState(6); // Số sản phẩm hiển thị ban đầu
   const [sortBy, setSortBy] = useState(null);
+
+  console.log("selectedProduct", selectedProduct);
 
   useEffect(() => {
     if (modalVisibleUpdate) {
@@ -93,6 +117,11 @@ const ProductManagementScreen = () => {
       product.productCode.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Sắp xếp danh sách đơn hàng theo created_at từ mới nhất đến cũ nhất
+  filteredProducts?.sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+  );
+
   const filteredProductsSort = filteredProducts?.sort((a, b) => {
     if (sortBy === "basePrice") {
       return a.basePrice - b.basePrice;
@@ -101,10 +130,10 @@ const ProductManagementScreen = () => {
       return b.basePrice - a.basePrice;
     }
     if (sortBy === "created_at") {
-      return new Date(a.created_at) - new Date(b.created_at);
+      return new Date(b.created_at) - new Date(a.created_at); // Sắp xếp từ mới nhất đến cũ nhất
     }
     if (sortBy === "-created_at") {
-      return new Date(b.created_at) - new Date(a.created_at);
+      return new Date(a.created_at) - new Date(b.created_at); // Sắp xếp từ cũ nhất đến mới nhất
     }
     if (sortBy === "weight") {
       return a.weight - b.weight;
@@ -118,7 +147,6 @@ const ProductManagementScreen = () => {
   const handleFilterChange = (filter) => {
     setSortBy(filter);
   };
-
   const handleLoadMore = () => {
     setVisibleProducts(visibleProducts + 6); // Tăng số lượng sản phẩm hiển thị khi nhấn nút "Xem thêm"
   };
@@ -373,14 +401,47 @@ const ProductManagementScreen = () => {
     setModalVisibleUpdate(false);
   };
 
-  const handleDeleteProductImage = (product) => {
-    // Delete product logic here
-    deleteProductImage(product._id);
+  const handleDeleteProductImage = (productId, imageUrl) => {
+    // debugger;
+    deleteProductImage({ productId, imageUrl });
+    setModalVisible(false);
   };
 
-  const handleAddImage = (imageProduct) => {
-    // Define options for image picker
+  const requestStoragePermission = async () => {
+    if (Platform.OS === "android") {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+          {
+            title: "Storage Permission",
+            message: "App needs access to your storage to select images.",
+            buttonNeutral: "Ask Me Later",
+            buttonNegative: "Cancel",
+            buttonPositive: "OK",
+          }
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      } catch (err) {
+        console.warn(err);
+        return false;
+      }
+    } else {
+      // Đối với iOS, có thể không cần yêu cầu quyền
+      return true;
+    }
+  };
+
+  const handleAddImage = async (imageProduct) => {
+    const hasPermission = await requestStoragePermission();
+    if (!hasPermission) {
+      console.log("Permission denied");
+      return;
+    }
+
     const options = {
+      mediaType: "photo", // Chọn loại media
+      quality: 1, // Chất lượng hình ảnh (0-1)
+      // includeBase64: false, // Chọn có bao gồm Base64 hay không
       title: "Select Image",
       storageOptions: {
         skipBackup: true,
@@ -388,29 +449,110 @@ const ProductManagementScreen = () => {
       },
     };
 
-    // Launch image picker
-    ImagePicker.launchImageLibrary(options, (response) => {
+    ImagePicker.launchImageLibrary(options, async (response) => {
+      console.log("response", response);
       if (response.didCancel) {
         console.log("User cancelled image picker");
-      } else if (response.error) {
+        return;
+      }
+      if (response.error) {
         console.log("ImagePicker Error: ", response.error);
-      } else {
-        console.log("Selected image: ", response.uri);
+        return;
+      }
 
-        // Upload image using API
+      let uri, type, fileName;
+
+      if (Platform.OS === "web") {
+        uri = response.uri;
+        type = response.type || "image/jpeg"; // Fallback type
+        fileName = response.name || "image.jpg"; // Fallback filename
+
+        // Convert to Blob
+        const blob = await fetch(uri).then((res) => res.blob());
+        const compressedBlob = await compressBlob(blob);
+        // debugger;
+        // Create FormData
+        console.log("FormData entries for web:");
         const formData = new FormData();
-        formData.append("image", {
-          uri: response.uri,
-          type: response.type,
-          name: response.fileName,
-        });
+        formData.append("image", compressedBlob, fileName);
 
-        console.log("FormData to be sent: ", formData);
+        // Check if FormData is populated
+        for (let [key, value] of formData.entries()) {
+          console.log("key&value", key, value); // Log entries
+        }
 
-        addProductImage({
-          productId: imageProduct._id,
-          imageFile: formData,
-        });
+        // Gửi dữ liệu
+        try {
+          const response = await http.post(
+            `/products/${imageProduct._id}/images`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data", // Để axios tự động thêm boundary
+              },
+            }
+          );
+          console.log("Upload thành công:", response);
+          showSuccessMessage("Upload thành công!");
+          setModalVisible(false);
+          await refetch(); // Refetch sản phẩm
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          showErrorMessage("Có lỗi xảy ra!");
+        }
+      } else console.log(Platform.OS, "Platform.OS");
+
+      if (Platform.OS === "android") {
+        debugger;
+        uri = response.uri; // Đường dẫn đến hình ảnh
+        type = response.type || "image/jpeg"; // Loại hình ảnh
+        fileName = response.fileName || "image.jpg"; // Tên tệp tin
+
+        // uri = asset.uri;
+        // type = asset.type || "image/jpeg"; // Fallback type
+        // fileName = asset.name || "image.jpg"; // Fallback filename
+
+        try {
+          // Fetch the image as a blob
+          const blob = await fetch(uri).then((res) => {
+            if (!res.ok) {
+              throw new Error("Failed to fetch the image.");
+            }
+            return res.blob();
+          });
+
+          // Compress the blob
+          const compressedBlob = await compressBlob(blob);
+
+          // Create FormData
+          const formData = new FormData();
+          formData.append("image", {
+            uri: uri,
+            type: type,
+            name: fileName,
+          });
+          console.log("formDataAnd", formData);
+
+          // Gửi dữ liệu
+          const uploadResponse = await http.post(
+            `/products/${imageProduct._id}/images`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+
+          console.log("Upload thành công:", uploadResponse);
+          showSuccessMessage("Upload thành công!");
+          await refetch(); // Refetch sản phẩm
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          showErrorMessage("Có lỗi xảy ra!");
+        }
       }
     });
   };
@@ -454,15 +596,6 @@ const ProductManagementScreen = () => {
 
     const formattedPrice = formatCurrency(item?.basePrice);
 
-    // const clearErrorAfterTimeout = (key) => {
-    //   setTimeout(() => {
-    //     setErrors((prevErrors) => ({
-    //       ...prevErrors,
-    //       [key]: null,
-    //     }));
-    //   }, 3000); // 3 seconds timeout
-    // };
-
     return (
       <Card style={styles.card}>
         <Card.Content>
@@ -472,17 +605,21 @@ const ProductManagementScreen = () => {
               handleUpdateProduct={handleUpdateProduct}
               setModalVisible={setModalVisible}
               setSelectedProduct={setSelectedProduct}
-              handleDeleteProductImage={handleDeleteProductImage}
+              handleDeleteProductImage={() =>
+                handleDeleteProductImage(item._id, item.image_url)
+              }
             />
           </View>
           <Title className="font-semibold  text-[14px] text-center ">
             #{item.productCode}
           </Title>
           <Image
+            className="bg-white"
             source={{
-              uri: item.image
-                ? item.image
+              uri: item.image_url
+                ? item.image_url
                 : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s",
+              // "https://cdn.pnj.io/images/detailed/136/gnxmxmy001678-nhan-vang-18k-dinh-da-cz-pnj-_1.png",
             }}
             style={styles.image}
           />
@@ -490,11 +627,18 @@ const ProductManagementScreen = () => {
             <Feather
               name="camera"
               size={16}
-              color="black"
+              color={item.image_url ? "black" : "black"} // Nếu có image_url thì màu xám
               onPress={() => {
-                setSelectedProduct(item);
-                handleAddImage(item);
+                if (item.image_url) {
+                  showErrorMessage(
+                    "Vui lòng xoá ảnh cũ thì mới tạo được ảnh mới"
+                  );
+                } else {
+                  setSelectedProduct(item);
+                  handleAddImage(item);
+                }
               }}
+              style={{ opacity: item.image_url ? 0.5 : 1 }} // Giảm độ trong suốt nếu có image_url
             />
           </View>
           <View style={styles.indexContainer}>
@@ -509,6 +653,8 @@ const ProductManagementScreen = () => {
               setSelectedProduct(item);
               setModalVisible(true);
             }}
+            numberOfLines={2} // Giới hạn số dòng hiển thị
+            ellipsizeMode="tail" // Thêm dấu "..." ở cuối nếu văn bản quá dài
           >
             {item.name}
           </Title>
@@ -546,32 +692,36 @@ const ProductManagementScreen = () => {
     }
 
     return (
-      <TouchableOpacity
-        className="bg-[#ccac00] rounded-md p-1 text-center w-[40%] mt-4 mx-auto"
-        onPress={handleLoadMore}
-      >
-        <Title className="text-white text-center text-sm text-semibold">
-          Xem thêm
-        </Title>
-      </TouchableOpacity>
+      <View>
+        <TouchableOpacity
+          className="bg-[#ccac00] rounded-md p-1 text-center w-[40%] mt-4 mx-auto"
+          onPress={handleLoadMore}
+        >
+          <Title className="text-white text-center text-sm text-semibold">
+            Xem thêm
+          </Title>
+        </TouchableOpacity>
+      </View>
     );
   };
 
   return (
     <View style={styles.container}>
-      <View className="flex-row p-2 justify-between">
-        <Text style={styles.title}>Quản lý sản phẩm Trang Sức</Text>
-        <View style={styles.buttonContainer2} onPress={openModalAdd}>
+      {/* <View className="flex-row p-2 justify-between">
+      </View> */}
+      <View style={styles.searchContainer}>
+        <View
+          style={styles.buttonContainer2}
+          className="mr-3"
+          onPress={openModalAdd}
+        >
           <TouchableOpacity
             className="flex-row  bg-[#ccac00] p-2 rounded-md mb-4 "
             onPress={openModalAdd}
           >
             <FontAwesome name="plus" size={20} color="white" />
-            {/* <Text style={{ color: "white", marginLeft: 10 }}>Tạo Sản Phẩm</Text> */}
           </TouchableOpacity>
         </View>
-      </View>
-      <View style={styles.searchContainer}>
         <Searchbar
           placeholder="Tìm tên hoặc mã sản phẩm..."
           onChangeText={setSearchQuery}
@@ -580,7 +730,15 @@ const ProductManagementScreen = () => {
         />
         <FilterDropdown onFilterChange={handleFilterChange} />
       </View>
-      <View style={styles.separator}></View> {/* Separator View */}
+      {products && (
+        <Text className="my-2 ml-2 font-semibold">
+          Tổng có: {products.length} Sản phẩm
+        </Text>
+      )}
+      <View style={styles.separator}>
+        <Text> </Text>
+      </View>
+      {/* Separator View */}
       {isLoading ? (
         <Text>Loading...</Text>
       ) : error ? (
@@ -607,12 +765,12 @@ const ProductManagementScreen = () => {
         <View style={styles.modalContainer}>
           <Card style={styles.modalCard}>
             {selectedProduct && (
-              <>
+              <View>
                 <Card.Content>
                   <Image
                     source={{
-                      uri: selectedProduct.image
-                        ? selectedProduct.image
+                      uri: selectedProduct.image_url
+                        ? selectedProduct.image_url
                         : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s",
                     }}
                     style={styles.modalImage}
@@ -620,12 +778,19 @@ const ProductManagementScreen = () => {
                   <View style={styles.cameraIconContainer}>
                     <Feather
                       name="camera"
-                      size={24}
-                      color="black"
+                      size={16}
+                      color={selectedProduct.image_url ? "black" : "black"} // Nếu có image_url thì màu xám
                       onPress={() => {
-                        setSelectedProduct(selectedProduct);
-                        handleAddImage(selectedProduct);
+                        if (selectedProduct.image_url) {
+                          showErrorMessage(
+                            "Vui lòng xoá ảnh cũ thì mới tạo được ảnh mới"
+                          );
+                        } else {
+                          setSelectedProduct(selectedProduct);
+                          handleAddImage(selectedProduct);
+                        }
                       }}
+                      style={{ opacity: selectedProduct.image_url ? 0.5 : 1 }} // Giảm độ trong suốt nếu có image_url
                     />
                   </View>
                   <Title className="font-semibold text-lg ">
@@ -640,7 +805,7 @@ const ProductManagementScreen = () => {
                   </Paragraph>
                   <Paragraph className="text-xs">
                     {" "}
-                    Lần sửa cuối:{" "}
+                    Lần cập nhật cuối:{" "}
                     {moment(selectedProduct?.updated_at).format(
                       "DD/MM/YYYY, hh:mm A"
                     )}
@@ -717,17 +882,19 @@ const ProductManagementScreen = () => {
                           name="trash"
                           size={20}
                           color="#8B0000"
-                          onPress={() => {
-                            setSelectedProduct(selectedProduct);
-                            handleDeleteProductImage(selectedProduct);
-                          }}
+                          onPress={() =>
+                            handleDeleteProductImage(
+                              selectedProduct._id,
+                              selectedProduct.image_url
+                            )
+                          }
                         />
                       </TouchableOpacity>
                     </View>
                   </View>
                 </Card.Content>
                 <Button onPress={closeModal}>Close</Button>
-              </>
+              </View>
             )}
           </Card>
         </View>
@@ -765,7 +932,7 @@ const ProductManagementScreen = () => {
               <TextInput
                 style={styles.input}
                 placeholder="Trọng lượng (Gram)"
-                value={updatedProductData.weight}
+                value={updatedProductData.weight.toString()}
                 onChangeText={(text) => handleUpdateChange("weight", text)}
                 keyboardType="numeric"
                 mode="outlined"
@@ -782,7 +949,7 @@ const ProductManagementScreen = () => {
               <TextInput
                 style={styles.input}
                 placeholder="Giá đá quý (VND)"
-                value={updatedProductData.gemCost}
+                value={updatedProductData.gemCost.toString()}
                 onChangeText={(text) => handleUpdateChange("gemCost", text)}
                 keyboardType="numeric"
                 mode="outlined"
@@ -848,7 +1015,7 @@ const ProductManagementScreen = () => {
               <TextInput
                 style={styles.input}
                 placeholder="Khối lượng (gram)"
-                value={newProductData.weight}
+                value={newProductData.weight.toString()}
                 onChangeText={(text) => handleChange("weight", text)}
                 keyboardType="numeric"
                 mode="outlined"
@@ -864,7 +1031,7 @@ const ProductManagementScreen = () => {
               <TextInput
                 style={styles.input}
                 placeholder="Chi phí đá (VND)"
-                value={newProductData.gemCost}
+                value={newProductData.gemCost.toString()}
                 onChangeText={(text) => handleChange("gemCost", text)}
                 keyboardType="numeric"
                 mode="outlined"
@@ -918,7 +1085,7 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#f9f8e6",
   },
   filterButton: {
     marginLeft: 10,
@@ -926,6 +1093,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
+    backgroundColor: "#ffffff",
   },
   card: {
     margin: 5,
@@ -943,6 +1111,7 @@ const styles = StyleSheet.create({
     height: 150, // Adjust height as needed
     resizeMode: "cover", // or 'contain' as per your preference
     marginBottom: 10,
+    backgroundColor: "#ffffff",
   },
   separator: {
     height: 1,
@@ -1006,6 +1175,7 @@ const styles = StyleSheet.create({
     height: 300,
     marginBottom: 10,
     resizeMode: "cover",
+    backgroundColor: "#ffffff",
   },
   cameraIconContainer: {
     position: "absolute",

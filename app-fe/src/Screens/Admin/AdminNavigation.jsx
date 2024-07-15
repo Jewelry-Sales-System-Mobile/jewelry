@@ -4,19 +4,19 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import ManageCounter from "./Counter/ManageCounter";
 import { Text } from "react-native";
 import CustomTabIconV2 from "./CustomIconTabV2";
-import ProductManagementScreen from "./TabNavigation/ProductManage";
-import DashboardScreen from "./TabNavigation/DashBoard";
-import OrderManagementScreen from "./TabNavigation/OrderManage";
-import CustomerManagementScreen from "./TabNavigation/CustomerManage";
-import AccountManagementScreen from "./TabNavigation/AccountManage";
-import CounterManagementScreen from "./TabNavigation/CounterManage";
+
 import CounterStackNavigator from "../../navigation/stack-navigators/CounterStackNavigator";
 import Setttings from "./TabNavigation/Setttings";
 import AccountManagementStackNavigator from "./StackTab/AccountManagementStackNavigator";
+import SettingManagementStackNavigator from "./StackTab/SettingManagementStackNavigator";
+import DashboardStackNavigator from "./StackTab/DashboardStackNavigator";
+import OrderManagementStackNavigator from "./StackTab/OrderManagementStackNavigator";
+import { SafeAreaView } from "react-native-safe-area-context";
+import ProductManagementStackNavigator from "./StackTab/ProductManagementStackNavigate";
 
 const Tab = createBottomTabNavigator();
 
-export default function AdminNavigation({ navigation }) {
+export default function AdminNavigation() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -26,7 +26,7 @@ export default function AdminNavigation({ navigation }) {
             iconUri =
               "https://www.iconpacks.net/icons/2/free-settings-icon-3110-thumb.png";
           } else if (route.name === "Product") {
-            iconUri = "https://img.icons8.com/small/64/null/gear.png";
+            iconUri = "https://cdn-icons-png.freepik.com/512/332/332938.png";
           } else if (route.name === "Account") {
             iconUri = "https://static.thenounproject.com/png/4181324-200.png";
           } else if (route.name === "Order") {
@@ -39,7 +39,7 @@ export default function AdminNavigation({ navigation }) {
           }
           return <CustomTabIconV2 uri={iconUri} isFocused={focused} />;
         },
-        tabBarActiveTintColor: "tomato",
+        tabBarActiveTintColor: "#ccac00",
         tabBarInactiveTintColor: "gray",
         tabBarStyle: {
           height: 75, // Đổi chiều cao thành 70px
@@ -56,7 +56,7 @@ export default function AdminNavigation({ navigation }) {
     >
       <Tab.Screen
         name="Dashboard"
-        component={DashboardScreen}
+        component={DashboardStackNavigator}
         options={{ headerShown: false }}
       />
       <Tab.Screen
@@ -64,19 +64,15 @@ export default function AdminNavigation({ navigation }) {
         component={AccountManagementStackNavigator}
         options={{ headerShown: false }}
       />
-      {/* <Tab.Screen
-        name="Customer"
-        component={CustomerManagementScreen}
-        options={{ headerShown: false }}
-      /> */}
+
       <Tab.Screen
         name="Product"
-        component={ProductManagementScreen}
+        component={ProductManagementStackNavigator}
         options={{ headerShown: false }}
       />
       <Tab.Screen
         name="Order"
-        component={OrderManagementScreen}
+        component={OrderManagementStackNavigator}
         options={{ headerShown: false }}
       />
       <Tab.Screen
@@ -86,7 +82,7 @@ export default function AdminNavigation({ navigation }) {
       />
       <Tab.Screen
         name="Setting"
-        component={Setttings}
+        component={SettingManagementStackNavigator}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>

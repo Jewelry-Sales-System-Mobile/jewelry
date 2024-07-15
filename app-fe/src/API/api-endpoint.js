@@ -7,4 +7,5 @@ export const API_ENDPOINTS = {
   ALL_CUSTOMERS: "/customers",
   CUSTOMERS: "/customers",
   USERS: "/users",
+  GOLD_PRICES: "/gold-prices",
 };

@@ -78,16 +78,18 @@ class OrderServices {
     const { insertedId } = await databaseService.orders.insertOne(newBody);
 
     const order = await databaseService.orders.findOne({ _id: insertedId });
-    let addedPoints = Math.floor(body.total / 100000);
+    const addedPoints = Math.floor(body.total / 100000);
+    console.log(addedPoints);
+
     if (body.discount > 0) {
       const discountPoints = Math.floor(body.discount / 100000) * 100 * -1;
-      await databaseService.users.updateOne(
-        { _id: new ObjectId(user_id) },
+      await databaseService.customers.updateOne(
+        { _id: new ObjectId(body.customer_id) },
         { $inc: { points: discountPoints } }
       );
     }
-    await databaseService.users.updateOne(
-      { _id: new ObjectId(user_id) },
+    await databaseService.customers.updateOne(
+      { _id: new ObjectId(body.customer_id) },
       { $inc: { points: addedPoints } }
     );
     return { order, addedPoints };
@@ -112,7 +114,7 @@ class OrderServices {
       {
         $set: {
           paymentStatus: PaymentStatus.Paid,
-          total: order.total * -1,
+          total: order.total,
         },
         $currentDate: { updated_at: true },
       },
@@ -137,6 +139,20 @@ class OrderServices {
         HTTP_STATUS.BAD_REQUEST
       );
     }
+
+    // Calculate the points to revert
+    const addedPoints = Math.floor(order.total / 100000);
+    let pointsToRevert = addedPoints;
+    if (order.discount > 0) {
+      const discountPoints = Math.floor(order.discount / 100000) * 100;
+      pointsToRevert -= discountPoints; // Subtracting because discountPoints is negative
+    }
+
+    // Revert points to the customer
+    await databaseService.customers.updateOne(
+      { _id: new ObjectId(order.customer_id) },
+      { $inc: { points: -pointsToRevert } } // Use negative to revert the points
+    );
 
     const updatedOrder = await databaseService.orders.findOneAndUpdate(
       { _id: new ObjectId(order_id) },

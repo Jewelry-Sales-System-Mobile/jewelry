@@ -4,6 +4,7 @@ import {
   confirmOrderController,
   createOrderController,
   getAllOrdersController,
+  getAllOrdersOfACustomerController,
   getOrderByIdController,
   getOrderByOrderCodeController,
 } from "~/controllers/orders.controllers";
@@ -85,6 +86,6 @@ ordersRouter.put(
  */
 ordersRouter.get(
   "/by-customer/:customer_id",
-  wrapRequestHandler(getAllOrdersController)
+  wrapRequestHandler(getAllOrdersOfACustomerController)
 );
 export default ordersRouter;

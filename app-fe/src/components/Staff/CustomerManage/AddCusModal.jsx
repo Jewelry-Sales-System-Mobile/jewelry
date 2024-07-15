@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   TextInput,
@@ -16,13 +16,24 @@ import { DatePickerModal } from "react-native-paper-dates";
 import { useForm, Controller } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useCreateCustomer } from "../../../API/customerApi";
 
 const schema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
-  phone: Yup.number().required("Phone is required"),
-  dob: Yup.date().required("Date of birth is required").nullable(),
-  // Add other fields validation as needed
+  phone: Yup.string()
+    .matches(
+      /^0[345789][0-9]{8}$/,
+      "Phone must have exact 10 digits and start with 03, 04, 05, 07, 08, or 09"
+    )
+    .required("Phone is required"),
+  dob: Yup.date()
+    .max(
+      new Date(new Date().setFullYear(new Date().getFullYear() - 16)),
+      "Must be at least 16 years old"
+    )
+    .required("Date of birth is required")
+    .nullable(), // Add other fields validation as needed
 });
 
 export default function AddCusModal({
@@ -30,28 +41,30 @@ export default function AddCusModal({
   closeModalAdd,
   openModalAdd,
 }) {
-  const [newCustomerData, setNewCustomerData] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    dob: "",
-  });
+  // const [newCustomerData, setNewCustomerData] = useState({
+  //   name: "",
+  //   phone: "",
+  //   email: "",
+  //   dob: "",
+  // });
   const [date, setDate] = useState("");
   const [open, setOpen] = useState(false);
+  const { mutate: createCustomer, isSuccess } = useCreateCustomer();
   const {
     control,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
   });
-  const handleChange = (key, value) => {
-    setNewCustomerData({
-      ...newCustomerData,
-      [key]: value,
-    });
-  };
+  // const handleChange = (key, value) => {
+  //   setNewCustomerData({
+  //     ...newCustomerData,
+  //     [key]: value,
+  //   });
+  // };
 
   const onDismissSingle = useCallback(() => {
     setOpen(false);
@@ -75,8 +88,15 @@ export default function AddCusModal({
   );
   const onSubmit = (data) => {
     console.log(data);
+    createCustomer(data);
     // Handle your form submission logic here
   };
+  useEffect(() => {
+    if (isSuccess) {
+      closeModalAdd();
+      reset();
+    }
+  }, [isSuccess]);
   return (
     <Modal visible={modalVisibleAdd} animationType="slide" transparent={true}>
       <View className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-black bg-opacity-50">

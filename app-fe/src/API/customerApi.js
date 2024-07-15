@@ -38,6 +38,14 @@ const getOrdersByCustomerId = async (customerId) => {
   return data.data;
 };
 
+export {
+  getCustomers,
+  getCustomerById,
+  createCustomer,
+  updateCustomer,
+  getOrdersByCustomerId,
+};
+
 export const useGetOrdersByCustomerId = (customerId) => {
   const { data, isLoading, error } = useQuery(["orders", customerId], () =>
     getOrdersByCustomerId(customerId)
@@ -77,7 +85,8 @@ export const useCreateCustomer = () => {
 export const useUpdateCustomer = () => {
   const queryClient = useQueryClient();
   return useMutation(updateCustomer, {
-    onSuccess: () => {
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(["customer", data._id]);
       showSuccessMessage("Khách hàng đã được cập nhật thành công!");
       queryClient.invalidateQueries("customers");
     },

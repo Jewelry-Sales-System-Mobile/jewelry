@@ -16,6 +16,10 @@ import {
 import moment from "moment";
 import { useGetProductById } from "../../../API/productApi";
 import { Title } from "react-native-paper";
+import { Tooltip, Icon } from "react-native-elements";
+import { useGetMyProfile } from "../../../API/staffApi";
+import { FontAwesome } from "@expo/vector-icons";
+import UpdateCusModal from "../../../components/Staff/CustomerManage/UpdateCusModal";
 
 const CustomerDetailScreen = () => {
   const route = useRoute();
@@ -25,12 +29,32 @@ const CustomerDetailScreen = () => {
     isLoading: customerLoading,
     error: customerError,
   } = useGetCustomerById(customerId);
+  const { data: info } = useGetMyProfile();
   const [limit, setLimit] = useState(3);
   const {
     data: orders,
     isLoading: ordersLoading,
     error: ordersError,
   } = useGetOrdersByCustomerId(customerId); // Use the new API hook
+
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [modalVisibleUpdate, setModalVisibleUpdate] = useState(false);
+
+  // Hàm mở modal
+  const openModalUpdate = () => {
+    setModalVisibleUpdate(true);
+  };
+
+  // Hàm đóng modal
+  const closeModalUpdate = () => {
+    setModalVisibleUpdate(false);
+    // Đặt lại thông tin sản phẩm mới về trạng thái ban đầu khi đóng modal
+  };
+
+  console.log("tooltipVisible", tooltipVisible);
+  const toggleTooltip = () => {
+    setTooltipVisible(!tooltipVisible);
+  };
 
   console.log("orders", orders);
 
@@ -63,6 +87,18 @@ const CustomerDetailScreen = () => {
     );
   };
 
+  const formatCurrencyVND = (value) => {
+    if (value == null || isNaN(value)) return "0 VND";
+    const numValue = Number(value); // Convert value to a number
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(numValue.toFixed(2));
+  };
+
+  console.log("ordersTotal", orders);
+  const total = orders.reduce((acc, order) => acc + order.total, 0);
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -72,11 +108,29 @@ const CustomerDetailScreen = () => {
         style={styles.customerDetailCard}
         imageStyle={{ borderRadius: 8 }}
       >
-        <View className="flex-row justify-between">
+        <View className="flex-row justify-between items-center">
           <Text style={styles.detailTitle}>{customer.name}</Text>
-          <Text className="text-[#937C00] text-lg font-bold">
-            {customer.points} Điểm{" "}
-          </Text>
+          <View className="flex-row items-center">
+            <Text className="text-[#937C00] text-lg font-bold mr-3">
+              {customer.points} Điểm{" "}
+            </Text>
+            <Tooltip
+              className="rounded-md"
+              height={100}
+              width={250}
+              popover={
+                <View className="bg-[#FFFFF] p-2 rounded-md">
+                  <Text className="text-white font-semibold">
+                    Đơn hàng được quy đổi 100.000 đ = 1 Điểm. Được {">"} 100
+                    Điểm thì được Giảm giá cho đơn tiếp theo với 100 Điểm =
+                    100.000 đ
+                  </Text>
+                </View>
+              }
+            >
+              <Icon name="info" type="feather" color="#937C00" />
+            </Tooltip>
+          </View>
         </View>
 
         <View style={styles.detailText} className="flex-row">
@@ -94,6 +148,12 @@ const CustomerDetailScreen = () => {
           <Text className="text-base mr-2 font-semibold">Email:</Text>
           <Text className="text-base ">{customer.email}</Text>
         </View>
+        <View className="flex-row mb-4">
+          <Text className="text-base mr-2 font-semibold">Tổng chi tiêu: </Text>
+          <Text className="text-base font-semibold text-[#937C00]">
+            {formatCurrencyVND(total)}
+          </Text>
+        </View>
 
         <Text className="text-xs text-gray">
           Ngày tạo: {moment(customer.createdAt).format("DD/MM/YYYY, hh:mm A")}
@@ -102,10 +162,25 @@ const CustomerDetailScreen = () => {
           Ngày sửa lần cuối:{" "}
           {moment(customer.updatedAt).format("DD/MM/YYYY, hh:mm A")}
         </Text>
+        {info && info.role === 1 && (
+          <View>
+            <View
+              className="flex-row items-center justify-end mt-2.5 z-10"
+              onPress={openModalUpdate}
+            >
+              <TouchableOpacity
+                className="flex-row p-2 rounded-md mb-4"
+                onPress={openModalUpdate}
+              >
+                <FontAwesome name="pencil-square-o" size={24} color="blue" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       </ImageBackground>
 
       <Text className="uppercase font-semibold text-sm mb-5">
-        Danh sách đơn hàng của {customer.name}:
+        Danh sách đơn hàng của {customer.name} ({orders.length} đơn):
       </Text>
 
       <View
@@ -123,6 +198,13 @@ const CustomerDetailScreen = () => {
           ind
         />
       </View>
+
+      <UpdateCusModal
+        modalVisibleAdd={modalVisibleUpdate}
+        closeModalAdd={closeModalUpdate}
+        openModalAdd={openModalUpdate}
+        item={customer}
+      />
     </View>
   );
 };
@@ -168,6 +250,8 @@ const OrderItem = ({ item, index }) => {
         return null;
     }
   };
+
+  const discountPrice = item?.discount * 1000;
 
   return (
     <View style={styles.orderRow}>
@@ -234,43 +318,46 @@ const OrderItem = ({ item, index }) => {
               quantity={detail.quantity}
               index={index}
             />
-            <View className="w-full  flex-row justify-end items-center my-5 pr-5">
-              <View className="w-[60%]">
-                <View className="flex-row justify-between">
-                  <Text className="text-left">Tạm tổng:</Text>
-                  <Text className="text-right">
-                    {item.subtotal
-                      ? item.subtotal.toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        })
-                      : 0}{" "}
-                  </Text>
-                </View>
-                <View className="flex-row justify-between">
-                  <Text className="text-left">Sử dụng điểm:</Text>
-                  <Text className="text-right">
-                    {item.discount.toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })}
-                  </Text>
-                </View>
-                <View className="flex-row justify-between">
-                  <Text className="text-left">Tổng thành tiền:</Text>
-                  <Text className="text-right">
-                    {item.total
-                      ? item.total.toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        })
-                      : 0}{" "}
-                  </Text>
-                </View>
-              </View>
-            </View>
           </View>
         ))}
+      {expanded && (
+        <View className="w-full  flex-row justify-end items-center my-5 pr-5">
+          <View className="w-[60%]">
+            <View className="flex-row justify-between">
+              <Text className="text-left">Tạm tổng:</Text>
+              <Text className="text-right">
+                {item.subtotal
+                  ? item.subtotal.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
+                  : 0}{" "}
+              </Text>
+            </View>
+            <View className="flex-row justify-between">
+              <Text className="text-left">Sử dụng điểm:</Text>
+              <Text className="text-right">
+                -{" "}
+                {discountPrice.toLocaleString("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                })}
+              </Text>
+            </View>
+            <View className="flex-row justify-between">
+              <Text className="text-left">Tổng thành tiền:</Text>
+              <Text className="text-right">
+                {item.total
+                  ? item.total.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
+                  : 0}{" "}
+              </Text>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -299,8 +386,8 @@ const ProductDetail = ({ productId, quantity, index }) => {
       <Text className="mr-2 font-semibold">{index + 1}.</Text>
       <Image
         source={{
-          uri: product.image
-            ? product.image
+          uri: product.image_url
+            ? product.image_url
             : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s",
         }}
         style={styles.productImage}
@@ -377,6 +464,7 @@ const styles = StyleSheet.create({
     height: 50,
     marginBottom: 10,
     marginRight: 5,
+    backgroundColor: "#ffffff",
   },
 
   statusIcon: {

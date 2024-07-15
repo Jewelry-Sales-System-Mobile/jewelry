@@ -4,12 +4,14 @@ import { Ionicons } from "@expo/vector-icons";
 // import CustomTabIcon from "../../components/Navigation";
 
 import CustomTabIconV2 from "./CustomIconTabV2";
-import ProductManagementScreen from "../Screens/Guest/TabNavigation/ProductManage";
-import DashboardScreen from "../Screens/Guest/TabNavigation/DashBoard";
 import OrderManagementScreen from "../Screens/Guest/TabNavigation/OrderManage";
 import CustomerManagementScreen from "../Screens/Guest/TabNavigation/CustomerManage";
 import CounterStackNavigator from "./stack-navigators/CounterStackNavigator";
 import Setttings from "../Screens/Guest/TabNavigation/Settings";
+import OrderManagementStackNavigator from "../Screens/Admin/StackTab/OrderManagementStackNavigator";
+import ProductManagementStackNavigator from "../Screens/Guest/StackNavigateTab/ProductManagementStackNavigator";
+import SettingManagementStackNavigator from "../Screens/Admin/StackTab/SettingManagementStackNavigator";
+import DashboardStackNavigator from "../Screens/Admin/StackTab/DashboardStackNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -23,11 +25,11 @@ export default function GuestNavigation({ navigation }) {
             iconUri =
               "https://img.icons8.com/small/64/null/gender-neutral-user.png";
           } else if (route.name === "Product") {
-            iconUri = "https://img.icons8.com/small/64/null/gear.png";
+            iconUri = "https://cdn-icons-png.freepik.com/512/332/332938.png";
           } else if (route.name === "Order") {
+            iconUri = "https://static.thenounproject.com/png/112573-200.png";
+          } else if (route.name === "OrderList") {
             iconUri = "https://cdn-icons-png.flaticon.com/512/2977/2977924.png";
-          } else if (route.name === "Quầy hàng") {
-            iconUri = "https://img.icons8.com/small/64/null/switch.png";
           } else if (route.name === "Setting") {
             iconUri =
               "https://www.iconpacks.net/icons/2/free-settings-icon-3110-thumb.png";
@@ -54,17 +56,18 @@ export default function GuestNavigation({ navigation }) {
     >
       <Tab.Screen
         name="Dashboard"
-        component={DashboardScreen}
+        component={DashboardStackNavigator}
         options={{ headerShown: false }}
       />
       <Tab.Screen
         name="Customer"
         component={CustomerManagementScreen}
+        // component={OrderSuccess}
         options={{ headerShown: false }}
       />
       <Tab.Screen
         name="Product"
-        component={ProductManagementScreen}
+        component={ProductManagementStackNavigator}
         options={{ headerShown: false }}
       />
       <Tab.Screen
@@ -73,13 +76,13 @@ export default function GuestNavigation({ navigation }) {
         options={{ headerShown: false }}
       />
       <Tab.Screen
-        name="Quầy hàng"
-        component={CounterStackNavigator}
+        name="OrderList"
+        component={OrderManagementStackNavigator}
         options={{ headerShown: false }}
       />
       <Tab.Screen
         name="Setting"
-        component={Setttings}
+        component={SettingManagementStackNavigator}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>

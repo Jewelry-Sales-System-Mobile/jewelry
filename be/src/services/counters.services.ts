@@ -61,7 +61,18 @@ class CounterServices {
       counter.assignedEmployees.map((id) => id.toString()).includes(employee_id)
     ) {
       throw new ErrorWithStatus(
-        "Employee already assigned",
+        "Employee already assigned in this counter",
+        HTTP_STATUS.CREATED
+      );
+    }
+
+    // Check if employee is assigned to another counter
+    if (
+      employee.assigned_counter &&
+      employee.assigned_counter.toString() !== counter_id
+    ) {
+      throw new ErrorWithStatus(
+        "Employee is assigned to another counter",
         HTTP_STATUS.CREATED
       );
     }
