@@ -10,10 +10,10 @@ import { ObjectId } from "mongodb";
 import { ProductStatus } from "~/constants/enum";
 import { ErrorWithStatus } from "~/models/Errors";
 import HTTP_STATUS from "~/constants/httpStatus";
-import mediasService from "./medias.services";
+// import mediasService from "./medias.services";
 import { Request } from "express";
 import { PRODUCTS_MESSAGES } from "~/constants/messages";
-import { deleteFileFromS3 } from "~/utils/s3";
+// import { deleteFileFromS3 } from "~/utils/s3";
 
 class ProductServices {
   async generateUniqueProductCode() {
@@ -182,52 +182,53 @@ class ProductServices {
   }
 
   async addImageToProduct(product_id: string, req: Request) {
-    const product = await databaseService.products.findOne({
-      _id: new ObjectId(product_id),
-    });
-    if (!product) {
-      throw new ErrorWithStatus(
-        PRODUCTS_MESSAGES.PRODUCT_NOT_FOUND,
-        HTTP_STATUS.NOT_FOUND
-      );
-    }
-    const urls = await mediasService.uploadImage(req);
-    const images = urls.map((url) => ({
-      _id: new ObjectId(),
-      url: url.url,
-    }));
+  //   const product = await databaseService.products.findOne({
+  //     _id: new ObjectId(product_id),
+  //   });
+  //   if (!product) {
+  //     throw new ErrorWithStatus(
+  //       PRODUCTS_MESSAGES.PRODUCT_NOT_FOUND,
+  //       HTTP_STATUS.NOT_FOUND
+  //     );
+  //   }
+  //   const urls = await mediasService.uploadImage(req);
+  //   const images = urls.map((url) => ({
+  //     _id: new ObjectId(),
+  //     url: url.url,
+  //   }));
 
-    // Add the new images to the product
-    const result = await databaseService.products.findOneAndUpdate(
-      { _id: new ObjectId(product_id) },
-      { $set: { image_url: images[0]?.url } },
-      { returnDocument: "after" }
-    );
+  //   // Add the new images to the product
+  //   const result = await databaseService.products.findOneAndUpdate(
+  //     { _id: new ObjectId(product_id) },
+  //     { $set: { image_url: images[0]?.url } },
+  //     { returnDocument: "after" }
+  //   );
 
-    return result;
-  }
+  //   return result;
+  // }
 
-  async deleteProductImage(product_id: string, url: string) {
-    const product = await databaseService.products.findOne({
-      _id: new ObjectId(product_id),
-    });
-    if (!product) {
-      throw new ErrorWithStatus(
-        PRODUCTS_MESSAGES.PRODUCT_NOT_FOUND,
-        HTTP_STATUS.NOT_FOUND
-      );
-    }
+  // async deleteProductImage(product_id: string, url: string) {
+  //   const product = await databaseService.products.findOne({
+  //     _id: new ObjectId(product_id),
+  //   });
+  //   if (!product) {
+  //     throw new ErrorWithStatus(
+  //       PRODUCTS_MESSAGES.PRODUCT_NOT_FOUND,
+  //       HTTP_STATUS.NOT_FOUND
+  //     );
+  //   }
 
-    const filename = url.split("/").pop();
-    await deleteFileFromS3(filename as string);
-    // Remove the image URL from the product
-    const result = await databaseService.products.findOneAndUpdate(
-      { _id: new ObjectId(product_id) },
-      { $set: { image_url: "" } },
-      { returnDocument: "after" }
-    );
+  //   const filename = url.split("/").pop();
+  //   await deleteFileFromS3(filename as string);
+  //   // Remove the image URL from the product
+  //   const result = await databaseService.products.findOneAndUpdate(
+  //     { _id: new ObjectId(product_id) },
+  //     { $set: { image_url: "" } },
+  //     { returnDocument: "after" }
+  //   );
 
-    return result;
+  //   return result;
+  // }
   }
 }
 
