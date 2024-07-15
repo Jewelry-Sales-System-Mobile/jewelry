@@ -1,9 +1,9 @@
 import { Router } from "express";
 import {
   ActiveProductController,
-  addImageToProductController,
+  // addImageToProductController,
   CreateProductController,
-  deleteProductImageController,
+  // deleteProductImageController,
   GetAllProductsController,
   GetProductByIdController,
   InActiveProductController,
@@ -76,11 +76,11 @@ productsRouter.post(
  * Header: { Authorization: Bearer <access_token> }
  * Body: {address: string}
  */
-productsRouter.post(
-  "/:product_id/images",
-  accessTokenValidator,
-  wrapRequestHandler(addImageToProductController)
-);
+// productsRouter.post(
+//   "/:product_id/images",
+//   accessTokenValidator,
+//   wrapRequestHandler(addImageToProductController)
+// );
 
 /**
  * Description: Delete Product Image
@@ -89,11 +89,11 @@ productsRouter.post(
  * Header: { Authorization: Bearer <access_token> }
  * Body: {address: string}
  */
-productsRouter.put(
-  "/:product_id/images/delete",
-  accessTokenValidator,
-  wrapRequestHandler(deleteProductImageController)
-);
+// productsRouter.put(
+//   "/:product_id/images/delete",
+//   accessTokenValidator,
+//   wrapRequestHandler(deleteProductImageController)
+// );
 
 /**
  * Description: Update Product
