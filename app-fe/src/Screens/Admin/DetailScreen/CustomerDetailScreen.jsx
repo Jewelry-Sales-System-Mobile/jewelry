@@ -17,6 +17,9 @@ import moment from "moment";
 import { useGetProductById } from "../../../API/productApi";
 import { Title } from "react-native-paper";
 import { Tooltip, Icon } from "react-native-elements";
+import { useGetMyProfile } from "../../../API/staffApi";
+import { FontAwesome } from "@expo/vector-icons";
+import UpdateCusModal from "../../../components/Staff/CustomerManage/UpdateCusModal";
 
 const CustomerDetailScreen = () => {
   const route = useRoute();
@@ -26,6 +29,7 @@ const CustomerDetailScreen = () => {
     isLoading: customerLoading,
     error: customerError,
   } = useGetCustomerById(customerId);
+  const { data: info } = useGetMyProfile();
   const [limit, setLimit] = useState(3);
   const {
     data: orders,
@@ -34,6 +38,18 @@ const CustomerDetailScreen = () => {
   } = useGetOrdersByCustomerId(customerId); // Use the new API hook
 
   const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [modalVisibleUpdate, setModalVisibleUpdate] = useState(false);
+
+  // Hàm mở modal
+  const openModalUpdate = () => {
+    setModalVisibleUpdate(true);
+  };
+
+  // Hàm đóng modal
+  const closeModalUpdate = () => {
+    setModalVisibleUpdate(false);
+    // Đặt lại thông tin sản phẩm mới về trạng thái ban đầu khi đóng modal
+  };
 
   console.log("tooltipVisible", tooltipVisible);
   const toggleTooltip = () => {
@@ -146,6 +162,21 @@ const CustomerDetailScreen = () => {
           Ngày sửa lần cuối:{" "}
           {moment(customer.updatedAt).format("DD/MM/YYYY, hh:mm A")}
         </Text>
+        {info && info.role === 1 && (
+          <View>
+            <View
+              className="flex-row items-center justify-end mt-2.5 z-10"
+              onPress={openModalUpdate}
+            >
+              <TouchableOpacity
+                className="flex-row p-2 rounded-md mb-4"
+                onPress={openModalUpdate}
+              >
+                <FontAwesome name="pencil-square-o" size={24} color="blue" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       </ImageBackground>
 
       <Text className="uppercase font-semibold text-sm mb-5">
@@ -167,6 +198,13 @@ const CustomerDetailScreen = () => {
           ind
         />
       </View>
+
+      <UpdateCusModal
+        modalVisibleAdd={modalVisibleUpdate}
+        closeModalAdd={closeModalUpdate}
+        openModalAdd={openModalUpdate}
+        item={customer}
+      />
     </View>
   );
 };

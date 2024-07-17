@@ -85,7 +85,8 @@ export const useCreateCustomer = () => {
 export const useUpdateCustomer = () => {
   const queryClient = useQueryClient();
   return useMutation(updateCustomer, {
-    onSuccess: () => {
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(["customer", data._id]);
       showSuccessMessage("Khách hàng đã được cập nhật thành công!");
       queryClient.invalidateQueries("customers");
     },

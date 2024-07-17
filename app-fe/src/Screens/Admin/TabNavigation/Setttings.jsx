@@ -12,8 +12,7 @@ import { useGetCounterById } from "../../../API/counter";
 
 export default function Setttings() {
   const { setIsSignedIn } = useRoleStore();
-  const [userId, setuserId] = useState("");
-  // const { data: staff, isLoading, error } = useGetStaffById(userId);
+  // const [userId, setuserId] = useState("");
   const { data: staff, isLoading, error } = useGetMyProfile();
   const {
     data: counterDetail,
@@ -22,7 +21,7 @@ export default function Setttings() {
   } = useGetCounterById(staff?.assigned_counter);
   const navigation = useNavigation();
 
-  console.log("staff", staff);
+  console.log("staff", staff, counterDetail);
 
   const logOut = () => {
     setIsSignedIn(false);
@@ -30,28 +29,28 @@ export default function Setttings() {
     showSuccessMessage("Log Out Successfully!");
   };
 
-  useEffect(() => {
-    const fetchToken = async () => {
-      try {
-        const token = await getToken(); // Assuming getToken is a function to get token from AsyncStorage
-        if (token) {
-          const decodeToken = jwtDecode(token);
-          const currentTime = Math.floor(Date.now() / 1000);
-          if (currentTime < decodeToken.exp) {
-            // Assuming 'user_id' is the key in JWT payload containing user ID
-            // Extract user ID from token and do something with it if needed
-            const userId = decodeToken.user_id;
-            setuserId(userId); // Set user ID to state (if needed
-            // console.log("User ID from token:", userId);
-          }
-        }
-      } catch (error) {
-        console.log("Error fetching token:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchToken = async () => {
+  //     try {
+  //       const token = await getToken(); // Assuming getToken is a function to get token from AsyncStorage
+  //       if (token) {
+  //         const decodeToken = jwtDecode(token);
+  //         const currentTime = Math.floor(Date.now() / 1000);
+  //         if (currentTime < decodeToken.exp) {
+  //           // Assuming 'user_id' is the key in JWT payload containing user ID
+  //           // Extract user ID from token and do something with it if needed
+  //           const userId = decodeToken.user_id;
+  //           setuserId(userId); // Set user ID to state (if needed
+  //           // console.log("User ID from token:", userId);
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.log("Error fetching token:", error);
+  //     }
+  //   };
 
-    fetchToken();
-  }, []);
+  //   fetchToken();
+  // }, []);
 
   return (
     <View>
@@ -65,15 +64,15 @@ export default function Setttings() {
                   uri: "https://bootdey.com/img/Content/avatar/avatar6.png",
                 }}
               />
-              <Text style={styles.name}>{staff.name}</Text>
+              <Text style={styles.name}>{staff?.name}</Text>
 
-              <Text style={styles.userInfo}>{staff.email}</Text>
+              <Text style={styles.userInfo}>{staff?.email}</Text>
               <Text className="uppercase mt-3 font-bold tẽtx-lg">
-                {staff && staff.role === 0 ? "Quản lý" : "Nhân viên"}{" "}
+                {staff && staff?.role === 0 ? "Quản lý" : "Nhân viên"}{" "}
               </Text>
-              {staff && staff.role !== 0 && (
+              {staff && staff?.role === 1 && (
                 <View>
-                  {counterDetail ? (
+                  {/* {counterDetail ? (
                     <View className="flex-row mt-4">
                       <View className="flex-row">
                         <Text className="mr-3 text-lg font-bold text-gray-700">
@@ -101,14 +100,14 @@ export default function Setttings() {
                     </View>
                   ) : (
                     <View className="flex-row mt-4">
-                      <Text className="mr-3 font-semibold text-lg font-bold text-gray-700">
+                      <Text className="mr-3 font-semibold text-lg text-gray-700">
                         Quầy quản lý:
                       </Text>
                       <Text className="text-gray-700 text-lg  font-semibold mr-2">
                         Chưa được phân quyền
                       </Text>
                     </View>
-                  )}
+                  )} */}
                 </View>
               )}
             </View>

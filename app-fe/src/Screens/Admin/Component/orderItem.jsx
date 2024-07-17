@@ -73,7 +73,7 @@ const OrderItem = ({ item, index, info }) => {
     }
   };
 
-  const discountPrice = item?.discount * 1000;
+  const discountPrice = item?.discount;
 
   return (
     <View style={styles.orderRow}>

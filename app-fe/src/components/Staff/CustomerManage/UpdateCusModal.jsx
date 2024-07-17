@@ -16,7 +16,7 @@ import { DatePickerModal } from "react-native-paper-dates";
 import { useForm, Controller } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useCreateCustomer } from "../../../API/customerApi";
+import { useUpdateCustomer } from "../../../API/customerApi";
 
 const schema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
@@ -36,20 +36,30 @@ const schema = Yup.object().shape({
     .nullable(), // Add other fields validation as needed
 });
 
-export default function AddCusModal({
+export default function UpdateCusModal({
   modalVisibleAdd,
   closeModalAdd,
   openModalAdd,
+  item,
 }) {
-  // const [newCustomerData, setNewCustomerData] = useState({
-  //   name: "",
-  //   phone: "",
-  //   email: "",
-  //   dob: "",
-  // });
+  //   const [newCustomerData, setNewCustomerData] = useState({
+  //     name: item?.name,
+  //     phone: item?.phone,
+  //     email: item?.email,
+  //     dob: item?.dob,
+  //   });
+  console.log(item, "item");
   const [date, setDate] = useState("");
   const [open, setOpen] = useState(false);
-  const { mutate: createCustomer, isSuccess } = useCreateCustomer();
+  const { mutate: updateCustomer, isSuccess } = useUpdateCustomer();
+  // Assuming item might not have all the properties or could be undefined
+  const defaultValues = {
+    name: item?.name ?? "",
+    phone: item?.phone.replace(/^"(.*)"$/, "$1") ?? "",
+    email: item?.email ?? "",
+    dob: item?.dob ? new Date(item.dob) : null, // Convert string to Date object
+  };
+
   const {
     control,
     handleSubmit,
@@ -58,13 +68,14 @@ export default function AddCusModal({
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
+    defaultValues, // Set the default values for the form
   });
-  // const handleChange = (key, value) => {
-  //   setNewCustomerData({
-  //     ...newCustomerData,
-  //     [key]: value,
-  //   });
-  // };
+  //   const handleChange = (key, value) => {
+  //     setNewCustomerData({
+  //       ...newCustomerData,
+  //       [key]: value,
+  //     });
+  //   };
 
   const onDismissSingle = useCallback(() => {
     setOpen(false);
@@ -88,13 +99,15 @@ export default function AddCusModal({
   );
   const onSubmit = (data) => {
     console.log(data);
-    createCustomer(data);
+    updateCustomer({ customerId: item._id, updatedFields: data });
+
     // Handle your form submission logic here
   };
   useEffect(() => {
     if (isSuccess) {
+      console.log("success");
       closeModalAdd();
-      reset();
+      // reset();
     }
   }, [isSuccess]);
   return (
@@ -102,9 +115,9 @@ export default function AddCusModal({
       <View className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-black bg-opacity-50">
         <View className="bg-white p-5 rounded-lg w-full max-w-xs">
           <Title className="font-semibold text-center text-xl mb-4 text-[#ccac00]">
-            Them Khach Hang Moi
+            Chỉnh Sửa Khách Hàng
           </Title>
-          <Text className="text-slate-500">Ten Khach Hang</Text>
+          <Text className="text-slate-500">Tên Khách Hàng</Text>
           <Controller
             control={control}
             name="name"
@@ -138,7 +151,7 @@ export default function AddCusModal({
           {errors.email && (
             <Text className="text-red-500">{errors.email.message}</Text>
           )}
-          <Text className="text-slate-500">So Dien Thoai</Text>
+          <Text className="text-slate-500">Số Điện Thoại</Text>
           <Controller
             control={control}
             name="phone"
@@ -155,7 +168,7 @@ export default function AddCusModal({
           {errors.phone && (
             <Text className="text-red-500">{errors.phone.message}</Text>
           )}
-          <Text className="text-slate-500">Ngay Sinh</Text>
+          <Text className="text-slate-500">Ngày Sinh</Text>
 
           <Controller
             control={control}
@@ -172,7 +185,7 @@ export default function AddCusModal({
                   onPress={() => setOpen(true)}
                   className="text-white text-center bg-purple-400 ml-3 text-sm p-1 rounded-xl w-1/3"
                 >
-                  Select Date
+                  Chọn ngày
                 </TouchableOpacity>
                 <DatePickerModal
                   locale="en"
@@ -192,7 +205,7 @@ export default function AddCusModal({
             className="bg-[#ccac00] p-2.5 rounded-md mt-2.5 w-full items-center"
             onPress={handleSubmit(onSubmit)}
           >
-            <Text className="text-white">Thêm Khach Hang</Text>
+            <Text className="text-white">Sửa Thông Tin</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.cancelButton} onPress={closeModalAdd}>
             <Text style={styles.buttonText}>Hủy</Text>

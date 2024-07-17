@@ -8,10 +8,20 @@ import {
 import { useMakerOrder } from "../../../API/order.js";
 import OrderCard from "../../../components/Staff/OrderManage/OrderCard.jsx";
 import { useNavigation } from "@react-navigation/native";
+import { Feather } from "@expo/vector-icons";
 
 const OrderManagementScreen = () => {
-  const { customer, order_details, subtotal, discount, total, applyDiscount } =
-    useCartStore();
+  const {
+    customer,
+    order_details,
+    subtotal,
+    discount,
+    total,
+    applyDiscount,
+    increaseDiscount,
+    decreaseDiscount,
+    setCustomer,
+  } = useCartStore();
   const { mutate: makerOrder } = useMakerOrder();
   const navigation = useNavigation();
 
@@ -19,7 +29,7 @@ const OrderManagementScreen = () => {
     const checkOut = {
       customer_id: customer._id,
       order_details: order_details,
-      discount: discount * 1000,
+      discount: discount,
       subtotal: subtotal,
       total: total,
     };
@@ -46,6 +56,23 @@ const OrderManagementScreen = () => {
       applyDiscount(0);
     }
   };
+  const handleDecreaseDiscount = () => {
+    console.log("decrease");
+    decreaseDiscount();
+  };
+
+  const handleIncreaseDiscount = () => {
+    console.log(
+      "increase",
+      discount + 100000,
+      customer.points * 1000,
+      discount + 100000 < customer.points * 1000
+    );
+    if (customer.points > 100 && discount + 100000 < customer.points * 1000) {
+      console.log("increase", discount, customer.points);
+      increaseDiscount();
+    }
+  };
   return (
     <View className="flex bg-white h-full">
       <Text className=" text-2xl font-bold my-6 text-center">Tạo Đơn Hàng</Text>
@@ -61,16 +88,21 @@ const OrderManagementScreen = () => {
           </TouchableOpacity>
         </View>
       ) : (
-        <View className="mb-3 ">
-          <Text className="ml-3 my-1 text-base">
-            Tên Khách Hang: {customer.name}
-          </Text>
-          <Text className="ml-3 mb-1 text-sm text-slate-500">
-            Số điện thoại: {customer.phone}
-          </Text>
-          <Text className="ml-3 mb-1 text-sm text-slate-500">
-            Email: {customer.email}
-          </Text>
+        <View className="flex flex-row">
+          <View className="mb-3">
+            <Text className="ml-3 my-1 text-base">
+              Tên Khách Hang: {customer.name}
+            </Text>
+            <Text className="ml-3 mb-1 text-sm text-slate-500">
+              Số điện thoại: {customer.phone}
+            </Text>
+            <Text className="ml-3 mb-1 text-sm text-slate-500">
+              Email: {customer.email}
+            </Text>
+          </View>
+          <TouchableOpacity onPress={() => setCustomer("")}>
+            <Feather name="x-circle" size={21} color="red"></Feather>
+          </TouchableOpacity>
         </View>
       )}
 
@@ -106,50 +138,69 @@ const OrderManagementScreen = () => {
           <FlatList
             data={order_details}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              // Your component or JSX to render each item
-              <OrderCard item={item} />
-            )}
+            renderItem={({ item }) => <OrderCard item={item} />}
+            ListFooterComponent={() =>
+              customer !== "" && order_details.length > 0 ? (
+                <View className="flex-1 items-end m-5 mb-5">
+                  <Text className="mx-3 my-1 text-lg">
+                    Tạm Tính:{" "}
+                    {(Math.round(subtotal / 1000) * 1000).toLocaleString()}đ
+                  </Text>
+                  <View className="w-2/3 flex flex-row">
+                    <View className="w-1/3">
+                      <Text className="text-center text-base text-slate-500">
+                        Giảm giá:{" "}
+                      </Text>
+                    </View>
+                    <View className="w-1/6 flex item-center mx-auto">
+                      <TouchableOpacity
+                        onPress={handleDecreaseDiscount}
+                        className="flex item-center mx-auto  mt-1"
+                      >
+                        <Feather
+                          name="minus"
+                          size={13}
+                          className="text-center"
+                          color={"red"}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <View className="w-1/3">
+                      <Text className="text-center text-base text-orange-500">
+                        {discount.toLocaleString()}đ
+                      </Text>
+                    </View>
+                    <View className="w-1/6 flex item-center mx-auto">
+                      <TouchableOpacity
+                        onPress={handleIncreaseDiscount}
+                        className="flex item-center mx-auto  mt-1"
+                      >
+                        <Feather
+                          name="plus"
+                          size={13}
+                          className="text-center"
+                          color={"green"}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  <Text className="mx-3 my-1 text-xs text-slate-500">
+                    Tối đa: {(customer.points * 1000).toLocaleString()}đ
+                  </Text>
+                  <Text className="m-3 text-xl ">
+                    Tổng tiền:{" "}
+                    {(Math.round(total / 1000) * 1000).toLocaleString()}
+                  </Text>
+                  <TouchableOpacity onPress={CheckOut}>
+                    <Text className="bg-yellow-500 font-bold text-white text-lg px-3 py-2 rounded-xl">
+                      Thanh Toán
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ) : null
+            }
           />
         </>
-      )}
-      {customer !== "" && order_details.length > 0 ? (
-        <View className="flex-1 items-end m-5 mb-5">
-          <Text className="mx-3 my-1 text-lg">
-            Tạm Tính: {(Math.round(subtotal / 1000) * 1000).toLocaleString()}đ
-          </Text>
-          {/* <View className="flex justify-end"> */}
-          <Text className="mx-3 text-base text-slate-400">
-            Giảm giá:
-            {customer.points > 0
-              ? (customer.points * 1000).toLocaleString() + "đ"
-              : "0"}
-          </Text>
-          <TouchableOpacity className="" onPress={() => setDiscount()}>
-            {customer.points > 100 && discount === 0 ? (
-              <Text className=" bg-orange-500 text-xs rounded-xl px-3 py-1 text-white font-bold">
-                Áp Dụng
-              </Text>
-            ) : customer.points < 100 ? (
-              ""
-            ) : (
-              <Text className=" bg-white-500 border-[1px] border-red-500 text-xs rounded-xl px-3 py-1 text-red-500 font-bold">
-                Bỏ Áp Dụng
-              </Text>
-            )}
-          </TouchableOpacity>
-          {/* </View> */}
-          <Text className="m-3 text-xl ">
-            Tổng tiền: {(Math.round(total / 1000) * 1000).toLocaleString()}
-          </Text>
-          <TouchableOpacity onPress={() => CheckOut()}>
-            <Text className="bg-yellow-500 font-bold text-white text-lg px-3 py-2 rounded-xl">
-              Thanh Toán
-            </Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        ""
       )}
     </View>
   );

@@ -134,28 +134,31 @@ class OrderServices {
     }
 
     if (order.paymentStatus === PaymentStatus.Paid) {
-      const updatedOrder = await databaseService.orders.findOneAndUpdate(
-        { _id: new ObjectId(order_id) },
-        {
-          $set: {
-            paymentStatus: PaymentStatus.Cancelled,
-            total: order.total * -1,
-          },
-          $currentDate: { updated_at: true },
-        },
-        {
-          returnDocument: "after",
-        }
+      throw new ErrorWithStatus(
+        "Cannot cancel paid order",
+        HTTP_STATUS.BAD_REQUEST
       );
-      return updatedOrder;
     }
+
+    // Calculate the points to revert
+    const addedPoints = Math.floor(order.total / 100000);
+    let pointsToRevert = addedPoints;
+    if (order.discount > 0) {
+      const discountPoints = Math.floor(order.discount / 100000) * 100;
+      pointsToRevert -= discountPoints; // Subtracting because discountPoints is negative
+    }
+
+    // Revert points to the customer
+    await databaseService.customers.updateOne(
+      { _id: new ObjectId(order.customer_id) },
+      { $inc: { points: -pointsToRevert } } // Use negative to revert the points
+    );
 
     const updatedOrder = await databaseService.orders.findOneAndUpdate(
       { _id: new ObjectId(order_id) },
       {
         $set: {
           paymentStatus: PaymentStatus.Cancelled,
-          total: 0,
         },
         $currentDate: { updated_at: true },
       },
