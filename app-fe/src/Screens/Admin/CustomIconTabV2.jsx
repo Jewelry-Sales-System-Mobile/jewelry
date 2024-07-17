@@ -12,6 +12,7 @@ const CustomTabIconV2 = ({ uri, isFocused }) => {
     <View
       style={{
         display: "flex",
+        flexDirection:"column",
         justifyContent: "center",
         alignItems: "center",
         height: isFocused ? 56 : 36,
